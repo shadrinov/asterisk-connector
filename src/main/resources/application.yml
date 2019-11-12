@@ -1,0 +1,23 @@
+connector:
+   ami-config:
+   rules:
+      - events:
+         - Join
+         - AgentCalled
+        action:
+           type: rest
+           url: https://devel.ntechs/vtiger.php
+        data:
+           channelId: $Join(chanid)
+           callerid: $Join()
+           agentcalled: $AgentCalled(member)
+      - events:
+         - Join
+         - AgentCalled
+        action:
+           type: rest
+           url: https://devel.ntechs/vtiger.php
+        data:
+           channelId: $Join(chanid)
+           callerid: $Join()
+           agentcalled: $AgentCalled(member)
