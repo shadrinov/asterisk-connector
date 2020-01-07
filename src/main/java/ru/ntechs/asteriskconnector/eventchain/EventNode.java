@@ -1,41 +1,40 @@
 package ru.ntechs.asteriskconnector.eventchain;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 
+@Slf4j
 public class EventNode {
 	private Message message;
 	private EventNode next;
-	private EventNode head;
-	private EventNode tail;
-	private Integer ticks;
+	private EventNode prev;
+	private int ticks;
 
-	public EventNode(Integer ticks, Message message) {
+	public EventNode(int birthTicks, Message message) {
 		super();
 
 		this.message = message;
+		this.ticks = birthTicks;
 		this.next = null;
-		this.head = this;
-		this.tail = this;
-		this.ticks = ticks;
+		this.prev = null;
 	}
 
-	public EventNode(Integer ticks, Message message, EventNode ancestor) {
+	public EventNode(int birthTicks, Message message, EventNode ancestor) {
 		super();
 
-		synchronized (ancestor.head) {
+		while (ancestor.next != null) {
+			log.warn("ancestor EventNode is not tail... searching for tail...");
+			ancestor = ancestor.next;
+		}
+
+		synchronized (ancestor) {
 			this.message = message;
 			this.next = null;
-			this.head = ancestor.head;
-			this.tail = null;
-			this.ticks = ticks;
+			this.prev = ancestor;
+			this.ticks = birthTicks;
 
-			head.tail.next = this;
-			head.tail = this;
+			ancestor.next = this;
 		}
-	}
-
-	public EventNode getHead() {
-		return head;
 	}
 
 	public Message getMessage() {
@@ -46,11 +45,24 @@ public class EventNode {
 		return next;
 	}
 
-	public EventNode getTail() {
-		return tail;
+	public EventNode getPrev() {
+		return prev;
 	}
 
 	public Integer getTicks() {
 		return ticks;
+	}
+
+	public EventNode split() {
+		EventNode newHead = next;
+
+		if (next != null) {
+			synchronized (next) {
+				next.prev = null;
+				next = null;
+			}
+		}
+
+		return newHead;
 	}
 }

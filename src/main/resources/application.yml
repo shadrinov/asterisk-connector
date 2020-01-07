@@ -8,16 +8,28 @@ connector:
            type: rest
            url: https://devel.ntechs/vtiger.php
         data:
-           channelId: $Join(chanid)
-           callerid: $Join()
-           agentcalled: $AgentCalled(member)
+           channelId: ${Join(chanid)}
+           callerid: ${Join()}
+           agentcalled: ${AgentCalled(member)}
       - events:
-         - Join
+         - AgentRingNoAnswer
          - AgentCalled
+         - Leave
         action:
            type: rest
            url: https://devel.ntechs/vtiger.php
         data:
-           channelId: $Join(chanid)
-           callerid: $Join()
-           agentcalled: $AgentCalled(member)
+           channelId: ${Join(chanid)}
+           callerid: ${Join()}
+           agentcalled: ${AgentCalled(member)}
+      - events:
+         - RTCPReceived
+         - RTCPSent
+         - RTCPReceived
+        action:
+           type: rest
+           url: https://devel.ntechs/vtiger.php
+        data:
+           channelId: ${Join(chanid)}
+           callerid: ${Join()}
+           agentcalled: ${AgentCalled(member)}
