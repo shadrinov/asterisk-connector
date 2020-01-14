@@ -34,23 +34,21 @@ public class EventChain {
 		else
 			tailEvent = new EventNode(birthTicks, message, tailEvent);
 
-		log.info(String.format("Testing against message: %s", message.getName()));
-
 		for (int index = 0; index < rules.size(); index++) {
 			List<String> eventNames = rules.get(index).getEvents();
 
 			log.info(String.format("Expected sequence: %s", eventNames.toString()));
-			log.info(String.format("Testing rulesProgress.get(index): %d", rulesProgress.get(index)));
-			log.info(String.format("Testing eventNames.get(rulesProgress.get(index)): %s", eventNames.get(rulesProgress.get(index))));
-			log.info(String.format("Testing message.getName(): %s", message.getName()));
+			log.info(String.format("Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
 
 			if (eventNames.get(rulesProgress.get(index)).equalsIgnoreCase(message.getName())) {
 				rulesProgress.set(index, rulesProgress.get(index) + 1);
 
 				if (rulesProgress.get(index) >= rules.get(index).getEvents().size()) {
-					log.info(String.format("MATCH! Executing action: %s: %s", rules.get(index).getAction().getType(), rules.get(index).getAction().getUrl()));
+					log.info(String.format("Result: MATCH! Executing action: %s: %s", rules.get(index).getAction().getType(), rules.get(index).getAction().getUrl()));
 					rulesProgress.set(index, 0);
 				}
+				else
+					log.info(String.format("Result: PROGRESS! Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
 			}
 		}
 
