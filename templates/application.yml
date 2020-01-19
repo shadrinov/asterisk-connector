@@ -1,12 +1,15 @@
 connector:
    ami-config:
+   bitrix:
+      api: https://ntechs.bitrix24.ru/rest/telephony.externalLine.get
+      clientid: clientid
+      clientkey: clientkey
    rules:
       - events:
          - Join
-         - AgentCalled
         action:
            type: rest
-           url: https://devel.ntechs/vtiger.php
+           url: https://ntechs.bitrix24.ru/rest/telephony.externalcall.register
         data:
            channelId: ${Join(chanid)}
            callerid: ${Join()}

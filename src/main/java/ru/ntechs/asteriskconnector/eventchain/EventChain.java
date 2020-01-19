@@ -5,20 +5,22 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
-import ru.ntechs.asteriskconnector.config.ConnectorEvent;
+import ru.ntechs.asteriskconnector.config.ConnectorRule;
 
 @Slf4j
 public class EventChain {
 	private EventNode tailEvent;
 	private EventNode headEvent;
-	private List<ConnectorEvent> rules;
+	private ConnectorRule lastMatched;
+	private List<ConnectorRule> rules;
 	private ArrayList<Integer> rulesProgress;
 
-	EventChain(List<ConnectorEvent> rules) {
+	EventChain(List<ConnectorRule> rules) {
 		super();
 
 		this.tailEvent = null;
 		this.headEvent = null;
+		this.lastMatched = null;
 		this.rules = rules;
 		this.rulesProgress = new ArrayList<>(rules.size());
 
@@ -37,14 +39,15 @@ public class EventChain {
 		for (int index = 0; index < rules.size(); index++) {
 			List<String> eventNames = rules.get(index).getEvents();
 
-			log.info(String.format("Expected sequence: %s", eventNames.toString()));
-			log.info(String.format("Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
+//			log.info(String.format("Expected sequence: %s", eventNames.toString()));
+//			log.info(String.format("Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
 
 			if (eventNames.get(rulesProgress.get(index)).equalsIgnoreCase(message.getName())) {
 				rulesProgress.set(index, rulesProgress.get(index) + 1);
 
 				if (rulesProgress.get(index) >= rules.get(index).getEvents().size()) {
 					log.info(String.format("Result: MATCH! Executing action: %s: %s", rules.get(index).getAction().getType(), rules.get(index).getAction().getUrl()));
+					lastMatched = rules.get(index);
 					rulesProgress.set(index, 0);
 				}
 				else
@@ -60,10 +63,7 @@ public class EventChain {
 	}
 
 	public int getTailBirthTicks() {
-		if (tailEvent != null)
-			return tailEvent.getTicks();
-		else
-			return 0;
+		return (tailEvent != null) ? tailEvent.getTicks() : 0;
 	}
 
 	public String getUniqueId() {
@@ -80,6 +80,13 @@ public class EventChain {
 
 		if (headEvent == null)
 			tailEvent = null;
+	}
+
+	public ConnectorRule getLastMatched() {
+		ConnectorRule result = lastMatched;
+		lastMatched = null;
+
+		return result;
 	}
 
 	@Override

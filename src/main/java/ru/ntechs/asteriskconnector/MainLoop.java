@@ -6,23 +6,18 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.AMI;
 import ru.ntechs.ami.Message;
-import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
 @Slf4j
 @Component
 public class MainLoop {
+	@Autowired
 	private EventDispatcher eventDispatcher;
 
 	@Autowired
 	private AMI ami;
 
-	@Autowired
-	private ConnectorConfig config;
-
 	public void run() throws Exception {
-		eventDispatcher = new EventDispatcher(config);
-
 		ami.addHandler("Join", message -> { OnJoin(message); });
 		ami.addHandler("Leave", message -> { OnLeave(message); });
 		ami.addHandler("AgentCalled", message -> { onAgentCalled(message); });
@@ -30,11 +25,11 @@ public class MainLoop {
 		ami.addHandler("AgentConnect", message -> { onAgentConnect(message); });
 		ami.addHandler("AgentComplete", message -> { onAgentComplete(message); });
 
-		ami.addHandler("RTCPSent", message -> { onRTCPSent(message); });
-		ami.addHandler("RTCPReceived", message -> { onRTCPReceived(message); });
+//		ami.addHandler("RTCPSent", message -> { onRTCPSent(message); });
+//		ami.addHandler("RTCPReceived", message -> { onRTCPReceived(message); });
 
 		while (true) {
-			log.info("--- garbage collection iteration ---");
+//			log.info("--- garbage collection iteration ---");
 
 			eventDispatcher.collectGarbage();
 			Thread.sleep(1000);

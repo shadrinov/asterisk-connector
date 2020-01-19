@@ -30,4 +30,5 @@ target/
 .settings
 .project
 
-/application.properties
+application.properties
+application.yml

@@ -3,11 +3,16 @@ package ru.ntechs.asteriskconnector.eventchain;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
+import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
 @Slf4j
+@Component
 public class EventDispatcher {
 	final static int EVENT_LIFETIME = 600;
 
@@ -17,9 +22,10 @@ public class EventDispatcher {
 
 	private ConnectorConfig config;
 
-	public EventDispatcher(ConnectorConfig config) {
-		super();
+	@Autowired
+	private BitrixTelephony bitrixTelephony;
 
+	public EventDispatcher(ConnectorConfig config) {
 		this.tickCount = 0;
 		this.chains = new ConcurrentHashMap<>();
 		this.config = config;
@@ -43,13 +49,18 @@ public class EventDispatcher {
 			eventChain = unmappableEvents;
 
 		eventChain.enqueue(tickCount, msg);
+
+//		ConnectorRule rule = eventChain.getLastMatched();
+
+//		if (rule != null)
+//			bitrixTelephony.registerCall();
 	}
 
 	public void collectGarbage() {
 		tickCount++;
 
 		for (Entry<String, EventChain> chainEntry : chains.entrySet()) {
-			log.info(chainEntry.getValue().toString());
+//			log.info(chainEntry.getValue().toString());
 
 			if ((tickCount - chainEntry.getValue().getTailBirthTicks()) > EVENT_LIFETIME)
 				chains.remove(chainEntry.getKey());
@@ -57,7 +68,7 @@ public class EventDispatcher {
 
 		unmappableEvents.garbageCollect(tickCount - EVENT_LIFETIME);
 
-		if (!unmappableEvents.isEmpty())
-			log.info(unmappableEvents.toString());
+//		if (!unmappableEvents.isEmpty())
+//			log.info(unmappableEvents.toString());
 	}
 }

@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ConnectorAction {
-	private String type;
-	private String url;
-	private String method;
+public class ConnectorBitrix {
+	private String api;
+	private String clientId;
+	private String clientKey;
 }

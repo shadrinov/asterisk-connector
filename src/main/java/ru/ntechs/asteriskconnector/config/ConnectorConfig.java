@@ -13,5 +13,6 @@ import lombok.Setter;
 @Configuration
 @ConfigurationProperties(prefix = "connector")
 public class ConnectorConfig {
-	private List<ConnectorEvent> rules;
+	private ConnectorBitrix bitrix;
+	private List<ConnectorRule> rules;
 }
