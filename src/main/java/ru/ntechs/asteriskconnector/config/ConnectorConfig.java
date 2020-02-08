@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,5 +15,5 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "connector")
 public class ConnectorConfig {
 	private ConnectorBitrix bitrix;
-	private List<ConnectorRule> rules;
+	private List<ConnectorRule> rules = new ArrayList<ConnectorRule>();  // NPE happens otherwise
 }
