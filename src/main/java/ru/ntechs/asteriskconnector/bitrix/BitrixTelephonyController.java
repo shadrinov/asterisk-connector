@@ -20,6 +20,11 @@ public class BitrixTelephonyController {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
 
+	@RequestMapping(method = RequestMethod.POST, path = "/say")
+	public String say(@RequestBody String name) {
+	    return "Say";
+	}
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 	public @ResponseBody User getUserById(@PathVariable String id) {
 		User user = new User();
