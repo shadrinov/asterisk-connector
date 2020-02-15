@@ -3,15 +3,11 @@ package ru.ntechs.asteriskconnector.eventchain;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
-import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
-@Slf4j
 @Component
 public class EventDispatcher {
 	final static int EVENT_LIFETIME = 600;
@@ -21,9 +17,6 @@ public class EventDispatcher {
 	private int tickCount;
 
 	private ConnectorConfig config;
-
-	@Autowired
-	private BitrixTelephony bitrixTelephony;
 
 	public EventDispatcher(ConnectorConfig config) {
 		this.tickCount = 0;

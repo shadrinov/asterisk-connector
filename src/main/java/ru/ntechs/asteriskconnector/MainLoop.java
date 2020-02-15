@@ -66,13 +66,13 @@ public class MainLoop {
 		eventDispatcher.dispatch(message);
 	}
 
-	private void onRTCPReceived(Message message) {
-		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
-		eventDispatcher.dispatch(message);
-	}
-
-	private void onRTCPSent(Message message) {
-		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
-		eventDispatcher.dispatch(message);
-	}
+//	private void onRTCPReceived(Message message) {
+//		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
+//		eventDispatcher.dispatch(message);
+//	}
+//
+//	private void onRTCPSent(Message message) {
+//		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
+//		eventDispatcher.dispatch(message);
+//	}
 }

@@ -1,6 +1,7 @@
 package ru.ntechs.asteriskconnector.bitrix;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.ClientHttpResponse;
@@ -9,10 +10,10 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephonyLine;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventBind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineAdd;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineGet;
-import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestTemplate;
 import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
 @Slf4j
@@ -29,7 +30,6 @@ public class BitrixTelephony {
 
 		restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new ResponseErrorHandler() {
-
 			@Override
 			public boolean hasError(ClientHttpResponse response) throws IOException {
 				log.info(String.format("RestTemplate.hasError(): %d %s", response.getStatusCode().value(), response.getStatusText()));
@@ -41,6 +41,11 @@ public class BitrixTelephony {
 				log.info(String.format("RestTemplate.handleError(): %d %s", response.getStatusCode().value(), response.getStatusText()));
 			}
 		});
+
+		restTemplate.getInterceptors().add(new LoggingRequestInterceptor());
+//		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+//		interceptors.add(new LoggingRequestInterceptor());
+//		restTemplate.setInterceptors(interceptors);
 	}
 
 	public void installAuth(BitrixEvent be) {
@@ -56,33 +61,16 @@ public class BitrixTelephony {
 	    log.info(result);
 	}
 
-	public void getExternalLine() {
-		RestRequestTemplate req;
-		String msg;
-
-		req = new RestRequestExternalLineGet(bitrixAuth);
-		log.info(String.format("Executing: %s", req.getMethod()));
-		msg = restTemplate.postForObject(bitrixAuth.getMethodUri(req.getMethod()), req, String.class);
-		log.info(msg);
-
-		req = new RestRequestExternalLineAdd(bitrixAuth, "679606");
-		log.info(String.format("Executing: %s", req.getMethod()));
-		msg = restTemplate.postForObject(bitrixAuth.getMethodUri(req.getMethod()), req, String.class);
-		log.info(msg);
-
-		req = new RestRequestExternalLineAdd(bitrixAuth, "679618");
-		log.info(String.format("Executing: %s", req.getMethod()));
-		msg = restTemplate.postForObject(bitrixAuth.getMethodUri(req.getMethod()), req, String.class);
-		log.info(msg);
+	public ArrayList<TelephonyLine> getExternalLine() throws BitrixRestApiException {
+		return new RestRequestExternalLineGet(bitrixAuth).exec().getResult();
 	}
 
-	public void bindEvent(BitrixEvent be) {
-		RestRequestTemplate req;
-		String msg;
+	public void addExternalLine() throws BitrixRestApiException {
+		new RestRequestExternalLineAdd(bitrixAuth, 679606, "Сетевые технологии").exec();
+		new RestRequestExternalLineAdd(bitrixAuth, 679618, "ИнТехСнаб").exec();
+	}
 
-		req = new RestRequestEventBind(bitrixAuth);
-		log.info(String.format("Executing: %s", req.getMethod()));
-		msg = restTemplate.postForObject(bitrixAuth.getMethodUri(req.getMethod()), req, String.class);
-		log.info(msg);
+	public void bindEvent(String event, String handler) throws BitrixRestApiException {
+		new RestRequestEventBind(bitrixAuth, event, handler).exec();
 	}
 }

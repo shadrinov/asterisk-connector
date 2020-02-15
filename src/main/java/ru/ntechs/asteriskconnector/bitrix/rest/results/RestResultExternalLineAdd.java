@@ -9,6 +9,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestResultExternalLineAdd extends RestResultTemplate {
+public class RestResultExternalLineAdd extends RestResult {
 	private ArrayList<String> result;
 }

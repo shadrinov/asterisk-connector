@@ -1,4 +1,4 @@
-package ru.ntechs.asteriskconnector;
+package ru.ntechs.asteriskconnector.bitrix;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -21,6 +21,7 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+//@Component
 public class RequestAndResponseLoggingFilter extends OncePerRequestFilter {
     private static final List<MediaType> VISIBLE_TYPES = Arrays.asList(
         MediaType.valueOf("text/*"),

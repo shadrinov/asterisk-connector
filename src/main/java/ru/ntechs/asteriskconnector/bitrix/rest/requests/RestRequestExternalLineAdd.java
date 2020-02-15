@@ -12,12 +12,16 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 @ToString(callSuper = true)
 public class RestRequestExternalLineAdd extends RestRequestTemplate {
 	@JsonProperty("NUMBER")
-	private String number;
+	private Integer number;
 
-	public RestRequestExternalLineAdd(BitrixAuth auth, String number) {
+	@JsonProperty("NAME")
+	private String name;
+
+	public RestRequestExternalLineAdd(BitrixAuth auth, Integer number, String name) {
 		super(auth);
 
 		this.number = number;
+		this.name = name;
 	}
 
 	@Override

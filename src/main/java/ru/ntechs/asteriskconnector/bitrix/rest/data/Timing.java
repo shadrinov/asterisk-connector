@@ -1,4 +1,4 @@
-package ru.ntechs.asteriskconnector.bitrix.rest.results;
+package ru.ntechs.asteriskconnector.bitrix.rest.data;
 
 import java.util.Date;
 
@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class RestResultTiming {
+public class Timing {
 	private Float start;
 	private Float finish;
 	private Float duration;

@@ -11,6 +11,7 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestEventBind extends RestRequestTemplate {
+	private String event;
 	private String handler;
 
 	@JsonProperty("auth_type")
@@ -19,8 +20,12 @@ public class RestRequestEventBind extends RestRequestTemplate {
 	@JsonProperty("event_type")
 	private String eventType;
 
-	public RestRequestEventBind(BitrixAuth auth) {
+	public RestRequestEventBind(BitrixAuth auth, String event, String handler) {
 		super(auth);
+
+		this.event = event;
+		this.handler = handler;
+		this.eventType = "online";
 	}
 
 	@Override

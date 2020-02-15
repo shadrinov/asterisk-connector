@@ -20,11 +20,6 @@ public class BitrixTelephonyController {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
 
-	@RequestMapping(method = RequestMethod.POST, path = "/say")
-	public String say(@RequestBody String name) {
-	    return "Say";
-	}
-	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 	public @ResponseBody User getUserById(@PathVariable String id) {
 		User user = new User();
@@ -72,29 +67,39 @@ public class BitrixTelephonyController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/")
-	public @ResponseBody String appPage(@RequestBody MultiValueMap<String, String> params) throws Exception {
+	public @ResponseBody String appPage(@RequestBody MultiValueMap<String, String> params) {
 		return "this is start page";
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/event")
-	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) throws Exception {
+	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
 		BitrixEvent be = new BitrixEvent(params);
 		log.info(be.toString());
 
-		switch (be.getEvent()) {
-		case ("ONAPPINSTALL"):
-			log.info("Handling event: " + be.getEvent());
-			bitrixTelephony.installAuth(be);
+		try {
+			switch (be.getEvent()) {
+				case ("ONAPPINSTALL"):
+					log.info("Handling event: " + be.getEvent());
+					bitrixTelephony.installAuth(be);
 
-			bitrixTelephony.bindEvent(be);
-			break;
+					try {
+						bitrixTelephony.bindEvent("OnExternalCallStart", "https://ntechs.bitrix24.ru/rest/onExternalCallStart");
+					} catch (BitrixRestApiException e) {
+						log.info(e.getMessage());
+						log.info("It is nessesary to unbind all events and rebind actual");
+					}
 
-		default:
-			log.info("Unhandled event: " + be.getEvent());
-			break;
+					bitrixTelephony.getExternalLine();
+					break;
+
+				default:
+					log.info("Unhandled event: " + be.getEvent());
+					break;
+			}
+		} catch (BitrixRestApiException e) {
+			log.info(e.getMessage());
 		}
 
-		bitrixTelephony.getExternalLine();
-		return "hello";
+		return null;
 	}
 }

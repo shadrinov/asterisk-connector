@@ -22,7 +22,7 @@ public class EventChain {
 		this.headEvent = null;
 		this.lastMatched = null;
 		this.rules = rules;
-		this.rulesProgress = new ArrayList<>(1024); // NPE happens otherwise
+		this.rulesProgress = new ArrayList<>(rules.size());
 
 		for (int index = 0; index < rules.size(); index++)
 			rulesProgress.add(0);
