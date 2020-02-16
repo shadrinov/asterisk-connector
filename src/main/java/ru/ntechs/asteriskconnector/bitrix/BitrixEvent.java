@@ -85,6 +85,17 @@ public class BitrixEvent {
 		this.dataVersion = (getValue(data, "data[VERSION]") != null) ? Integer.valueOf(getValue(data, "data[VERSION]")) : null;
 		this.dataLanguageId = getValue(data, "data[LANGUAGE_ID]");
 
+		// data[PHONE_NUMBER]=[34],
+		// data[PHONE_NUMBER_INTERNATIONAL]=[34],
+		// data[EXTENSION]=[],
+		// data[USER_ID]=[7],
+		// data[CALL_LIST_ID]=[0],
+		// data[LINE_NUMBER]=[679606],
+		// data[IS_MOBILE]=[0],
+		// data[CALL_ID]=[externalCall.4c5e2d96ded95ecd628e2cfc325d7cdf.1581860751],
+		// data[CRM_ENTITY_TYPE]=[LEAD],
+		// data[CRM_ENTITY_ID]=[29]
+
 		this.authAccessToken = getValue(data, "auth[access_token]");
 		this.authExpires = (getValue(data, "auth[expires]") != null) ? Integer.valueOf(getValue(data, "auth[expires]")) : null;
 		this.authExpiresIn = (getValue(data, "auth[expires_in]") != null) ? Integer.valueOf(getValue(data, "auth[expires_in]")) : null;

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
+import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
+import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 
 @Getter
 @Setter
@@ -31,5 +33,9 @@ public class RestRequestEventBind extends RestRequestTemplate {
 	@Override
 	public String getMethod() {
 		return "event.bind";
+	}
+
+	public RestResult exec() throws BitrixRestApiException {
+		return exec(RestResult.class);
 	}
 }

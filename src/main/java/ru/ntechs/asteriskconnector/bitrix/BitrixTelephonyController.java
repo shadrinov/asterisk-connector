@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephonyLine;
 
 @Slf4j
 @RestController
@@ -75,25 +77,41 @@ public class BitrixTelephonyController {
 	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
 		BitrixEvent be = new BitrixEvent(params);
 		log.info(be.toString());
+		log.info(params.toString());
 
 		try {
 			switch (be.getEvent()) {
 				case ("ONAPPINSTALL"):
-					log.info("Handling event: " + be.getEvent());
+					log.info("Handling event: {}", be.getEvent());
 					bitrixTelephony.installAuth(be);
 
-					try {
-						bitrixTelephony.bindEvent("OnExternalCallStart", "https://ntechs.bitrix24.ru/rest/onExternalCallStart");
-					} catch (BitrixRestApiException e) {
-						log.info(e.getMessage());
-						log.info("It is nessesary to unbind all events and rebind actual");
+					for (Event event : bitrixTelephony.getEvent()) {
+						if (!event.getEvent().equalsIgnoreCase("ONAPPINSTALL")) {
+							log.info("Unbind event {}: {}", event.getEvent(), event.getHandler());
+							bitrixTelephony.unbindEvent(event);
+						}
 					}
 
-					bitrixTelephony.getExternalLine();
+					for (TelephonyLine telephonyLine : bitrixTelephony.getExternalLine()) {
+						log.info("Deleting external line {}: {}", telephonyLine.getNumber(), telephonyLine.getName());
+						bitrixTelephony.deleteExternalLine(telephonyLine);
+					}
+
+					bitrixTelephony.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
+
+					bitrixTelephony.addExternalLine(679606, "Сетевые технологии");
+					bitrixTelephony.addExternalLine(679618, "ИнТехСнаб");
+
+					log.info(bitrixTelephony.getEvent().toString());
+					log.info(bitrixTelephony.getExternalLine().toString());
+					break;
+
+				case ("ONEXTERNALCALLSTART"):
+					log.info("Handling event: {}", be.getEvent());
 					break;
 
 				default:
-					log.info("Unhandled event: " + be.getEvent());
+					log.info("Unhandled event: {}", be.getEvent());
 					break;
 			}
 		} catch (BitrixRestApiException e) {

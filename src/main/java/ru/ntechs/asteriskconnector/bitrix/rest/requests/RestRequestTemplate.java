@@ -61,8 +61,8 @@ public abstract class RestRequestTemplate {
 
 	public abstract String getMethod();
 
-	public RestResult exec() throws BitrixRestApiException {
-		ResponseEntity<RestResult> response = restTemplate.postForEntity(auth.getMethodUri(getMethod()), this, RestResult.class);
+	protected <T extends RestResult> T exec(Class<T> result) throws BitrixRestApiException {
+		ResponseEntity<T> response = restTemplate.postForEntity(auth.getMethodUri(getMethod()), this, result);
 
 		String msg = formatErrorMessage(response.getStatusCode(), response.getBody());
 		log.debug(msg);
@@ -71,6 +71,12 @@ public abstract class RestRequestTemplate {
 			throw new BitrixRestApiException(msg);
 
 		return response.getBody();
+	}
+
+	public String exec_debug() throws BitrixRestApiException {
+		String result = restTemplate.postForObject(auth.getMethodUri(getMethod()), this, String.class);
+		log.info(result);
+		return result;
 	}
 
 	protected String formatErrorMessage(HttpStatus statusCode, RestResult body) {
