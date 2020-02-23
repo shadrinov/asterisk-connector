@@ -7,8 +7,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ConnectorAction {
-	private String type;
-	private String url;
-	private String method;
+public class ConnectorAsterisk {
+	private String channel;
+	private String context;
+	private String exten;
+	private String priority;
 }

@@ -8,12 +8,15 @@ import org.springframework.context.annotation.Configuration;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Configuration
 @ConfigurationProperties(prefix = "connector")
 public class ConnectorConfig {
 	private ConnectorBitrix bitrix;
-	private List<ConnectorRule> rules = new ArrayList<ConnectorRule>();  // NPE happens otherwise
+	private ConnectorAsterisk asterisk;
+	private List<ConnectorRule> rules = new ArrayList<>();  // NPE happens otherwise
 }

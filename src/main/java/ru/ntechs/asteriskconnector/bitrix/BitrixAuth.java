@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import org.springframework.stereotype.Component;
 
+import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
+
 @Component
 public class BitrixAuth extends Thread {
 	private String applicationToken;

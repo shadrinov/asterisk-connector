@@ -1,10 +1,13 @@
-package ru.ntechs.asteriskconnector.bitrix;
+package ru.ntechs.asteriskconnector.bitrix.rest.events;
+
+import java.util.List;
 
 import org.springframework.util.MultiValueMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 // params are {
 //	event=[ONAPPINSTALL],
@@ -25,24 +28,18 @@ import lombok.ToString;
 //	auth[application_token]=[9f871c9abe689a943110e60ebd7337de]
 // }
 
+@Slf4j
 @Getter
 @Setter
 @ToString
 public class BitrixEvent {
-
 //	event
 	private String event;                   // [ONAPPINSTALL]
 
 //	ts
 	private Integer ts;                     // [1579686153]
 
-//	data[VERSION]
-	private Integer dataVersion;            // [1]
-
-//	data[LANGUAGE_ID]
-	private String dataLanguageId;          // [ru]
-
-//	@Json("auth[access_token]")
+//	auth[access_token]
 	private String authAccessToken;         // [1927285e0043d4ca0042213e000000070000037c0754d2995eec0feff429359baa5d53]
 
 //	auth[expires]
@@ -79,38 +76,42 @@ public class BitrixEvent {
 	private String authApplicationToken;    // [9f871c9abe689a943110e60ebd7337de]
 
 	public BitrixEvent(MultiValueMap<String, String> data) {
-		this.event = getValue(data, "event");
-		this.ts = (getValue(data, "ts") != null) ? Integer.valueOf(getValue(data, "ts")) : null;
+		this.event = getString(data, "event");
+		this.ts = getInteger(data, "ts");
 
-		this.dataVersion = (getValue(data, "data[VERSION]") != null) ? Integer.valueOf(getValue(data, "data[VERSION]")) : null;
-		this.dataLanguageId = getValue(data, "data[LANGUAGE_ID]");
-
-		// data[PHONE_NUMBER]=[34],
-		// data[PHONE_NUMBER_INTERNATIONAL]=[34],
-		// data[EXTENSION]=[],
-		// data[USER_ID]=[7],
-		// data[CALL_LIST_ID]=[0],
-		// data[LINE_NUMBER]=[679606],
-		// data[IS_MOBILE]=[0],
-		// data[CALL_ID]=[externalCall.4c5e2d96ded95ecd628e2cfc325d7cdf.1581860751],
-		// data[CRM_ENTITY_TYPE]=[LEAD],
-		// data[CRM_ENTITY_ID]=[29]
-
-		this.authAccessToken = getValue(data, "auth[access_token]");
-		this.authExpires = (getValue(data, "auth[expires]") != null) ? Integer.valueOf(getValue(data, "auth[expires]")) : null;
-		this.authExpiresIn = (getValue(data, "auth[expires_in]") != null) ? Integer.valueOf(getValue(data, "auth[expires_in]")) : null;
-		this.authScope = getValue(data, "auth[scope]");
-		this.authDomain = getValue(data, "auth[domain]");
-		this.authServerEndpoint = getValue(data, "auth[server_endpoint]");
-		this.authStatus = getValue(data, "auth[status]");
-		this.authClientEndpoint = getValue(data, "auth[client_endpoint]");
-		this.authMemberId = getValue(data, "auth[member_id]");
-		this.authUserId = (getValue(data, "auth[user_id]") != null) ? Integer.valueOf(getValue(data, "auth[user_id]")) : null;
-		this.authRefreshToken = getValue(data, "auth[refresh_token]");
-		this.authApplicationToken = getValue(data, "auth[application_token]");
+		// Common
+		this.authAccessToken = getString(data, "auth[access_token]");
+		this.authExpires = getInteger(data, "auth[expires]");
+		this.authExpiresIn = getInteger(data, "auth[expires_in]");
+		this.authScope = getString(data, "auth[scope]");
+		this.authDomain = getString(data, "auth[domain]");
+		this.authServerEndpoint = getString(data, "auth[server_endpoint]");
+		this.authStatus = getString(data, "auth[status]");
+		this.authClientEndpoint = getString(data, "auth[client_endpoint]");
+		this.authMemberId = getString(data, "auth[member_id]");
+		this.authUserId = getInteger(data, "auth[user_id]");
+		this.authRefreshToken = getString(data, "auth[refresh_token]");
+		this.authApplicationToken = getString(data, "auth[application_token]");
 	}
 
-	private String getValue(MultiValueMap<String, String> data, String attr) {
-		return ((data.get(attr) != null) && (data.get(attr).size() > 0)) ? data.get(attr).get(0) : null;
+	public static String getEvent(MultiValueMap<String, String> data) {
+		return getString(data, "event").toUpperCase();
+	}
+
+	protected static String getString(MultiValueMap<String, String> data, String attr) {
+		List<String> vals = data.get(attr);
+		return ((vals != null) && (vals.size() > 0)) ? vals.get(0) : null;
+	}
+
+	protected static Integer getInteger(MultiValueMap<String, String> data, String attr) {
+		List<String> vals = data.get(attr);
+
+		if ((vals != null) && (vals.size() > 0)) {
+			String value = vals.get(0);
+
+			return (!value.isEmpty()) ? Integer.valueOf(value) : null;
+		}
+		else
+			return null;
 	}
 }

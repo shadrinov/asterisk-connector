@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
-import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephonyLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventBind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventUnbind;
@@ -33,15 +34,15 @@ public class BitrixTelephony {
 	public void registerCall() {
 	}
 
-	public ArrayList<TelephonyLine> getExternalLine() throws BitrixRestApiException {
+	public ArrayList<ExternalLine> getExternalLine() throws BitrixRestApiException {
 		return new RestRequestExternalLineGet(bitrixAuth).exec().getResult();
 	}
 
-	public void addExternalLine(int number, String name) throws BitrixRestApiException {
+	public void addExternalLine(Integer number, String name) throws BitrixRestApiException {
 		new RestRequestExternalLineAdd(bitrixAuth, number, name).exec();
 	}
 
-	public void deleteExternalLine(TelephonyLine telephonyLine) throws BitrixRestApiException {
+	public void deleteExternalLine(ExternalLine telephonyLine) throws BitrixRestApiException {
 		new RestRequestExternalLineDelete(bitrixAuth, telephonyLine).exec();
 	}
 

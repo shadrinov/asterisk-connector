@@ -9,9 +9,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class TelephonyLine {
+public class ExternalLine {
 	@JsonProperty("NUMBER")
-	private String number;
+	private Integer number;
 
 	@JsonProperty("NAME")
 	private String name;

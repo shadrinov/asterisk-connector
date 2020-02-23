@@ -5,9 +5,11 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class ConnectorRule {
 	private List<String> events;
 	private ConnectorAction action;

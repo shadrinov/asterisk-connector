@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.AMI;
+import ru.ntechs.ami.actions.Originate;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
-import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephonyLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
+import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEventOnAppInstall;
+import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEventOnExternalCallStart;
+import ru.ntechs.asteriskconnector.config.ConnectorAsterisk;
+import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
 @Slf4j
 @RestController
@@ -21,6 +29,12 @@ import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephonyLine;
 public class BitrixTelephonyController {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
+
+	@Autowired
+	private ConnectorConfig conf;
+
+	@Autowired
+	private AMI ami;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 	public @ResponseBody User getUserById(@PathVariable String id) {
@@ -75,15 +89,13 @@ public class BitrixTelephonyController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/event")
 	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
-		BitrixEvent be = new BitrixEvent(params);
-		log.info(be.toString());
-		log.info(params.toString());
-
 		try {
-			switch (be.getEvent()) {
+			switch (BitrixEvent.getEvent(params)) {
 				case ("ONAPPINSTALL"):
-					log.info("Handling event: {}", be.getEvent());
-					bitrixTelephony.installAuth(be);
+					BitrixEventOnAppInstall beOnAppInstall = new BitrixEventOnAppInstall(params);
+
+					log.info("Handling event: {}", beOnAppInstall.getEvent());
+					bitrixTelephony.installAuth(beOnAppInstall);
 
 					for (Event event : bitrixTelephony.getEvent()) {
 						if (!event.getEvent().equalsIgnoreCase("ONAPPINSTALL")) {
@@ -92,26 +104,48 @@ public class BitrixTelephonyController {
 						}
 					}
 
-					for (TelephonyLine telephonyLine : bitrixTelephony.getExternalLine()) {
+					for (ExternalLine telephonyLine : bitrixTelephony.getExternalLine()) {
 						log.info("Deleting external line {}: {}", telephonyLine.getNumber(), telephonyLine.getName());
 						bitrixTelephony.deleteExternalLine(telephonyLine);
 					}
 
-					bitrixTelephony.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
+					if ((conf.getBitrix() != null) && (conf.getBitrix().getExternalLines() != null)) {
+						for (ExternalLine line : conf.getBitrix().getExternalLines()) {
+							log.info("Registering external line: {}, {}", line.getNumber(), line.getName());
+							bitrixTelephony.addExternalLine(line.getNumber(), line.getName());
+						}
+					}
 
-					bitrixTelephony.addExternalLine(679606, "Сетевые технологии");
-					bitrixTelephony.addExternalLine(679618, "ИнТехСнаб");
+					log.info("Registering event: ONEXTERNALCALLSTART");
+					bitrixTelephony.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
 
 					log.info(bitrixTelephony.getEvent().toString());
 					log.info(bitrixTelephony.getExternalLine().toString());
 					break;
 
 				case ("ONEXTERNALCALLSTART"):
-					log.info("Handling event: {}", be.getEvent());
+					BitrixEventOnExternalCallStart beOnExternalCallStart = new BitrixEventOnExternalCallStart(params);
+					ConnectorAsterisk asterisk = conf.getAsterisk();
+
+					log.info("Handling event: {}", beOnExternalCallStart.getEvent());
+
+					if (asterisk != null) {
+						Originate originate = new Originate(ami);
+
+						log.info(asterisk.toString());
+						originate.setChannel(MessageFormat.format(asterisk.getChannel(), "11"));
+						originate.setContext(asterisk.getContext());
+						originate.setExten(MessageFormat.format(asterisk.getExten(), "89605332222"));
+						originate.setPriority(asterisk.getPriority());
+						originate.submit();
+					}
+					else
+						log.info("no configuration: connector.asterisk");
+
 					break;
 
 				default:
-					log.info("Unhandled event: {}", be.getEvent());
+					log.info("Unhandled event: {}", BitrixEvent.getEvent(params));
 					break;
 			}
 		} catch (BitrixRestApiException e) {

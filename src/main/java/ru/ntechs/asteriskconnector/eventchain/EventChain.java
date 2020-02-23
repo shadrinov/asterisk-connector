@@ -51,7 +51,7 @@ public class EventChain {
 					rulesProgress.set(index, 0);
 				}
 				else
-					log.info(String.format("Result: PROGRESS! Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
+					log.info(String.format("Result: PROGRESS! Waiting for message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
 			}
 		}
 
