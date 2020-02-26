@@ -15,7 +15,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineDel
 @ToString(callSuper = true)
 public class RestRequestExternalLineDelete extends RestRequestTemplate {
 	@JsonProperty("NUMBER")
-	private Integer number;
+	private String number;
 
 	@JsonProperty("NAME")
 	private String name;

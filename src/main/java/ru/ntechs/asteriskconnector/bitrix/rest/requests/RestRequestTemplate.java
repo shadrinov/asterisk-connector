@@ -1,6 +1,8 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +44,26 @@ public abstract class RestRequestTemplate {
 			restTemplate.setErrorHandler(new ResponseErrorHandler() {
 				@Override
 				public boolean hasError(ClientHttpResponse response) throws IOException {
-//					log.info(String.format("RestTemplate.hasError(): %d %s", response.getStatusCode().value(), response.getStatusText()));
-					return false;
+					log.info("Request status: {} {}", response.getStatusCode().value(), response.getStatusText());
+					return (response.getStatusCode().compareTo(HttpStatus.UNAUTHORIZED) == 0);
 				}
 
 				@Override
 				public void handleError(ClientHttpResponse response) throws IOException {
-//					log.info(String.format("RestTemplate.handleError(): %d %s", response.getStatusCode().value(), response.getStatusText()));
+					log.info("Request error: {} {}", response.getStatusCode().value(), response.getStatusText());
+
+					StringBuilder inputStringBuilder = new StringBuilder();
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody(), "UTF-8"));
+					String line = bufferedReader.readLine();
+
+					while (line != null) {
+						inputStringBuilder.append(line);
+						inputStringBuilder.append('\n');
+						line = bufferedReader.readLine();
+					}
+
+					log.info("Headers      : {}", response.getHeaders());
+					log.info("Response body: {}", inputStringBuilder.toString());
 				}
 			});
 

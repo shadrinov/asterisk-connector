@@ -12,10 +12,10 @@ import lombok.ToString;
 public class BitrixEventOnExternalCallStart extends BitrixEvent {
 
 //	data[PHONE_NUMBER]
-	private Integer dataPhoneNumber;		// [34]
+	private String dataPhoneNumber;		// [34]
 
 //	data[PHONE_NUMBER_INTERNATIONAL]
-	private Integer dataPhoneNumberInternational;	// [34]
+	private String dataPhoneNumberInternational;	// [34]
 
 //	data[EXTENSION]
 	private String dataExtension;			// []
@@ -27,7 +27,7 @@ public class BitrixEventOnExternalCallStart extends BitrixEvent {
 	private Integer dataCallListId;			// [0]
 
 //	data[LINE_NUMBER]
-	private Integer dataLineNumber;			// [679606]
+	private String dataLineNumber;			// [679606]
 
 //	data[IS_MOBILE]
 	private Integer dataIsMobile;			// [0]
@@ -44,12 +44,12 @@ public class BitrixEventOnExternalCallStart extends BitrixEvent {
 	public BitrixEventOnExternalCallStart(MultiValueMap<String, String> data) {
 		super(data);
 
-		this.dataPhoneNumber = getInteger(data, "data[PHONE_NUMBER]");
-		this.dataPhoneNumberInternational = getInteger(data, "data[PHONE_NUMBER_INTERNATIONAL]");
+		this.dataPhoneNumber = getString(data, "data[PHONE_NUMBER]");
+		this.dataPhoneNumberInternational = getString(data, "data[PHONE_NUMBER_INTERNATIONAL]");
 		this.dataExtension = getString(data, "data[EXTENSION]");
 		this.dataUserId = getInteger(data, "data[USER_ID]");
 		this.dataCallListId = getInteger(data, "data[CALL_LIST_ID]");
-		this.dataLineNumber = getInteger(data, "data[LINE_NUMBER]");
+		this.dataLineNumber = getString(data, "data[LINE_NUMBER]");
 		this.dataIsMobile = getInteger(data, "data[IS_MOBILE]");
 		this.dataCallId = getString(data, "data[CALL_ID]");
 		this.dataCrmEntityType = getString(data, "data[CRM_ENTITY_TYPE]");

@@ -17,6 +17,5 @@ import lombok.ToString;
 @ConfigurationProperties(prefix = "connector")
 public class ConnectorConfig {
 	private ConnectorBitrix bitrix;
-	private ConnectorAsterisk asterisk;
 	private List<ConnectorRule> rules = new ArrayList<>();  // NPE happens otherwise
 }

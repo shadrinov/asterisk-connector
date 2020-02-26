@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 public class ExternalLine {
 	@JsonProperty("NUMBER")
-	private Integer number;
+	private String number;
 
 	@JsonProperty("NAME")
 	private String name;

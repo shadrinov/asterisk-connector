@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventBind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventGet;
@@ -15,6 +16,8 @@ import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventUnbind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineAdd;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineDelete;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineGet;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserCurrent;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserGet;
 import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
 @Slf4j
@@ -38,7 +41,7 @@ public class BitrixTelephony {
 		return new RestRequestExternalLineGet(bitrixAuth).exec().getResult();
 	}
 
-	public void addExternalLine(Integer number, String name) throws BitrixRestApiException {
+	public void addExternalLine(String number, String name) throws BitrixRestApiException {
 		new RestRequestExternalLineAdd(bitrixAuth, number, name).exec();
 	}
 
@@ -56,5 +59,13 @@ public class BitrixTelephony {
 
 	public void unbindEvent(Event event) throws BitrixRestApiException {
 		new RestRequestEventUnbind(bitrixAuth, event).exec();
+	}
+
+	public User getCurrentUser() throws BitrixRestApiException {
+		return new RestRequestUserCurrent(bitrixAuth).exec().getResult();
+	}
+
+	public ArrayList<User> getUser(Integer id) throws BitrixRestApiException {
+		return new RestRequestUserGet(bitrixAuth, id).exec().getResult();
 	}
 }

@@ -2,10 +2,14 @@ package ru.ntechs.asteriskconnector.bitrix;
 
 import java.time.Instant;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
+import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
+@Getter
 @Component
 public class BitrixAuth extends Thread {
 	private String applicationToken;
@@ -18,6 +22,9 @@ public class BitrixAuth extends Thread {
 
 	private String authServer;
 	private String clientServer;
+
+	@Autowired
+	private ConnectorConfig conf;
 
 	public BitrixAuth() {
 		setName("oauth-token-updater");
@@ -54,12 +61,7 @@ public class BitrixAuth extends Thread {
 		return clientServer + method;
 	}
 
-	public String getAccessToken() {
-		return accessToken;
-	}
+	private void auth() {
 
-	public String getClientServer() {
-		return clientServer;
 	}
-
 }
