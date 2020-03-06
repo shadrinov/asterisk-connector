@@ -44,7 +44,7 @@ public abstract class RestRequestTemplate {
 			restTemplate.setErrorHandler(new ResponseErrorHandler() {
 				@Override
 				public boolean hasError(ClientHttpResponse response) throws IOException {
-					log.info("Request status: {} {}", response.getStatusCode().value(), response.getStatusText());
+//					log.info("Request status: {} {}", response.getStatusCode().value(), response.getStatusText());
 					return (response.getStatusCode().compareTo(HttpStatus.UNAUTHORIZED) == 0);
 				}
 
@@ -78,11 +78,12 @@ public abstract class RestRequestTemplate {
 
 	protected <T extends RestResult> T exec(Class<T> result) throws BitrixRestApiException {
 		ResponseEntity<T> response = restTemplate.postForEntity(auth.getMethodUri(getMethod()), this, result);
+		RestResult body = response.getBody();
 
-		String msg = formatErrorMessage(response.getStatusCode(), response.getBody());
+		String msg = formatErrorMessage(response.getStatusCode(), body);
 		log.debug(msg);
 
-		if (response.getStatusCode().isError())
+		if (response.getStatusCode().isError() || (body.getError() != null) || (body.getErrorDescription() != null))
 			throw new BitrixRestApiException(msg);
 
 		return response.getBody();

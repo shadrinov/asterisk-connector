@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
@@ -18,23 +17,30 @@ import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineD
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserCurrent;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserGet;
-import ru.ntechs.asteriskconnector.config.ConnectorConfig;
 
-@Slf4j
 @Component
 public class BitrixTelephony {
-
 	@Autowired
 	private BitrixAuth bitrixAuth;
 
-	public BitrixTelephony(ConnectorConfig config) {
+	private BitrixTelephony(BitrixAuth clone) {
+		this.bitrixAuth = clone;
 	}
 
-	public void installAuth(BitrixEvent be) {
-		bitrixAuth.installAuth(be);
+	public BitrixTelephony clone(BitrixEvent be) {
+		return new BitrixTelephony(bitrixAuth.clone(be));
 	}
 
-	public void registerCall() {
+	public void afterInstall(BitrixTelephony btInstall) {
+		bitrixAuth.afterInstall(btInstall.bitrixAuth);
+	}
+
+	public boolean validateAppToken(BitrixEvent event) {
+		return bitrixAuth.validateAppToken(event);
+	}
+
+	public boolean isInstalled() {
+		return bitrixAuth.isInstalled();
 	}
 
 	public ArrayList<ExternalLine> getExternalLine() throws BitrixRestApiException {

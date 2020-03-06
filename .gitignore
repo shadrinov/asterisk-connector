@@ -32,3 +32,4 @@ target/
 
 application.properties
 application.yml
+connector.json

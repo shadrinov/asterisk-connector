@@ -7,7 +7,6 @@ import org.springframework.util.MultiValueMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 // params are {
 //	event=[ONAPPINSTALL],
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 //	auth[application_token]=[9f871c9abe689a943110e60ebd7337de]
 // }
 
-@Slf4j
 @Getter
 @Setter
 @ToString

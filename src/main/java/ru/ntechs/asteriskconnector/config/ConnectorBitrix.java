@@ -10,7 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class ConnectorBitrix {
-	private String api;
 	private String auth;
 	private String clientId;
 	private String clientKey;

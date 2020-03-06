@@ -138,47 +138,58 @@ public class BitrixTelephonyController {
 	}
 
 	private String cleanupPhoneNumber(String phone) {
-		return phone.replaceAll("^\\+7", "8").replaceAll("[\\(\\) \\-]", "");
+		return phone.replaceAll("[^\\d\\+]", "").replaceAll("^\\+7", "8");
 	}
 
-	private void onAppInstall(MultiValueMap<String, String> params) throws BitrixRestApiException {
-		BitrixEventOnAppInstall beOnAppInstall = new BitrixEventOnAppInstall(params);
+	private void onAppInstall(MultiValueMap<String, String> params) throws BitrixLocalException, BitrixRestApiException {
+		BitrixEventOnAppInstall event = new BitrixEventOnAppInstall(params);
 
-		log.info("Handling event: {}", beOnAppInstall.getEvent());
-		bitrixTelephony.installAuth(beOnAppInstall);
+		log.info("Handling event: {}", event.getEvent());
+		log.debug("Detailed event: {}", event.toString());
 
-		for (Event event : bitrixTelephony.getEvent()) {
-			if (!event.getEvent().equalsIgnoreCase("ONAPPINSTALL")) {
-				log.info("Unbind event {}: {}", event.getEvent(), event.getHandler());
-				bitrixTelephony.unbindEvent(event);
+		if (bitrixTelephony.isInstalled())
+			throw new BitrixLocalException(String.format("application is already installed, to perform new installation, please remove data file (connector.json)", event.getAuthAccessToken()));
+
+		BitrixTelephony btInstall = bitrixTelephony.clone(event);
+
+		for (Event eventName : btInstall.getEvent()) {
+			if (!eventName.getEvent().equalsIgnoreCase("ONAPPINSTALL")) {
+				log.info("Unbind event {}: {}", eventName.getEvent(), eventName.getHandler());
+				btInstall.unbindEvent(eventName);
 			}
 		}
 
-		for (ExternalLine telephonyLine : bitrixTelephony.getExternalLine()) {
+		for (ExternalLine telephonyLine : btInstall.getExternalLine()) {
 			log.info("Deleting external line {}: {}", telephonyLine.getNumber(), telephonyLine.getName());
-			bitrixTelephony.deleteExternalLine(telephonyLine);
+			btInstall.deleteExternalLine(telephonyLine);
 		}
 
 		if ((conf.getBitrix() != null) && (conf.getBitrix().getExternalLines() != null)) {
 			for (ConnectorExternalLine line : conf.getBitrix().getExternalLines()) {
 				log.info("Registering external line: {}, {}", line.getNumber(), line.getName());
-				bitrixTelephony.addExternalLine(line.getNumber(), line.getName());
+				btInstall.addExternalLine(line.getNumber(), line.getName());
 			}
 		}
 
 		log.info("Registering event: ONEXTERNALCALLSTART");
-		bitrixTelephony.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
+		btInstall.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
 
-		log.info(bitrixTelephony.getEvent().toString());
-		log.info(bitrixTelephony.getExternalLine().toString());
+		bitrixTelephony.afterInstall(btInstall);
+
+		log.info(btInstall.getEvent().toString());
+		log.info(btInstall.getExternalLine().toString());
 	}
 
 	private void onExternalCallStart(MultiValueMap<String, String> params) throws BitrixLocalException, BitrixRestApiException {
 		BitrixEventOnExternalCallStart event = new BitrixEventOnExternalCallStart(params);
-		ConnectorExternalLine externalLine = externalLines.get(event.getDataLineNumber());;
 
 		log.info("Handling event: {}", event.getEvent());
-		log.info("Detailed event: {}", event.toString());
+		log.debug("Detailed event: {}", event.toString());
+
+		if (!bitrixTelephony.validateAppToken(event))
+			throw new BitrixLocalException(String.format("invalid application token: %s", event.getAuthAccessToken()));
+
+		ConnectorExternalLine externalLine = externalLines.get(event.getDataLineNumber());
 
 		if (externalLine == null)
 			throw new BitrixLocalException(String.format("unknown requested line number: %s", event.getDataLineNumber()));
