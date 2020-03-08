@@ -3,6 +3,7 @@ package ru.ntechs.asteriskconnector.bitrix;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -106,7 +107,7 @@ public class BitrixAuth {
 				}
 
 				if (expiresIn == null)
-					Thread.sleep(1000);
+					Thread.sleep(5000);
 				else if (expiresIn < 180) {
 					log.info("too short access token expiration period ({}), using 90", expiresIn);
 					Thread.sleep(90000);
@@ -156,10 +157,16 @@ public class BitrixAuth {
 					if (cb.getClientKey() == null)
 						throw new BitrixLocalException("auth server not specified: connector.bitrix.clientkey");
 
-					String uri = String.format("%s?grant_type=refresh_token&refresh_token=%s&client_id=%s&client_secret=%s",
-							cb.getAuth(), refreshToken, cb.getClientId(), cb.getClientKey());
+					HashMap<String, String> uriVars = new HashMap<>();
 
-					ResponseEntity<RestResultAuth> result = restTemplate.getForEntity(uri, RestResultAuth.class);
+					uriVars.put("refresh_token", refreshToken);
+					uriVars.put("client_id", cb.getClientId());
+					uriVars.put("client_secret", cb.getClientKey());
+
+					ResponseEntity<RestResultAuth> result = restTemplate.getForEntity(
+							cb.getAuth() + "?grant_type=refresh_token&refresh_token={refresh_token}&client_id={client_id}&client_secret={client_secret}",
+							RestResultAuth.class, uriVars);
+
 					RestResultAuth tokens = result.getBody();
 
 					if ((result.getStatusCode().value() == 200) && (tokens.getError() == null) && (tokens.getErrorDescription() == null)) {
@@ -170,12 +177,28 @@ public class BitrixAuth {
 						this.authServer = tokens.getServerEndpoint();
 						this.clientServer = tokens.getClientEndpoint();
 					}
+					else if (result.getStatusCode().value() != 200) {
+						log.info(formatErrorMessage(result.getStatusCode(), result.getBody()));
+
+						if (tokens.getError().equalsIgnoreCase("invalid_grant")) {
+							log.info("refresh_token expired or invalid, application reinstallation needed");
+
+							this.accessToken = null;
+							this.refreshToken = null;
+							this.expires = null;
+							this.expiresIn = null;
+						}
+						else {
+							this.expires = null;
+							this.expiresIn = null;
+						}
+					}
 					else {
 						log.info(formatErrorMessage(result.getStatusCode(), result.getBody()));
 
 						this.accessToken = null;
 						this.expires = null;
-						this.expiresIn = 15;
+						this.expiresIn = null;
 					}
 				} catch (BitrixLocalException e) {
 					log.info(e.getMessage());
@@ -189,7 +212,7 @@ public class BitrixAuth {
 	protected String formatErrorMessage(HttpStatus statusCode, RestResult body) {
 		return String.format("authorization failed: %d %s (%s)", statusCode.value(), statusCode.getReasonPhrase(),
 				(body != null) ?
-						String.format("%s (%s)", body.getErrorDescription(), body.getError()) :
+						String.format("%s%s", body.getError(), (body.getErrorDescription() != null) ? (", " + body.getErrorDescription()) : "") :
 							"No error description");
 	}
 
@@ -231,6 +254,6 @@ public class BitrixAuth {
 	}
 
 	public boolean isInstalled() {
-		return (applicationToken != null);
+		return ((applicationToken != null) && (refreshToken != null));
 	}
 }
