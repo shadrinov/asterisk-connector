@@ -25,12 +25,7 @@ public class MainLoop {
 		ami.addHandler("AgentConnect", message -> { onAgentConnect(message); });
 		ami.addHandler("AgentComplete", message -> { onAgentComplete(message); });
 
-//		ami.addHandler("RTCPSent", message -> { onRTCPSent(message); });
-//		ami.addHandler("RTCPReceived", message -> { onRTCPReceived(message); });
-
 		while (true) {
-//			log.info("--- garbage collection iteration ---");
-
 			eventDispatcher.collectGarbage();
 			Thread.sleep(1000);
 		}
@@ -65,14 +60,4 @@ public class MainLoop {
 		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
 		eventDispatcher.dispatch(message);
 	}
-
-//	private void onRTCPReceived(Message message) {
-//		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
-//		eventDispatcher.dispatch(message);
-//	}
-//
-//	private void onRTCPSent(Message message) {
-//		log.info(String.format("Plain Message: \"%s: %s\"", message.getType(), message.getName()));
-//		eventDispatcher.dispatch(message);
-//	}
 }

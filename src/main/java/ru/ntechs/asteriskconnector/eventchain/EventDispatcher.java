@@ -53,15 +53,10 @@ public class EventDispatcher {
 		tickCount++;
 
 		for (Entry<String, EventChain> chainEntry : chains.entrySet()) {
-//			log.info(chainEntry.getValue().toString());
-
 			if ((tickCount - chainEntry.getValue().getTailBirthTicks()) > EVENT_LIFETIME)
 				chains.remove(chainEntry.getKey());
 		}
 
 		unmappableEvents.garbageCollect(tickCount - EVENT_LIFETIME);
-
-//		if (!unmappableEvents.isEmpty())
-//			log.info(unmappableEvents.toString());
 	}
 }

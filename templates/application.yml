@@ -1,9 +1,23 @@
 connector:
-   ami-config:
+   address: https://connector.ntechs.ru/rest/
    bitrix:
-      api: https://ntechs.bitrix24.ru/rest/telephony.externalLine.get
+      api: https://ntechs.bitrix24.ru/rest/
+      auth: https://oauth.bitrix.info/oauth/token/
       clientid: clientid
       clientkey: clientkey
+      externallines:
+         - number: 123456
+           name: Физическое лицо
+           channel: Local/{0}@phy-phones
+           context: org-phones
+           exten: "{0}"
+           priority: 1
+         - number: 654321
+           name: Организация
+           channel: Local/{0}@org-phones
+           context: org-phones
+           exten: "{0}"
+           priority: 1
    rules:
       - events:
          - Join

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.AMI;
 import ru.ntechs.ami.actions.Originate;
+import ru.ntechs.ami.responses.Response;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
@@ -109,20 +110,15 @@ public class BitrixTelephonyController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/")
 	public @ResponseBody String appPage(@RequestBody MultiValueMap<String, String> params) {
-		return "this is start page";
+		return "Welcome to NTechs Asterisk Connector";
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/event")
 	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
 		try {
 			switch (BitrixEvent.getEvent(params).toUpperCase()) {
-				case ("ONAPPINSTALL"):
-					onAppInstall(params);
-					break;
-
-				case ("ONEXTERNALCALLSTART"):
-					onExternalCallStart(params);
-					break;
+				case ("ONAPPINSTALL"): onAppInstall(params); break;
+				case ("ONEXTERNALCALLSTART"): onExternalCallStart(params); break;
 
 				default:
 					log.info("Unhandled event: {}", BitrixEvent.getEvent(params));
@@ -172,7 +168,7 @@ public class BitrixTelephonyController {
 		}
 
 		log.info("Registering event: ONEXTERNALCALLSTART");
-		btInstall.bindEvent("ONEXTERNALCALLSTART", "https://connector.ntechs.ru/rest/event");
+		btInstall.bindEvent("ONEXTERNALCALLSTART", conf.getAddress() + "event");
 
 		bitrixTelephony.afterInstall(btInstall);
 
@@ -211,5 +207,16 @@ public class BitrixTelephonyController {
 		originate.setPriority(externalLine.getPriority());
 		originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(event.getDataPhoneNumber())));
 		originate.submit();
+
+		Response response = originate.waitForResponse(30000);
+
+		if (response != null) {
+			if (response instanceof ru.ntechs.ami.responses.Success)
+				log.info("got success response: {}", ((ru.ntechs.ami.responses.Success) response).toString());
+			else if (response instanceof ru.ntechs.ami.responses.Error)
+				log.info("got error response: {}", ((ru.ntechs.ami.responses.Error) response).toString());
+		}
+		else
+			log.info("timeout waiting for response on {}", originate.toString());
 	}
 }
