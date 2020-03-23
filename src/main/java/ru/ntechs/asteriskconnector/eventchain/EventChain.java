@@ -39,9 +39,6 @@ public class EventChain {
 		for (int index = 0; index < rules.size(); index++) {
 			List<String> eventNames = rules.get(index).getEvents();
 
-//			log.info(String.format("Expected sequence: %s", eventNames.toString()));
-//			log.info(String.format("Expected message: \"%s\" at %d", eventNames.get(rulesProgress.get(index)), rulesProgress.get(index)));
-
 			if (eventNames.get(rulesProgress.get(index)).equalsIgnoreCase(message.getName())) {
 				rulesProgress.set(index, rulesProgress.get(index) + 1);
 
