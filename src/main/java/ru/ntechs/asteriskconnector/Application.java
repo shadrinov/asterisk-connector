@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages={"ru.ntechs.asteriskconnector", "ru.ntechs.ami"})
+@SpringBootApplication(scanBasePackages={"ru.ntechs.asteriskconnector"})
 public class Application implements CommandLineRunner {
 
 	@Autowired

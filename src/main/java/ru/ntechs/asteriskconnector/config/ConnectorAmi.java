@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class ConnectorAmi {
 	private String hostname;
-	private int port;
+	private Integer port;
 	private String username;
 	private String password;
 }

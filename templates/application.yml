@@ -1,5 +1,11 @@
 connector:
    address: https://connector.ntechs.ru/rest/
+   debug: true
+   ami:
+      hostname: localhost
+      port: 5038
+      username: ntcrm
+      password: secret
    bitrix:
       api: https://ntechs.bitrix24.ru/rest/
       auth: https://oauth.bitrix.info/oauth/token/
