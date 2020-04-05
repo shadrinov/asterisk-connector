@@ -39,6 +39,9 @@ public class AMI extends ru.ntechs.ami.AMI {
 		setUsername(confAmi.getUsername());
 		setPassword(confAmi.getPassword());
 
+		if (confAmi.isDebug())
+			enableDebug();
+
 		start();
 	}
 }

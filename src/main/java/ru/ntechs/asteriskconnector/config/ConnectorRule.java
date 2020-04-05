@@ -13,5 +13,5 @@ import lombok.ToString;
 public class ConnectorRule {
 	private List<String> events;
 	private ConnectorAction action;
-	private Map<Object,Object> data;
+	private Map<String, String> data;
 }

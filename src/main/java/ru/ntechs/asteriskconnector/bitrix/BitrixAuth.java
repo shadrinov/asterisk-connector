@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -202,6 +203,8 @@ public class BitrixAuth {
 					}
 				} catch (BitrixLocalException e) {
 					log.info(e.getMessage());
+				} catch (RestClientException e) {
+					log.info("Failed to update access token, possible Bitrix24 cloud servers faulure: {}", e.getMessage());
 				}
 			}
 		}

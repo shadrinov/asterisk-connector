@@ -12,4 +12,5 @@ public class ConnectorAmi {
 	private Integer port;
 	private String username;
 	private String password;
+	private boolean debug;
 }
