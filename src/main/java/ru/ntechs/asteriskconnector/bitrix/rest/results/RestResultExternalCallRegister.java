@@ -8,6 +8,6 @@ import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestResultExternlCallRegister extends RestResult {
+public class RestResultExternalCallRegister extends RestResult {
 	private ExternalCall result;
 }

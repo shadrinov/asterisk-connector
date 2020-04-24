@@ -7,6 +7,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestResultExternalCallFinish extends RestResult {
+public class RestResultExternalCallShow extends RestResult {
 
 }

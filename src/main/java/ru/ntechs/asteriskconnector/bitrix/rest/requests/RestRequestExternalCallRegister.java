@@ -10,7 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
-import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternlCallRegister;
+import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallRegister;
 
 @Getter
 @Setter
@@ -89,7 +89,7 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 		return "telephony.externalcall.register";
 	}
 
-	public RestResultExternlCallRegister exec() throws BitrixRestApiException {
-		return exec(RestResultExternlCallRegister.class);
+	public RestResultExternalCallRegister exec() throws BitrixRestApiException {
+		return exec(RestResultExternalCallRegister.class);
 	}
 }

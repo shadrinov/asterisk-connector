@@ -1,5 +1,7 @@
 package ru.ntechs.asteriskconnector.config;
 
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,7 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ConnectorAction {
-	private String type;
-	private String url;
 	private String method;
+	private Map<String, String> data;
 }

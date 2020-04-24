@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
+import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
@@ -19,6 +20,8 @@ public class EventChain {
 
 	private List<ConnectorRule> rules;
 	private ArrayList<Integer> rulesProgress;
+
+	private ArrayList<Object> context;
 
 	EventChain(EventDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
 		super();
@@ -35,11 +38,13 @@ public class EventChain {
 
 		for (int index = 0; index < rules.size(); index++)
 			rulesProgress.add(0);
+
+		this.context = new ArrayList<>();
 	}
 
 	public synchronized void enqueue(int birthTicks, Message message) {
 		Object lock = new Object();
-		ConnectorRule matched = null;
+		ArrayList<ConnectorRule> matched = new ArrayList<>();
 
 		synchronized (lock) {
 			if (tailEvent == null) {
@@ -49,40 +54,47 @@ public class EventChain {
 			else
 				tailEvent = new EventNode(birthTicks, message, tailEvent);
 
-			if (channel == null) {
-				channel = message.getAttribute("Channel");
-
-				if ((channel == null) && (message.getName().equalsIgnoreCase("AgentCalled")))
-					channel = message.getAttribute("ChannelCalling");
-			}
+			if (channel == null)
+				channel = eventDispatcher.registerChannel(message);
 
 			for (int index = 0; index < rules.size(); index++) {
-				List<String> eventNames = rules.get(index).getEvents();
+				ConnectorRule rule = rules.get(index);
+				if (rule == null)
+					continue;
 
-				if (eventNames.get(rulesProgress.get(index)).equalsIgnoreCase(message.getName())) {
-					rulesProgress.set(index, rulesProgress.get(index) + 1);
+				List<String> eventNames = rule.getEvents();
+				if (eventNames == null)
+					continue;
 
-					if (rulesProgress.get(index) >= rules.get(index).getEvents().size()) {
+				Integer ruleProgress = rulesProgress.get(index);
+
+				if (eventNames.get(ruleProgress).equalsIgnoreCase(message.getName())) {
+					rulesProgress.set(index, ++ruleProgress);
+
+					if (ruleProgress >= eventNames.size()) {
+						List<ConnectorAction> action = rule.getAction();
+
 						log.info("Progress: {}, Result: MATCH! Got {}, executing action: {}",
 								rulesProgress.toString(),
-								eventNames.get(rulesProgress.get(index) - 1),
-								rules.get(index).getAction().toString());
+								eventNames.get(ruleProgress - 1),
+								(action != null) ? action.toString() : "<null>");
 
-						matched = rules.get(index);
 						rulesProgress.set(index, 0);
+						matched.add(rule);
 					}
-					else
+					else {
 						log.info("Progress: {}, Result: PROGRESS! Got {}, waiting for: \"{}\" at {}",
 								rulesProgress.toString(),
-								eventNames.get(rulesProgress.get(index) - 1),
-								eventNames.get(rulesProgress.get(index)),
-								rulesProgress.get(index));
+								eventNames.get(ruleProgress - 1),
+								eventNames.get(ruleProgress),
+								ruleProgress);
+					}
 				}
 			}
 		}
 
-		if (matched != null)
-			scriptFactory.buildScript(eventDispatcher, this, matched);
+		for (ConnectorRule rule : matched)
+			scriptFactory.buildScript(eventDispatcher, this, rule);
 	}
 
 	public boolean isEmpty() {
@@ -98,11 +110,25 @@ public class EventChain {
 	}
 
 	public String getChannel() {
-		return null;
+		return channel;
 	}
 
 	public EventNode getHead() {
 		return headEvent;
+	}
+
+	public void putInContext(Object obj) {
+		context.add(obj);
+	}
+
+	public <T> ArrayList<T> getFromContext(Class<T> requestedData) {
+		ArrayList<T> result = new ArrayList<>();
+
+		for  (Object obj : context)
+			if (requestedData.isInstance(obj))
+				result.add(requestedData.cast(obj));
+
+		return result;
 	}
 
 	public void garbageCollect(int age) {
