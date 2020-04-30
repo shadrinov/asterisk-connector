@@ -33,7 +33,7 @@ public abstract class RestRequestTemplate {
 	private BitrixAuth auth;
 
 	@JsonIgnore
-	protected static RestTemplate restTemplate;
+	private static RestTemplate restTemplate;
 
 	public RestRequestTemplate(BitrixAuth auth) {
 		this.auth = auth;

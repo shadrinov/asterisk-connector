@@ -60,7 +60,7 @@ public class Expression {
 		Message msg = node.getMessage();
 
 		if (msg == null)
-			throw new BitrixLocalException(formatError(String.format("BUG: EvetNode found, but it doesn't contain message '%s'", eventName)));
+			throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventName)));
 
 		String value = msg.getAttribute(params.get(0));
 

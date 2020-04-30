@@ -3,6 +3,7 @@ package ru.ntechs.asteriskconnector.eventchain;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,21 +16,19 @@ import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 public class EventDispatcher {
 	final static int EVENT_LIFETIME = 1800;
 
+	@Autowired
 	private ScriptFactory scriptFactory;
-	private ConcurrentHashMap<String, EventChain> chainByUniqueId;
-	private ConcurrentHashMap<String, String> uniqueIdByChannel;
-	private EventChain unmappableEvents;
-	private int tickCount;
 
 	private ConnectorConfig config;
 
-	public EventDispatcher(ScriptFactory scriptFactory, ConnectorConfig config) {
-		this.scriptFactory = scriptFactory;
-		this.chainByUniqueId = new ConcurrentHashMap<>();
-		this.uniqueIdByChannel = new ConcurrentHashMap<>();
-		this.unmappableEvents = new EventChain(this, scriptFactory, config.getRules());
-		this.tickCount = 0;
+	private ConcurrentHashMap<String, EventChain> chainByUniqueId = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, String> uniqueIdByChannel = new ConcurrentHashMap<>();
+	private EventChain unmappableEvents;
+	private int tickCount = 0;
+
+	public EventDispatcher(ConnectorConfig config) {
 		this.config = config;
+		this.unmappableEvents = new EventChain(this, scriptFactory, config.getRules());
 	}
 
 	public void dispatch(Message msg) {
@@ -91,16 +90,16 @@ public class EventDispatcher {
 			if ((tickCount - eventChain.getTailBirthTicks()) > EVENT_LIFETIME) {
 				String channel = eventChain.getChannel();
 
-				log.info("before garbage collection: {}", uniqueIdByChannel);
-				log.info("before garbage collection: {}", chainByUniqueId);
+				log.debug("before garbage collection: {}", uniqueIdByChannel);
+				log.debug("before garbage collection: {}", chainByUniqueId);
 
 				if (channel != null)
 					uniqueIdByChannel.remove(channel);
 
 				chainByUniqueId.remove(chainEntry.getKey());
 
-				log.info("after garbage collection: {}", uniqueIdByChannel);
-				log.info("after garbage collection: {}", chainByUniqueId);
+				log.debug("after garbage collection: {}", uniqueIdByChannel);
+				log.debug("after garbage collection: {}", chainByUniqueId);
 			}
 		}
 

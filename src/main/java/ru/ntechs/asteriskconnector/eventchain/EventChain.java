@@ -94,7 +94,7 @@ public class EventChain {
 		}
 
 		for (ConnectorRule rule : matched)
-			scriptFactory.buildScript(eventDispatcher, this, rule);
+			scriptFactory.buildScript(this, rule);
 	}
 
 	public boolean isEmpty() {
