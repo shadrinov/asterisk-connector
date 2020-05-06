@@ -1,10 +1,14 @@
 package ru.ntechs.asteriskconnector.scripting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.apache.catalina.User;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallRegister;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
@@ -27,7 +31,7 @@ public class MethodRegisterExternalCall extends Method {
 			log.info("evaluated: {}", data.toString());
 
 			String userPhoneInner = data.get("USER_PHONE_INNER");
-			String userId = data.get("USER_ID");
+			Integer userId = validateInt(data, "USER_ID");
 			String phoneNumber = data.get("PHONE_NUMBER");
 			String type = data.get("TYPE");
 
@@ -69,7 +73,15 @@ public class MethodRegisterExternalCall extends Method {
 			if (data.containsKey("LINE_NUMBER"))
 				req.setLineNumber(data.get("LINE_NUMBER"));
 
-			getEventChain().putInContext(req.exec().getResult());
+			ExternalCall call = req.exec().getResult();
+			getEventChain().putInContext(call);
+
+			if (req.getShow() != 0) {
+				ArrayList<User> users = findIntermediateBeans(User.class);
+
+				for (User entry : users)
+					getEventChain().putInContext(entry);
+			}
 		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());
 		}

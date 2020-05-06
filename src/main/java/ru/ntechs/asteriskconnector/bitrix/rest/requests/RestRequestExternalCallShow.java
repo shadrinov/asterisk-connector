@@ -4,10 +4,16 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
-import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallShow;
+import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 
+@Getter
+@Setter
+@ToString(callSuper = true)
 public class RestRequestExternalCallShow extends RestRequestTemplate {
 	@JsonProperty("CALL_ID")
 	private String callId;
@@ -28,7 +34,7 @@ public class RestRequestExternalCallShow extends RestRequestTemplate {
 		return "telephony.externalcall.show";
 	}
 
-	public RestResultExternalCallShow exec() throws BitrixRestApiException {
-		return exec(RestResultExternalCallShow.class);
+	public RestResult exec() throws BitrixRestApiException {
+		return exec(RestResult.class);
 	}
 }

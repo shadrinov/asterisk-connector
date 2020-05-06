@@ -5,14 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
+import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
 @Slf4j
+@Getter
 @Component
 public class ScriptFactory {
 	@Autowired
@@ -20,6 +23,9 @@ public class ScriptFactory {
 
 	@Autowired
 	private EventDispatcher eventDispatcher;
+
+	@Autowired
+	private BitrixTelephony bitrixTelephony;
 
 	public void buildScript(EventChain eventChain, ConnectorRule rule) {
 		if (rule == null)
@@ -61,13 +67,5 @@ public class ScriptFactory {
 				break;
 			}
 		}
-	}
-
-	public BitrixAuth getAuth() {
-		return auth;
-	}
-
-	public EventDispatcher getEventDispatcher() {
-		return eventDispatcher;
 	}
 }

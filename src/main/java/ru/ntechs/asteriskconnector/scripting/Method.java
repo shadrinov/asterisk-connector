@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ public abstract class Method {
 	private ScriptFactory scriptFactory;
 	private EventChain eventChain;
 	private ConnectorAction action;
+
+	private ArrayList<Object> intermediateBeans;
 
 	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action) {
 		super();
@@ -53,8 +56,10 @@ public abstract class Method {
 		if (template != null)
 			try {
 				for (String key : template.keySet()) {
-					Expression test = new Expression(eventDispatcher, eventChain, template.get(key));
-					params.put(key, test.eval());
+					Expression interpreter = new Expression(scriptFactory, eventChain, template.get(key));
+					String result = interpreter.eval();
+					intermediateBeans = interpreter.getIntermediateBeans();
+					params.put(key, result);
 				}
 			} catch (IOException | BitrixLocalException e) {
 				log.warn("Eror while evaluating expression: {}", e.getMessage());
@@ -71,7 +76,7 @@ public abstract class Method {
 			try {
 				result = Integer.valueOf(value);
 			} catch (NumberFormatException e) {
-				throw new BitrixLocalException(String.format("Failed to validate '%s', %s: %s", key, e.getMessage(), value));
+				throw new BitrixLocalException(String.format("Failed to validate integer '%s' for key '%s': %s", value, key, e.getMessage()));
 			}
 		}
 
@@ -89,6 +94,16 @@ public abstract class Method {
 				throw new BitrixLocalException(String.format("Failed to validate '%s', %s: %s", key, e.getMessage(), value));
 			}
 		}
+
+		return result;
+	}
+
+	protected <T> ArrayList<T> findIntermediateBeans(Class<T> type) {
+		ArrayList<T> result = new ArrayList<>();
+
+		for  (Object obj : intermediateBeans)
+			if (type.isInstance(obj))
+				result.add(type.cast(obj));
 
 		return result;
 	}

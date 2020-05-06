@@ -3,8 +3,6 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.catalina.User;
-
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
@@ -30,7 +28,6 @@ public class MethodShowExternalCall extends Method {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
 			log.info("evaluated: {}", data.toString());
 
-			ArrayList<User> user = getEventChain().getFromContext(User.class);
 			ArrayList<ExternalCall> calls = getEventChain().getFromContext(ExternalCall.class);
 
 			String callId = null;

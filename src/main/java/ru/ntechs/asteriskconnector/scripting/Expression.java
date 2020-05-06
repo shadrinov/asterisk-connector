@@ -7,24 +7,25 @@ import java.util.ArrayList;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 import ru.ntechs.asteriskconnector.eventchain.EventNode;
 
 public class Expression {
-	private EventDispatcher eventDispatcher;
+	private ScriptFactory scriptFactory;
 	private EventChain eventChain;
 	private String expr;
+	private ArrayList<Object> intermediateBeans;
 
 	private CharArrayReader reader;
 
 	private int failCharIndex;
 
-	public Expression(EventDispatcher eventDispatcher, EventChain eventChain, String expr) {
+	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr) {
 		super();
 
-		this.eventDispatcher = eventDispatcher;
+		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.expr = expr.trim();
+		this.intermediateBeans = new ArrayList<>();
 		this.reader = new CharArrayReader(this.expr.toCharArray());
 	}
 
@@ -71,12 +72,23 @@ public class Expression {
 	}
 
 	private String evalFunc(String funcName, ArrayList<String> params) throws IOException, BitrixLocalException {
+		Function func;
+
 		switch (funcName.toLowerCase()) {
-			case ("channel"): return new FunctionChannel(eventDispatcher, params.get(0), params.get(1)).eval();
+			case ("channel"): func = new FunctionChannel(scriptFactory, params); break;
+			case ("rest"): func = new FunctionREST(scriptFactory, params); break;
 
 			default:
 				throw new BitrixLocalException(formatError("Unknown function"));
 		}
+
+		String result = func.eval();
+		ArrayList<? extends Object> beans = func.getIntermediateBeans();
+
+		if (beans != null)
+			intermediateBeans.addAll(beans);
+
+		return result;
 	}
 
 	private String parseReplace() throws IOException, BitrixLocalException {
@@ -186,5 +198,9 @@ public class Expression {
 
 	private String formatError(String message) {
 		return String.format("%s: %s <-- ... %s", message, expr.substring(0, failCharIndex), expr.substring(failCharIndex + 1));
+	}
+
+	public ArrayList<Object> getIntermediateBeans() {
+		return intermediateBeans;
 	}
 }

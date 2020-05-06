@@ -71,7 +71,7 @@ public class EventChain {
 				if (eventNames.get(ruleProgress).equalsIgnoreCase(message.getName())) {
 					rulesProgress.set(index, ++ruleProgress);
 
-					if (ruleProgress >= eventNames.size()) {
+					if (ruleProgress >= eventNames.size() && (eventNames.size() > 0)) {
 						List<ConnectorAction> action = rule.getAction();
 
 						log.info("Progress: {}, Result: MATCH! Got {}, executing action: {}",
@@ -118,15 +118,16 @@ public class EventChain {
 	}
 
 	public void putInContext(Object obj) {
-		context.add(obj);
+		if (obj != null)
+			context.add(obj);
 	}
 
-	public <T> ArrayList<T> getFromContext(Class<T> requestedData) {
+	public <T> ArrayList<T> getFromContext(Class<T> type) {
 		ArrayList<T> result = new ArrayList<>();
 
 		for  (Object obj : context)
-			if (requestedData.isInstance(obj))
-				result.add(requestedData.cast(obj));
+			if (type.isInstance(obj))
+				result.add(type.cast(obj));
 
 		return result;
 	}

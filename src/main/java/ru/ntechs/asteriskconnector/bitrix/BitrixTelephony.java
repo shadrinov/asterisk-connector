@@ -1,6 +1,7 @@
 package ru.ntechs.asteriskconnector.bitrix;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -73,5 +74,11 @@ public class BitrixTelephony {
 
 	public ArrayList<User> getUser(Integer id) throws BitrixRestApiException {
 		return new RestRequestUserGet(bitrixAuth, id).exec().getResult();
+	}
+
+	public ArrayList<User> getUser(HashMap<String, String> constraints) throws BitrixRestApiException {
+		RestRequestUserGet req = new RestRequestUserGet(bitrixAuth);
+		req.setFilter(constraints);
+		return req.exec().getResult();
 	}
 }

@@ -1,19 +1,20 @@
 package ru.ntechs.asteriskconnector.scripting;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import lombok.Getter;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
 @Getter
 public abstract class Function {
-	private EventDispatcher eventDispatcher;
+	private ScriptFactory scriptFactory;
 
-	public Function(EventDispatcher eventDispatcher) {
+	public Function(ScriptFactory scriptFactory) {
 		super();
-		this.eventDispatcher = eventDispatcher;
+		this.scriptFactory = scriptFactory;
 	}
 
 	public abstract String eval() throws IOException, BitrixLocalException;
+	public abstract ArrayList<? extends Object> getIntermediateBeans();
 }
