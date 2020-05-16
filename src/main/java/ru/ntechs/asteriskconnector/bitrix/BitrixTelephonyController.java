@@ -191,12 +191,19 @@ public class BitrixTelephonyController {
 			throw new BitrixLocalException(String.format("unknown requested line number: %s", event.getDataLineNumber()));
 
 		ArrayList<User> usersInfo = bitrixTelephony.getUser(event.getAuthUserId());
+
+		if ((usersInfo == null) || usersInfo.isEmpty())
+			throw new BitrixLocalException("no information about calling agent Bitrix24 returned");
+
 		log.info("Bitrix user info: {}", usersInfo.toString());
-
-		if (usersInfo.isEmpty())
-			throw new BitrixLocalException("unable to get information about calling agent from Bitrix24");
-
 		User userInfo = usersInfo.get(0);
+
+		if (userInfo == null)
+			throw new BitrixLocalException("no information about calling agent Bitrix24 returned");
+
+		if (userInfo.getUfPhoneInner() == null)
+			throw new BitrixLocalException(String.format("no inner phone defined for user %s", userInfo.getEmail()));
+
 		userInfo.setUfPhoneInner(cleanupPhoneNumber(userInfo.getUfPhoneInner()));
 
 		Originate originate = new Originate(ami);

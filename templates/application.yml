@@ -27,32 +27,28 @@ connector:
    rules:
       - events:
          - Join
+         - AgentCalled
         action:
-           type: rest
-           url: https://ntechs.bitrix24.ru/rest/telephony.externalcall.register
-        data:
-           channelId: ${Join(chanid)}
-           callerid: ${Join()}
-           agentcalled: ${AgentCalled(member)}
+           - method: telephony.externalcall.register
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))
+                PHONE_NUMBER: ${Join(CallerIDNum)}
+                TYPE: 2
+      - events:
+         - AgentCalled
+         - AgentRingNoAnswer
+        action:
+           - method: telephony.externalcall.hide
       - events:
          - AgentRingNoAnswer
          - AgentCalled
-         - Leave
         action:
-           type: rest
-           url: https://devel.ntechs/vtiger.php
-        data:
-           channelId: ${Join(chanid)}
-           callerid: ${Join()}
-           agentcalled: ${AgentCalled(member)}
+           - method: telephony.externalcall.show
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))
       - events:
-         - RTCPReceived
-         - RTCPSent
-         - RTCPReceived
+         - Join
+         - AgentCalled
+         - Hangup
         action:
-           type: rest
-           url: https://devel.ntechs/vtiger.php
-        data:
-           channelId: ${Join(chanid)}
-           callerid: ${Join()}
-           agentcalled: ${AgentCalled(member)}
+           - method: telephony.externalcall.finish

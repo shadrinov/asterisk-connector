@@ -50,16 +50,20 @@ public class ScriptFactory {
 			}
 
 			switch (action.getMethod().toLowerCase()) {
+			case ("telephony.externalcall.finish"):
+				new MethodFinishExternalCall(this, eventChain, action).exec();
+				break;
+
+			case ("telephony.externalcall.hide"):
+				new MethodHideExternalCall(this, eventChain, action).exec();
+				break;
+
 			case ("telephony.externalcall.register"):
 				new MethodRegisterExternalCall(this, eventChain, action).exec();
 				break;
 
 			case ("telephony.externalcall.show"):
 				new MethodShowExternalCall(this, eventChain, action).exec();
-				break;
-
-			case ("telephony.externalcall.hide"):
-				new MethodHideExternalCall(this, eventChain, action).exec();
 				break;
 
 			default:

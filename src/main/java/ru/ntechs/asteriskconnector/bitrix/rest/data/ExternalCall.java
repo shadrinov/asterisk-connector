@@ -2,6 +2,7 @@ package ru.ntechs.asteriskconnector.bitrix.rest.data;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -26,4 +27,7 @@ public class ExternalCall {
 
 	@JsonProperty("CRM_ENTITY_TYPE")
 	private String crmEntityType;
+
+	@JsonIgnore
+	private boolean isFinished;
 }

@@ -58,7 +58,7 @@ public class FunctionREST extends Function {
 			intermediateBeans = bitrixTelephony.getUser(constraints);
 
 			if ((intermediateBeans == null) || (intermediateBeans.size() == 0))
-				throw new BitrixLocalException("sdsdsdsdsd");
+				throw new BitrixLocalException("No Bitrix user account found, constraints: " +  constraintsToString());
 
 			if (intermediateBeans.size() > 1) {
 				ArrayList<String> userIds = new ArrayList<>();
@@ -91,6 +91,19 @@ public class FunctionREST extends Function {
 	@Override
 	public ArrayList<User> getIntermediateBeans() {
 		return intermediateBeans;
+	}
+
+	private String constraintsToString() {
+		ArrayList<String> strConstr = new ArrayList<>();
+
+		constraints.forEach(new BiConsumer<String, String>() {
+			@Override
+			public void accept(String t, String u) {
+				strConstr.add(t + " = " + u);
+			}
+		});
+
+		return String.join(", ", strConstr);
 	}
 }
 // USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))

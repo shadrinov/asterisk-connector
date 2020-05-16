@@ -1,14 +1,14 @@
 package ru.ntechs.asteriskconnector.scripting;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
-
-import org.apache.catalina.User;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallRegister;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
@@ -73,14 +73,17 @@ public class MethodRegisterExternalCall extends Method {
 			if (data.containsKey("LINE_NUMBER"))
 				req.setLineNumber(data.get("LINE_NUMBER"));
 
-			ExternalCall call = req.exec().getResult();
-			getEventChain().putInContext(call);
+			if (req.getCallStartDate() == null)
+				req.setCallStartDate(Calendar.getInstance().getTime());
 
-			if (req.getShow() != 0) {
+			ExternalCall call = req.exec().getResult();
+			getContext().put(call);
+
+			if ((req.getShow() == null) || req.getShow() != 0) {
 				ArrayList<User> users = findIntermediateBeans(User.class);
 
 				for (User entry : users)
-					getEventChain().putInContext(entry);
+					getContext().put(entry);
 			}
 		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());

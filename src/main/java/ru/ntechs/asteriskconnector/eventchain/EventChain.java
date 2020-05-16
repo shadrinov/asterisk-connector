@@ -21,7 +21,7 @@ public class EventChain {
 	private List<ConnectorRule> rules;
 	private ArrayList<Integer> rulesProgress;
 
-	private ArrayList<Object> context;
+	private ChainContext context;
 
 	EventChain(EventDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
 		super();
@@ -39,7 +39,7 @@ public class EventChain {
 		for (int index = 0; index < rules.size(); index++)
 			rulesProgress.add(0);
 
-		this.context = new ArrayList<>();
+		this.context = new ChainContext();
 	}
 
 	public synchronized void enqueue(int birthTicks, Message message) {
@@ -74,20 +74,23 @@ public class EventChain {
 					if (ruleProgress >= eventNames.size() && (eventNames.size() > 0)) {
 						List<ConnectorAction> action = rule.getAction();
 
-						log.info("Progress: {}, Result: MATCH! Got {}, executing action: {}",
+						log.info("Progress: {}:{}, Result: MATCH! Got {} on {}, executing action: {}",
 								rulesProgress.toString(),
+								index,
 								eventNames.get(ruleProgress - 1),
+								channel,
 								(action != null) ? action.toString() : "<null>");
 
 						rulesProgress.set(index, 0);
 						matched.add(rule);
 					}
 					else {
-						log.info("Progress: {}, Result: PROGRESS! Got {}, waiting for: \"{}\" at {}",
+						log.info("Progress: {}:{}, Result: PROGRESS! Got {} on {}, waiting for {}",
 								rulesProgress.toString(),
+								index,
 								eventNames.get(ruleProgress - 1),
-								eventNames.get(ruleProgress),
-								ruleProgress);
+								channel,
+								eventNames.get(ruleProgress));
 					}
 				}
 			}
@@ -117,19 +120,8 @@ public class EventChain {
 		return headEvent;
 	}
 
-	public void putInContext(Object obj) {
-		if (obj != null)
-			context.add(obj);
-	}
-
-	public <T> ArrayList<T> getFromContext(Class<T> type) {
-		ArrayList<T> result = new ArrayList<>();
-
-		for  (Object obj : context)
-			if (type.isInstance(obj))
-				result.add(type.cast(obj));
-
-		return result;
+	public ChainContext getContext() {
+		return context;
 	}
 
 	public void garbageCollect(int age) {

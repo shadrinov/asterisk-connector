@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallShow;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
@@ -28,7 +29,13 @@ public class MethodShowExternalCall extends Method {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
 			log.info("evaluated: {}", data.toString());
 
-			ArrayList<ExternalCall> calls = getEventChain().getFromContext(ExternalCall.class);
+			ArrayList<ExternalCall> calls = getContext().get(ExternalCall.class);
+
+			ExternalCall firstCall = (calls.size() > 0) ? calls.get(0) : null;
+			if ((firstCall != null) && firstCall.isFinished()) {
+				log.info("suppressed method call, call is finished: {}, {}", getAction().getMethod(), firstCall.toString());
+				return;
+			}
 
 			String callId = null;
 			ArrayList<Integer> userIds = new ArrayList<>();
@@ -39,12 +46,8 @@ public class MethodShowExternalCall extends Method {
 			if (data.containsKey("USER_ID"))
 				userIds.add(validateInt(data, "USER_ID"));
 
-			if ((callId == null) && !calls.isEmpty()) {
-				ExternalCall firstCall = calls.get(0);
-
-				if (firstCall != null)
-					callId = firstCall.getCallId();
-			}
+			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
+				callId = firstCall.getCallId();
 
 			if (callId == null)
 				throw new BitrixLocalException("Required parameter is not defined: CALL_ID");
@@ -54,6 +57,9 @@ public class MethodShowExternalCall extends Method {
 
 			req = new RestRequestExternalCallShow(getAuth(), callId, userIds);
 			req.exec();
+
+			for (User user : findIntermediateBeans(User.class))
+				getContext().put(user);
 		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());
 		}

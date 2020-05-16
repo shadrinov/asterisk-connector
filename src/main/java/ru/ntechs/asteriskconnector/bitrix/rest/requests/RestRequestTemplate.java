@@ -68,13 +68,17 @@ public abstract class RestRequestTemplate {
 			});
 
 //			restTemplate.getInterceptors().add(new LoggingRequestInterceptor());
-//			List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+//			ArrayList<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 //			interceptors.add(new LoggingRequestInterceptor());
 //			restTemplate.setInterceptors(interceptors);
 		}
 	}
 
 	public abstract String getMethod();
+
+	protected RestTemplate getRestTemplate() {
+		return restTemplate;
+	}
 
 	protected <T extends RestResult> T exec(Class<T> result) throws BitrixRestApiException {
 		ResponseEntity<T> response = restTemplate.postForEntity(auth.getMethodUri(getMethod()), this, result);
@@ -91,7 +95,7 @@ public abstract class RestRequestTemplate {
 
 	public String exec_debug() throws BitrixRestApiException {
 		String result = restTemplate.postForObject(auth.getMethodUri(getMethod()), this, String.class);
-		log.info(result);
+		log.info("exec_debug(): {}", result);
 		return result;
 	}
 

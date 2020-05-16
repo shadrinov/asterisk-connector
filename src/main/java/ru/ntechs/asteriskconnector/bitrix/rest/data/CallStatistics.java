@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 public class CallStatistics {
 	@JsonProperty("CALL_ID")
-	private Integer callId;
+	private String callId;
 
 	@JsonProperty("ID")
 	private Integer id;

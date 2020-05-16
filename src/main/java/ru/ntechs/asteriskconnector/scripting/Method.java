@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
+import ru.ntechs.asteriskconnector.eventchain.ChainContext;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
@@ -50,6 +51,10 @@ public abstract class Method {
 		return scriptFactory.getAuth();
 	}
 
+	public ChainContext getContext() {
+		return eventChain.getContext();
+	}
+
 	protected HashMap<String, String> evaluate(EventDispatcher eventDispatcher, EventChain eventChain, Map<String, String> template) {
 		HashMap<String, String> params = new HashMap<>();
 
@@ -62,7 +67,7 @@ public abstract class Method {
 					params.put(key, result);
 				}
 			} catch (IOException | BitrixLocalException e) {
-				log.warn("Eror while evaluating expression: {}", e.getMessage());
+				log.warn("Expression evaluation failure: {}", e.getMessage());
 			}
 
 		return params;
