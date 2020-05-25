@@ -97,7 +97,7 @@ public class EventChain {
 		}
 
 		for (ConnectorRule rule : matched)
-			scriptFactory.buildScript(this, rule);
+			scriptFactory.buildScript(this, rule, message);
 	}
 
 	public boolean isEmpty() {
@@ -134,6 +134,10 @@ public class EventChain {
 
 	public EventNode findMessage(String name) {
 		return (tailEvent != null) ? tailEvent.findMessage(name) : null;
+	}
+
+	public EventNode findMessage(Message before, String name) {
+		return (tailEvent != null) ? tailEvent.findMessage(before, name) : null;
 	}
 
 	@Override

@@ -4,10 +4,12 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ru.ntechs.asteriskconnector.bitrix.BitrixDateDeserializer;
 
 @Getter
 @Setter
@@ -40,7 +42,8 @@ public class CallStatistics {
 	@JsonProperty("CALL_DURATION")
 	private Integer callDuration;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonDeserialize(using = BitrixDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.OBJECT, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
 	@JsonProperty("CALL_START_DATE")
 	private Date callStartDate;
 

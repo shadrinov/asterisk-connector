@@ -40,7 +40,7 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 	@JsonProperty("PHONE_NUMBER")
 	private String phoneNumber;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
 	@JsonProperty("CALL_START_DATE")
 	private Date callStartDate;
 

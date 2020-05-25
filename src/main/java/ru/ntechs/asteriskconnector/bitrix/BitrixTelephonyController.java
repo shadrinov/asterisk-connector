@@ -28,7 +28,7 @@ import ru.ntechs.asteriskconnector.config.ConnectorExternalLine;
 
 @Slf4j
 @RestController
-@RequestMapping("/rest")
+@RequestMapping("/api")
 public class BitrixTelephonyController {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
@@ -113,7 +113,7 @@ public class BitrixTelephonyController {
 		return "Welcome to NTechs Asterisk Connector";
 	}
 
-	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/event")
+	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/b24/event")
 	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
 		try {
 			switch (BitrixEvent.getEvent(params).toUpperCase()) {
@@ -168,7 +168,7 @@ public class BitrixTelephonyController {
 		}
 
 		log.info("Registering event: ONEXTERNALCALLSTART");
-		btInstall.bindEvent("ONEXTERNALCALLSTART", conf.getAddress() + "event");
+		btInstall.bindEvent("ONEXTERNALCALLSTART", conf.getAddress().concat("b24/event"));
 
 		bitrixTelephony.afterInstall(btInstall);
 

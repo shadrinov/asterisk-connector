@@ -20,4 +20,8 @@ public class ConnectorConfig {
 	private ConnectorAmi ami;
 	private ConnectorBitrix bitrix;
 	private List<ConnectorRule> rules = new ArrayList<>();  // NPE happens otherwise
+
+	public void setAddress(String address) {
+		this.address = (address.endsWith("/")) ? address : address.concat("/");
+	}
 }

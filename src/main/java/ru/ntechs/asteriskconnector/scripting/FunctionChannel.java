@@ -29,7 +29,7 @@ public class FunctionChannel extends Function {
 		EventChain eventChain = eventDispatcher.getEventChain(channelId);
 
 		if (eventChain != null) {
-			Expression interpreter = new Expression(scriptFactory, eventChain, expr);
+			Expression interpreter = new Expression(scriptFactory, eventChain, expr, getMessage());
 			String result = interpreter.eval();
 			intermediateBeans = interpreter.getIntermediateBeans();
 			return result;

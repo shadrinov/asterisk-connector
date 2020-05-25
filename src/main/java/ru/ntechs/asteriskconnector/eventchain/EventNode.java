@@ -67,13 +67,24 @@ public class EventNode {
 	}
 
 	public EventNode findMessage(String name) {
+		return findMessage(null, name);
+	}
+
+	public EventNode findMessage(Message before, String name) {
 		EventNode candidate = this;
+
+		if (before != null) {
+			while ((candidate != null) && (candidate.getMessage() != null)
+					&& (candidate.getMessage() != before)) {
+				candidate = candidate.getPrev();
+			}
+		}
 
 		while ((candidate != null) && (candidate.getMessage() != null)
 				&& !candidate.getMessage().getName().equalsIgnoreCase(name)) {
 			candidate = candidate.getPrev();
 		}
 
-		return (candidate != null) ? candidate : null;
+		return candidate;
 	}
 }

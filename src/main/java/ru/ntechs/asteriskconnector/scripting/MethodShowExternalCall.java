@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
@@ -15,8 +16,8 @@ import ru.ntechs.asteriskconnector.eventchain.EventChain;
 @Slf4j
 public class MethodShowExternalCall extends Method {
 
-	public MethodShowExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action) {
-		super(scriptFactory, eventChain, action);
+	public MethodShowExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+		super(scriptFactory, eventChain, action, message);
 	}
 
 	@Override

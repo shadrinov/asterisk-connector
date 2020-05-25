@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
@@ -27,9 +28,14 @@ public class ScriptFactory {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
 
-	public void buildScript(EventChain eventChain, ConnectorRule rule) {
+	public void buildScript(EventChain eventChain, ConnectorRule rule, Message message) {
 		if (rule == null)
 			return;
+
+		if (message == null) {
+			log.info("internal error (bug): no final message specified");
+			return;
+		}
 
 		List<ConnectorAction> actions = rule.getAction();
 
@@ -51,19 +57,19 @@ public class ScriptFactory {
 
 			switch (action.getMethod().toLowerCase()) {
 			case ("telephony.externalcall.finish"):
-				new MethodFinishExternalCall(this, eventChain, action).exec();
+				new MethodFinishExternalCall(this, eventChain, action, message).exec();
 				break;
 
 			case ("telephony.externalcall.hide"):
-				new MethodHideExternalCall(this, eventChain, action).exec();
+				new MethodHideExternalCall(this, eventChain, action, message).exec();
 				break;
 
 			case ("telephony.externalcall.register"):
-				new MethodRegisterExternalCall(this, eventChain, action).exec();
+				new MethodRegisterExternalCall(this, eventChain, action, message).exec();
 				break;
 
 			case ("telephony.externalcall.show"):
-				new MethodShowExternalCall(this, eventChain, action).exec();
+				new MethodShowExternalCall(this, eventChain, action, message).exec();
 				break;
 
 			default:

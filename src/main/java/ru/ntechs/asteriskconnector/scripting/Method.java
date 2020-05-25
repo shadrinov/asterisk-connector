@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
@@ -19,20 +20,22 @@ import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
 @Slf4j
 public abstract class Method {
-	private static final DateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	private static final DateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
 	private ScriptFactory scriptFactory;
 	private EventChain eventChain;
 	private ConnectorAction action;
+	private Message message;
 
 	private ArrayList<Object> intermediateBeans;
 
-	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action) {
+	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super();
 
 		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.action = action;
+		this.message = message;
 	}
 
 	public EventDispatcher getEventDispatcher() {
@@ -45,6 +48,10 @@ public abstract class Method {
 
 	public ConnectorAction getAction() {
 		return action;
+	}
+
+	public Message getMessage() {
+		return message;
 	}
 
 	public BitrixAuth getAuth() {
@@ -61,7 +68,7 @@ public abstract class Method {
 		if (template != null)
 			try {
 				for (String key : template.keySet()) {
-					Expression interpreter = new Expression(scriptFactory, eventChain, template.get(key));
+					Expression interpreter = new Expression(scriptFactory, eventChain, template.get(key), message);
 					String result = interpreter.eval();
 					intermediateBeans = interpreter.getIntermediateBeans();
 					params.put(key, result);

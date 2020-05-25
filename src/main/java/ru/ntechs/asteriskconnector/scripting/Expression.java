@@ -14,6 +14,7 @@ public class Expression {
 	private EventChain eventChain;
 	private String expr;
 	private ArrayList<Object> intermediateBeans;
+	private Message message;
 
 	private CharArrayReader reader;
 
@@ -27,6 +28,17 @@ public class Expression {
 		this.expr = expr.trim();
 		this.intermediateBeans = new ArrayList<>();
 		this.reader = new CharArrayReader(this.expr.toCharArray());
+	}
+
+	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr, Message message) {
+		super();
+
+		this.scriptFactory = scriptFactory;
+		this.eventChain = eventChain;
+		this.expr = expr.trim();
+		this.intermediateBeans = new ArrayList<>();
+		this.reader = new CharArrayReader(this.expr.toCharArray());
+		this.message = message;
 	}
 
 	public String eval() throws IOException, BitrixLocalException {
@@ -53,15 +65,25 @@ public class Expression {
 		if (params.size() != 1)
 			throw new BitrixLocalException(formatError("Wrong number of parameters in event reference"));
 
-		EventNode node = eventChain.findMessage(eventName);
+		Message msg;
 
-		if (node == null)
-			throw new BitrixLocalException(formatError(String.format("Unable to find message '%s' in current event chain", eventName)));
+		if (eventName.equalsIgnoreCase("!")) {
+			msg = message;
 
-		Message msg = node.getMessage();
+			if (msg == null)
+				throw new BitrixLocalException(formatError(String.format("no context event message ('%s') specfied", eventName)));
+		}
+		else {
+			EventNode node = eventChain.findMessage(message, eventName);
 
-		if (msg == null)
-			throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventName)));
+			if (node == null)
+				throw new BitrixLocalException(formatError(String.format("Unable to find message '%s' in current event chain", eventName)));
+
+			msg = node.getMessage();
+
+			if (msg == null)
+				throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventName)));
+		}
 
 		String value = msg.getAttribute(params.get(0));
 
@@ -76,7 +98,7 @@ public class Expression {
 
 		switch (funcName.toLowerCase()) {
 			case ("channel"): func = new FunctionChannel(scriptFactory, params); break;
-			case ("rest"): func = new FunctionREST(scriptFactory, params); break;
+			case ("rest"): func = new FunctionREST(scriptFactory, message, params); break;
 
 			default:
 				throw new BitrixLocalException(formatError("Unknown function"));
@@ -197,7 +219,10 @@ public class Expression {
 	}
 
 	private String formatError(String message) {
-		return String.format("%s: %s <-- ... %s", message, expr.substring(0, failCharIndex), expr.substring(failCharIndex + 1));
+		if (failCharIndex >= expr.length())
+			return String.format("%s: %s", message, expr);
+		else
+			return String.format("%s: %s <-- ... %s", message, expr.substring(0, failCharIndex), expr.substring(failCharIndex + 1));
 	}
 
 	public ArrayList<Object> getIntermediateBeans() {

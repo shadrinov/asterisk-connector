@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
@@ -15,8 +16,8 @@ import ru.ntechs.asteriskconnector.eventchain.EventChain;
 @Slf4j
 public class MethodFinishExternalCall extends Method {
 
-	public MethodFinishExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action) {
-		super(scriptFactory, eventChain, action);
+	public MethodFinishExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+		super(scriptFactory, eventChain, action, message);
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class MethodFinishExternalCall extends Method {
 				throw new BitrixLocalException("Required parameter is not defined: USER_ID");
 
 			RestRequestExternalCallFinish req = new RestRequestExternalCallFinish(getAuth(), callId, userId, 0);
-			req.exec_debug();
+			req.exec();
 
 			getContext().remove(users);
 
