@@ -1,0 +1,72 @@
+connector:
+   address: https://connector.ntechs.ru/api/
+   debug: true
+   ami:
+      hostname: localhost
+      port: 5038
+      username: ntcrm
+      password: secret
+   bitrix:
+      api: https://ntechs.bitrix24.ru/rest/
+      auth: https://oauth.bitrix.info/oauth/token/
+      clientid: clientid
+      clientkey: clientkey
+      externallines:
+         - number: 123456
+           name: Физическое лицо
+           channel: Local/{0}@phy-phones
+           context: org-phones
+           exten: "{0}"
+           priority: 1
+         - number: 654321
+           name: Организация
+           channel: Local/{0}@org-phones
+           context: org-phones
+           exten: "{0}"
+           priority: 1
+   rules:
+      - events:
+         - Newchannel
+         - QueueCallerJoin
+        action:
+           - method: telephony.externalcall.register
+             data:
+                USER_PHONE_INNER: 10
+                PHONE_NUMBER: ${QueueCallerJoin(CallerIDNum)}
+                TYPE: 2
+                SHOW: 0
+      - events:
+         - AgentRingNoAnswer
+        action:
+           - method: telephony.externalcall.hide
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentRingNoAnswer(DestCallerIDNum)}))
+      - events:
+         - AgentCalled
+        action:
+           - method: telephony.externalcall.show
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
+      - events:
+         - Newchannel
+         - QueueCallerJoin
+         - AgentCalled
+         - AgentConnect
+         - AgentComplete
+         - Hangup
+        action:
+           - method: telephony.externalcall.finish
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
+                DURATION: ${AgentComplete(TalkTime)}
+                STATUS_CODE: 200
+      - events:
+         - Newchannel
+         - QueueCallerJoin
+         - AgentCalled
+         - Hangup
+        action:
+           - method: telephony.externalcall.finish
+             data:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
+                STATUS_CODE: 304

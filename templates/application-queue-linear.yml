@@ -1,5 +1,5 @@
 connector:
-   address: https://connector.ntechs.ru/rest/
+   address: https://connector.ntechs.ru/api/
    debug: true
    ami:
       hostname: localhost
