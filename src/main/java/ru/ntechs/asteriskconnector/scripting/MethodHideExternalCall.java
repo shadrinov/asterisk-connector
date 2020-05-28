@@ -22,7 +22,7 @@ public class MethodHideExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, String> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
 
 		try {
 			RestRequestExternalCallHide req;
@@ -43,10 +43,10 @@ public class MethodHideExternalCall extends Method {
 			}
 
 			if (data.containsKey("CALL_ID"))
-				callId = data.get("CALL_ID");
+				callId = data.get("CALL_ID").asString();
 
 			if (data.containsKey("USER_ID"))
-				userIds.add(validateInt(data, "USER_ID"));
+				userIds.add(data.get("USER_ID").asInteger());
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();

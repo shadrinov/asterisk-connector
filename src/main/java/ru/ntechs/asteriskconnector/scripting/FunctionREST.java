@@ -17,11 +17,11 @@ public class FunctionREST extends Function {
 	private HashMap<String, String> constraints;
 	private ArrayList<User> intermediateBeans;
 
-	public FunctionREST(ScriptFactory scriptFactory, Message message, ArrayList<String> params) throws BitrixLocalException {
+	public FunctionREST(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) throws BitrixLocalException {
 		super(scriptFactory, message);
 
-		this.method = params.get(0);
-		this.field = params.get(1);
+		this.method = params.get(0).asString();
+		this.field = params.get(1).asString();
 
 		this.constraints = new HashMap<>();
 
@@ -31,8 +31,8 @@ public class FunctionREST extends Function {
 
 		try {
 			while (index < params.size()) {
-				key = params.get(index++);
-				val = params.get(index++);
+				key = params.get(index++).asString();
+				val = params.get(index++).asString();
 				constraints.put(key, val);
 			}
 		} catch (IndexOutOfBoundsException e) {
@@ -41,7 +41,7 @@ public class FunctionREST extends Function {
 	}
 
 	@Override
-	public String eval() throws IOException, BitrixLocalException {
+	public Scalar eval() throws IOException, BitrixLocalException {
 		switch (method.toLowerCase()) {
 			case ("user.get"): return userGet();
 
@@ -50,7 +50,7 @@ public class FunctionREST extends Function {
 		}
 	}
 
-	private String userGet() throws BitrixLocalException {
+	private Scalar userGet() throws BitrixLocalException {
 		ScriptFactory scriptFactory = getScriptFactory();
 		BitrixTelephony bitrixTelephony = scriptFactory.getBitrixTelephony();
 		String result = null;
@@ -86,7 +86,7 @@ public class FunctionREST extends Function {
 							e.getMessage(), method, field, String.join(", ", params)));
 		}
 
-		return result;
+		return new Scalar(String.format("$(REST(%s, %s...))", method, field), result);
 	}
 
 	@Override

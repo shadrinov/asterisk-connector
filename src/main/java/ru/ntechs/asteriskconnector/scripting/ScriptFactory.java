@@ -72,6 +72,10 @@ public class ScriptFactory {
 				new MethodShowExternalCall(this, eventChain, action, message).exec();
 				break;
 
+			case ("telephony.externalcall.attachrecord"):
+				new MethodExternalCallAttachRecord(this, eventChain, action, message).exec();
+				break;
+
 			default:
 				log.info("unsupported method: {}", action.getMethod());
 				break;

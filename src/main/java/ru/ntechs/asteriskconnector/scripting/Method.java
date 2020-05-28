@@ -62,14 +62,14 @@ public abstract class Method {
 		return eventChain.getContext();
 	}
 
-	protected HashMap<String, String> evaluate(EventDispatcher eventDispatcher, EventChain eventChain, Map<String, String> template) {
-		HashMap<String, String> params = new HashMap<>();
+	protected HashMap<String, Scalar> evaluate(EventDispatcher eventDispatcher, EventChain eventChain, Map<String, String> template) {
+		HashMap<String, Scalar> params = new HashMap<>();
 
 		if (template != null)
 			try {
 				for (String key : template.keySet()) {
 					Expression interpreter = new Expression(scriptFactory, eventChain, template.get(key), message);
-					String result = interpreter.eval();
+					Scalar result = interpreter.eval();
 					intermediateBeans = interpreter.getIntermediateBeans();
 					params.put(key, result);
 				}

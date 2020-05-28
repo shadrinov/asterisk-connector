@@ -22,7 +22,7 @@ public class MethodFinishExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, String> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
 
 		try {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
@@ -41,10 +41,10 @@ public class MethodFinishExternalCall extends Method {
 			}
 
 			if (data.containsKey("CALL_ID"))
-				callId = data.get("CALL_ID");
+				callId = data.get("CALL_ID").asString();
 
 			if (data.containsKey("USER_ID"))
-				userId = validateInt(data, "USER_ID");
+				userId = data.get("USER_ID").asInteger();
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();

@@ -23,7 +23,7 @@ public class MethodRegisterExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, String> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
 
 		try {
 			RestRequestExternalCallRegister req;
@@ -31,10 +31,10 @@ public class MethodRegisterExternalCall extends Method {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
 			log.info("evaluated: {}", data.toString());
 
-			String userPhoneInner = data.get("USER_PHONE_INNER");
-			Integer userId = validateInt(data, "USER_ID");
-			String phoneNumber = data.get("PHONE_NUMBER");
-			String type = data.get("TYPE");
+			String userPhoneInner = data.get("USER_PHONE_INNER").asString();
+			Integer userId = data.get("USER_ID").asInteger();
+			String phoneNumber = data.get("PHONE_NUMBER").asString();
+			String type = data.get("TYPE").asString();
 
 			if ((userPhoneInner == null) && (userId == null))
 				throw new BitrixLocalException("Required parameter is not defined: USER_PHONE_INNER or USER_ID");
@@ -46,33 +46,33 @@ public class MethodRegisterExternalCall extends Method {
 				throw new BitrixLocalException("Required parameter is not defined: TYPE");
 
 			if (userId != null)
-				req = new RestRequestExternalCallRegister(getAuth(), userId, phoneNumber, validateInt(data, "TYPE"));
+				req = new RestRequestExternalCallRegister(getAuth(), userId, phoneNumber, data.get("TYPE").asInteger());
 			else
-				req = new RestRequestExternalCallRegister(getAuth(), userPhoneInner, phoneNumber, validateInt(data, "TYPE"));
+				req = new RestRequestExternalCallRegister(getAuth(), userPhoneInner, phoneNumber, data.get("TYPE").asInteger());
 
 			if (data.containsKey("CALL_START_DATE"))
-				req.setCallStartDate(validateDate(data, "CALL_START_DATE"));
+				req.setCallStartDate(data.get("CALL_START_DATE").asDate());
 
 			if (data.containsKey("CRM_CREATE"))
-				req.setCrmCreate(validateInt(data, "CRM_CREATE"));
+				req.setCrmCreate(data.get("CRM_CREATE").asInteger());
 
 			if (data.containsKey("CRM_SOURCE"))
-				req.setCrmSource(data.get("CRM_SOURCE"));
+				req.setCrmSource(data.get("CRM_SOURCE").asString());
 
 			if (data.containsKey("CRM_ENTITY_TYPE"))
-				req.setCrmEntityType(data.get("CRM_ENTITY_TYPE"));
+				req.setCrmEntityType(data.get("CRM_ENTITY_TYPE").asString());
 
 			if (data.containsKey("CRM_ENTITY_ID"))
-				req.setCrmEntityId(validateInt(data, "CRM_ENTITY_ID"));
+				req.setCrmEntityId(data.get("CRM_ENTITY_ID").asInteger());
 
 			if (data.containsKey("SHOW"))
-				req.setShow(validateInt(data, "SHOW"));
+				req.setShow(data.get("SHOW").asInteger());
 
 			if (data.containsKey("CALL_LIST_ID"))
-				req.setCallListId(validateInt(data, "CALL_LIST_ID"));
+				req.setCallListId(data.get("CALL_LIST_ID").asInteger());
 
 			if (data.containsKey("LINE_NUMBER"))
-				req.setLineNumber(data.get("LINE_NUMBER"));
+				req.setLineNumber(data.get("LINE_NUMBER").asString());
 
 			if (req.getCallStartDate() == null)
 				req.setCallStartDate(Calendar.getInstance().getTime());

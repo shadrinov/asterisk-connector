@@ -25,6 +25,6 @@ public abstract class Function {
 		this.message = message;
 	}
 
-	public abstract String eval() throws IOException, BitrixLocalException;
+	public abstract Scalar eval() throws IOException, BitrixLocalException;
 	public abstract ArrayList<? extends Object> getIntermediateBeans();
 }
