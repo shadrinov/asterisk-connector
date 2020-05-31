@@ -68,9 +68,9 @@ public abstract class Method {
 		if (template != null)
 			try {
 				for (String key : template.keySet()) {
-					Expression interpreter = new Expression(scriptFactory, eventChain, template.get(key), message);
-					Scalar result = interpreter.eval();
-					intermediateBeans = interpreter.getIntermediateBeans();
+					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), message);
+					Scalar result = expr.eval();
+					intermediateBeans = expr.getIntermediateBeans();
 					params.put(key, result);
 				}
 			} catch (IOException | BitrixLocalException e) {

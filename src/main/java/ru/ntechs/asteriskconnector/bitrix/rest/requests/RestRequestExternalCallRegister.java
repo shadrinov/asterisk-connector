@@ -35,7 +35,7 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 	private String userPhoneInner;
 
 	@JsonProperty("USER_ID")
-	private Integer userId;
+	private Long userId;
 
 	@JsonProperty("PHONE_NUMBER")
 	private String phoneNumber;
@@ -66,9 +66,9 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 	private String lineNumber;
 
 	@JsonProperty("TYPE")
-	private Integer type;
+	private Short type;
 
-	public RestRequestExternalCallRegister(BitrixAuth auth, String userPhoneInner, String phoneNumber, Integer type) {
+	public RestRequestExternalCallRegister(BitrixAuth auth, String userPhoneInner, String phoneNumber, Short type) {
 		super(auth);
 
 		this.userPhoneInner = userPhoneInner;
@@ -76,7 +76,7 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 		this.type = type;
 	}
 
-	public RestRequestExternalCallRegister(BitrixAuth auth, Integer userId, String phoneNumber, Integer type) {
+	public RestRequestExternalCallRegister(BitrixAuth auth, Long userId, String phoneNumber, Short type) {
 		super(auth);
 
 		this.userId = userId;

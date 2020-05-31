@@ -29,7 +29,7 @@ public class MethodFinishExternalCall extends Method {
 			log.info("evaluated: {}", data.toString());
 
 			String callId = null;
-			Integer userId = null;
+			Long userId = null;
 
 			ArrayList<User> users = getContext().get(User.class);
 			ArrayList<ExternalCall> calls = getContext().get(ExternalCall.class);
@@ -44,7 +44,7 @@ public class MethodFinishExternalCall extends Method {
 				callId = data.get("CALL_ID").asString();
 
 			if (data.containsKey("USER_ID"))
-				userId = data.get("USER_ID").asInteger();
+				userId = data.get("USER_ID").asLong();
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();

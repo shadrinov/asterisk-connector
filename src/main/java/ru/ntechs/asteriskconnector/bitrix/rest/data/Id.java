@@ -11,5 +11,5 @@ import lombok.ToString;
 @ToString
 public class Id {
 	@JsonProperty("ID")
-	private Integer Id;
+	private Long Id;
 }

@@ -29,9 +29,9 @@ public class FunctionChannel extends Function {
 		EventChain eventChain = eventDispatcher.getEventChain(channelId);
 
 		if (eventChain != null) {
-			Expression interpreter = new Expression(scriptFactory, eventChain, expr, getMessage());
-			Scalar result = interpreter.eval();
-			intermediateBeans = interpreter.getIntermediateBeans();
+			Expression expr = new Expression(scriptFactory, eventChain, this.expr, getMessage());
+			Scalar result = expr.eval();
+			intermediateBeans = expr.getIntermediateBeans();
 			return result;
 		}
 		else

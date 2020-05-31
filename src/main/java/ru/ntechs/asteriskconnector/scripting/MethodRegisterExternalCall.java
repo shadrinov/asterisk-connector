@@ -31,10 +31,10 @@ public class MethodRegisterExternalCall extends Method {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
 			log.info("evaluated: {}", data.toString());
 
-			String userPhoneInner = data.get("USER_PHONE_INNER").asString();
-			Integer userId = data.get("USER_ID").asInteger();
-			String phoneNumber = data.get("PHONE_NUMBER").asString();
-			String type = data.get("TYPE").asString();
+			String userPhoneInner = (data.containsKey("USER_PHONE_INNER")) ? data.get("USER_PHONE_INNER").asString() : null;
+			Long userId = (data.containsKey("USER_ID")) ? data.get("USER_ID").asLong() : null;
+			String phoneNumber = (data.containsKey("PHONE_NUMBER")) ? data.get("PHONE_NUMBER").asString() : null;
+			String type = (data.containsKey("TYPE")) ? data.get("TYPE").asString() : null;
 
 			if ((userPhoneInner == null) && (userId == null))
 				throw new BitrixLocalException("Required parameter is not defined: USER_PHONE_INNER or USER_ID");
@@ -46,9 +46,9 @@ public class MethodRegisterExternalCall extends Method {
 				throw new BitrixLocalException("Required parameter is not defined: TYPE");
 
 			if (userId != null)
-				req = new RestRequestExternalCallRegister(getAuth(), userId, phoneNumber, data.get("TYPE").asInteger());
+				req = new RestRequestExternalCallRegister(getAuth(), userId, phoneNumber, data.get("TYPE").asShort());
 			else
-				req = new RestRequestExternalCallRegister(getAuth(), userPhoneInner, phoneNumber, data.get("TYPE").asInteger());
+				req = new RestRequestExternalCallRegister(getAuth(), userPhoneInner, phoneNumber, data.get("TYPE").asShort());
 
 			if (data.containsKey("CALL_START_DATE"))
 				req.setCallStartDate(data.get("CALL_START_DATE").asDate());

@@ -17,7 +17,7 @@ public class RestRequestExternalCallFinish extends RestRequestTemplate {
 	private String callId;
 
 	@JsonProperty("USER_ID")
-	private Integer userId;
+	private Long userId;
 
 	@JsonProperty("DURATION")
 	private Integer duration;
@@ -35,13 +35,13 @@ public class RestRequestExternalCallFinish extends RestRequestTemplate {
 	private String failedReason;
 
 	@JsonProperty("VOTE")
-	private Integer vote;
+	private Short vote;
 
 	@JsonProperty("ADD_TO_CHAT")
 	private Integer addToChat;
 
 
-	public RestRequestExternalCallFinish(BitrixAuth auth, String callId, Integer userId, Integer duration) {
+	public RestRequestExternalCallFinish(BitrixAuth auth, String callId, Long userId, Integer duration) {
 		super(auth);
 
 		this.callId = callId;

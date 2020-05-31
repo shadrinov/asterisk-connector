@@ -19,19 +19,19 @@ public class CallStatistics {
 	private String callId;
 
 	@JsonProperty("ID")
-	private Integer id;
+	private Long id;
 
 	@JsonProperty("CALL_TYPE")
-	private Integer callType;
+	private Short callType;
 
 	@JsonProperty("CALL_VOTE")
-	private Integer callVote;
+	private Short callVote;
 
 	@JsonProperty("COMMENT")
 	private String comment;
 
 	@JsonProperty("PORTAL_USER_ID")
-	private Integer portalUserId;
+	private Long portalUserId;
 
 	@JsonProperty("PORTAL_NUMBER")
 	private String portalNumber;
@@ -60,16 +60,16 @@ public class CallStatistics {
 	private String callFailedReason;
 
 	@JsonProperty("CRM_ACTIVITY_ID")
-	private Integer crmActivityId;
+	private Long crmActivityId;
 
 	@JsonProperty("CRM_ENTITY_ID")
-	private Integer crmEntityId;
+	private Long crmEntityId;
 
 	@JsonProperty("CRM_ENTITY_TYPE")
 	private String crmEntityType;
 
 	@JsonProperty("REST_APP_ID")
-	private Integer restAppId;
+	private Long restAppId;
 
 	@JsonProperty("REST_APP_NAME")
 	private String restAppName;
@@ -78,14 +78,14 @@ public class CallStatistics {
 	private Integer redialAttempt;
 
 	@JsonProperty("SESSION_ID")
-	private Integer sessionId;
+	private Long sessionId;
 
 	@JsonProperty("TRANSCRIPT_ID")
-	private Integer transcriptId;
+	private Long transcriptId;
 
 	@JsonProperty("TRANSCRIPT_PENDING")
 	private String transcriptPending;
 
 	@JsonProperty("RECORD_FILE_ID")
-	private Integer recordFileId;
+	private Long recordFileId;
 }

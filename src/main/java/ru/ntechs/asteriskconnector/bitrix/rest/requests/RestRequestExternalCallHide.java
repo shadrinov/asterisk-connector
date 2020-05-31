@@ -19,10 +19,10 @@ public class RestRequestExternalCallHide extends RestRequestTemplate {
 	private String callId;
 
 	@JsonProperty("USER_ID")
-	private ArrayList<Integer> userIds;
+	private ArrayList<Long> userIds;
 
 
-	public RestRequestExternalCallHide(BitrixAuth auth, String callId, ArrayList<Integer> userIds) {
+	public RestRequestExternalCallHide(BitrixAuth auth, String callId, ArrayList<Long> userIds) {
 		super(auth);
 
 		this.callId = callId;

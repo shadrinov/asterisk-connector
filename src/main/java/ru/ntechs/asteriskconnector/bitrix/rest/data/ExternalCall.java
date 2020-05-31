@@ -17,13 +17,13 @@ public class ExternalCall {
 	private String callId;
 
 	@JsonProperty("CRM_CREATED_LEAD")
-	private Integer crmCreatedLead;
+	private Long crmCreatedLead;
 
 	@JsonProperty("CRM_CREATED_ENTITIES")
 	private ArrayList<String> crmCreatedEntites;
 
 	@JsonProperty("CRM_ENTITY_ID")
-	private Integer crmEntityId;
+	private Long crmEntityId;
 
 	@JsonProperty("CRM_ENTITY_TYPE")
 	private String crmEntityType;

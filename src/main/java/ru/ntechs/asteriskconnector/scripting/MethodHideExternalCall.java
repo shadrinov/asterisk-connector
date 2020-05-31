@@ -31,7 +31,7 @@ public class MethodHideExternalCall extends Method {
 			log.info("evaluated: {}", data.toString());
 
 			String callId = null;
-			ArrayList<Integer> userIds = new ArrayList<>();
+			ArrayList<Long> userIds = new ArrayList<>();
 
 			ArrayList<User> users = getContext().get(User.class);
 			ArrayList<ExternalCall> calls = getContext().get(ExternalCall.class);
@@ -46,7 +46,7 @@ public class MethodHideExternalCall extends Method {
 				callId = data.get("CALL_ID").asString();
 
 			if (data.containsKey("USER_ID"))
-				userIds.add(data.get("USER_ID").asInteger());
+				userIds.add(data.get("USER_ID").asLong());
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();

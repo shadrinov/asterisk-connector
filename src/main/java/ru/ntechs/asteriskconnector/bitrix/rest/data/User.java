@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 public class User {
 	@JsonProperty("ID")
-	private Integer id;
+	private Long id;
 
 	@JsonProperty("ACTIVE")
 	private String active;

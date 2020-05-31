@@ -86,7 +86,7 @@ public class FunctionREST extends Function {
 							e.getMessage(), method, field, String.join(", ", params)));
 		}
 
-		return new Scalar(String.format("$(REST(%s, %s...))", method, field), result);
+		return new ScalarString(String.format("$(REST(%s, %s...))", method, field), result);
 	}
 
 	@Override

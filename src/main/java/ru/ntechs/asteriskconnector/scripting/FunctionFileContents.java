@@ -19,12 +19,12 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 
 public class FunctionFileContents extends Function {
 
-	public FunctionFileContents(ScriptFactory scriptFactory, ArrayList<String> params) {
+	public FunctionFileContents(ScriptFactory scriptFactory, ArrayList<Scalar> params) {
 		super(scriptFactory);
 		// TODO Auto-generated constructor stub
 	}
 
-	public FunctionFileContents(ScriptFactory scriptFactory, Message message, ArrayList<String> params) {
+	public FunctionFileContents(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) {
 		super(scriptFactory, message);
 		// TODO Auto-generated constructor stub
 	}

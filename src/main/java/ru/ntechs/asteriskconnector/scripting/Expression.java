@@ -42,7 +42,7 @@ public class Expression {
 	}
 
 	public Scalar eval() throws IOException, BitrixLocalException {
-		Scalar result = new Scalar(expr);
+		Scalar result = new ScalarString(expr);
 		int chr;
 
 		failCharIndex = 0;
@@ -51,38 +51,39 @@ public class Expression {
 			failCharIndex++;
 
 			switch (chr) {
-				case ('$'): result.append(parseReplace()); break;
-				case ('\\'): result.append(parseEscape()); break;
+				case ('$'): result = result.append(parseReplace()); break;
+				case ('\\'): result = result.append(parseEscape()); break;
 
-				default: result.append((char)chr); break;
+				default: result = result.append((char)chr); break;
 			}
 		}
 
 		return result;
 	}
 
-	private Scalar evalEvent(String eventName, ArrayList<Scalar> params) throws BitrixLocalException {
+	private Scalar evalEvent(Scalar eventName, ArrayList<Scalar> params) throws BitrixLocalException {
 		if (params.size() != 1)
 			throw new BitrixLocalException(formatError("Wrong number of parameters in event reference"));
 
 		Message msg;
+		String eventNameStr = eventName.asString();
 
-		if (eventName.equalsIgnoreCase("!")) {
+		if (eventNameStr.equalsIgnoreCase("!")) {
 			msg = message;
 
 			if (msg == null)
-				throw new BitrixLocalException(formatError(String.format("no context event message ('%s') specfied", eventName)));
+				throw new BitrixLocalException(formatError(String.format("no context event message ('%s') specfied", eventNameStr)));
 		}
 		else {
-			EventNode node = eventChain.findMessage(message, eventName);
+			EventNode node = eventChain.findMessage(message, eventNameStr);
 
 			if (node == null)
-				throw new BitrixLocalException(formatError(String.format("Unable to find message '%s' in current event chain", eventName)));
+				throw new BitrixLocalException(formatError(String.format("Unable to find message '%s' in current event chain", eventNameStr)));
 
 			msg = node.getMessage();
 
 			if (msg == null)
-				throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventName)));
+				throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventNameStr)));
 		}
 
 		String value = msg.getAttribute(params.get(0).asString());
@@ -90,28 +91,33 @@ public class Expression {
 		if (value == null)
 			throw new BitrixLocalException(formatError(String.format("Attribute '%s' is not defined", params.get(0))));
 
-		return new Scalar("${" + eventName + "}", value);
+		return new ScalarString("${" + eventNameStr + "}", value);
 	}
 
-	private Scalar evalFunc(String funcName, ArrayList<Scalar> params) throws IOException, BitrixLocalException {
+	private Scalar evalFunc(Scalar funcName, ArrayList<Scalar> params) throws IOException, BitrixLocalException {
 		Function func;
 
-		switch (funcName.toLowerCase()) {
+		switch (funcName.asString().toLowerCase()) {
 			case ("channel"): func = new FunctionChannel(scriptFactory, params); break;
-//			case ("filecontents"): func = new FunctionFileContents(scriptFactory, message, params); break;
+			case ("filecontents"): func = new FunctionFileContents(scriptFactory, message, params); break;
 			case ("rest"): func = new FunctionREST(scriptFactory, message, params); break;
 
 			default:
-				throw new BitrixLocalException(formatError("Unknown function"));
+				throw new BitrixLocalException(formatError(String.format("Function '%s' is not supported", funcName.asString())));
 		}
 
-		Scalar result = func.eval();
-		ArrayList<? extends Object> beans = func.getIntermediateBeans();
+		try {
+			Scalar result = func.eval();
+			ArrayList<? extends Object> beans = func.getIntermediateBeans();
 
-		if (beans != null)
-			intermediateBeans.addAll(beans);
+			if (beans != null)
+				intermediateBeans.addAll(beans);
 
-		return result;
+			return result;
+		}
+		catch (BitrixLocalException e) {
+			throw new BitrixLocalException(formatError(e.getMessage()));
+		}
 	}
 
 	private Scalar parseReplace() throws IOException, BitrixLocalException {
@@ -131,7 +137,7 @@ public class Expression {
 	}
 
 	private Scalar parseEvent() throws IOException, BitrixLocalException {
-		StringBuilder eventName = new StringBuilder();
+		Scalar eventName = new ScalarStringSplitted("<event name>");
 		ArrayList<Scalar> params = null;
 
 		while (true) {
@@ -142,16 +148,16 @@ public class Expression {
 				case ('('): params = parseParam(); break;
 				case (')'): throw new BitrixLocalException(formatError("Unexpected closing bracket"));
 				case ('{'): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
-				case ('}'): return evalEvent(eventName.toString().trim(), params);
+				case ('}'): return evalEvent(eventName.trim(), params);
 				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
 
-				default: eventName.append((char)chr); break;
+				default: eventName = eventName.append((char)chr); break;
 			}
 		}
 	}
 
 	private Scalar parseFunction() throws IOException, BitrixLocalException {
-		StringBuilder funcName = new StringBuilder();
+		Scalar funcName = new ScalarStringSplitted("<function name>");
 		ArrayList<Scalar> params = null;
 
 		while (true) {
@@ -160,18 +166,18 @@ public class Expression {
 
 			switch (chr) {
 				case ('('): params = parseParam(); break;
-				case (')'): return evalFunc(funcName.toString().trim(), params);
+				case (')'): return evalFunc(funcName.trim(), params);
 				case ('{'): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
 				case ('}'): throw new BitrixLocalException(formatError("Unexpected closing bracket"));
 				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
 
-				default: funcName.append((char)chr); break;
+				default: funcName = funcName.append((char)chr); break;
 			}
 		}
 	}
 
 	private ArrayList<Scalar> parseParam() throws IOException, BitrixLocalException {
-		StringBuilder param = new StringBuilder();
+		Scalar param = new ScalarStringSplitted("<parameter>");
 		ArrayList<Scalar> params = new ArrayList<>();
 
 		while (true) {
@@ -179,32 +185,32 @@ public class Expression {
 			failCharIndex++;
 
 			switch (chr) {
-				case (','): params.add(new Scalar("<unnamed parameter>", param.toString().trim())); param = new StringBuilder(); break;
+				case (','): params.add(param.trim()); param = new ScalarStringSplitted("<parameter>"); break;
 				case ('('): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
-				case (')'): params.add(new Scalar("<unnamed parameter>", param.toString().trim())); return params;
-				case ('$'): param.append(parseReplace()); break;
-				case ('"'): param.append(parseQuoted()); break;
-				case ('\\'): param.append(parseEscape()); break;
+				case (')'): params.add(param.trim()); return params;
+				case ('$'): param = param.append(parseReplace()); break;
+				case ('"'): param = param.append(parseQuoted()); break;
+				case ('\\'): param = param.append(parseEscape()); break;
 				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
 
-				default: param.append((char)chr); break;
+				default: param = param.append((char)chr); break;
 			}
 		}
 	}
 
 	private Scalar parseQuoted() throws IOException, BitrixLocalException {
-		StringBuilder param = new StringBuilder();
+		Scalar param = new ScalarStringSplitted("<quted>");
 
 		while (true) {
 			int chr = reader.read();
 			failCharIndex++;
 
 			switch (chr) {
-				case ('"'): return new Scalar("<unnamed quoted>", param.toString());
-				case ('\\'): param.append(parseEscape()); break;
+				case ('"'): return param;
+				case ('\\'): param = param.append(parseEscape()); break;
 				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
 
-				default: param.append((char)chr); break;
+				default: param = param.append((char)chr); break;
 			}
 		}
 	}
