@@ -63,8 +63,32 @@ public class MethodFinishExternalCall extends Method {
 				throw new BitrixLocalException("Required parameter is not defined: USER_ID");
 
 			RestRequestExternalCallFinish req = new RestRequestExternalCallFinish(getAuth(), callId, userId, 0);
-			req.exec();
 
+			if (data.containsKey("DURATION"))
+				req.setDuration(data.get("DURATION").asInteger());
+
+			if (data.containsKey("COST"))
+				req.setCost(data.get("COST").asDouble());
+
+			if (data.containsKey("COST_CURRENCY"))
+				req.setCostCurrency(data.get("COST_CURRENCY").asString());
+
+			if (data.containsKey("STATUS_CODE"))
+				req.setStatusCode(data.get("STATUS_CODE").asInteger());
+
+			if (data.containsKey("FAILED_REASON"))
+				req.setFailedReason(data.get("FAILED_REASON").asString());
+
+			if (data.containsKey("RECORD_URL"))
+				req.setRecordURL(data.get("RECORD_URL").asString());
+
+			if (data.containsKey("VOTE"))
+				req.setVote(data.get("VOTE").asInteger());
+
+			if (data.containsKey("ADD_TO_CHAT"))
+				req.setAddToChat(data.get("ADD_TO_CHAT").asInteger());
+
+			req.exec();
 			getContext().remove(users);
 
 			if (firstCall != null)

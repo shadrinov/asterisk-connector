@@ -43,6 +43,11 @@ public class ScalarInteger extends Scalar {
 	}
 
 	@Override
+	public Double asDouble() throws BitrixLocalException {
+		return value.doubleValue();
+	}
+
+	@Override
 	public Date asDate() throws BitrixLocalException {
 		return (value != null) ? new Date(value) : null;
 	}
@@ -56,7 +61,7 @@ public class ScalarInteger extends Scalar {
 
 	@Override
 	public Scalar append(Scalar operand) {
-		if (operand.isNull())
+		if ((operand == null) || operand.isNull())
 			return this;
 
 		if (value == null)

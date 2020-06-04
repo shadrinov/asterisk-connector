@@ -6,6 +6,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -14,25 +15,66 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
 
+import org.apache.commons.codec.binary.Base64InputStream;
+
+import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 
+@Slf4j
 public class FunctionFileContents extends Function {
+	public static final String NAME    = "FileContents";
+	public static final String LC_NAME = "filecontents";
 
-	public FunctionFileContents(ScriptFactory scriptFactory, ArrayList<Scalar> params) {
-		super(scriptFactory);
-		// TODO Auto-generated constructor stub
+	private String filename;
+
+	public FunctionFileContents(ScriptFactory scriptFactory, ArrayList<Scalar> params) throws BitrixLocalException {
+		super(scriptFactory, params);
+		init(params);
 	}
 
-	public FunctionFileContents(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) {
-		super(scriptFactory, message);
-		// TODO Auto-generated constructor stub
+	public FunctionFileContents(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) throws BitrixLocalException {
+		super(scriptFactory, message, params);
+		init(params);
+	}
+
+	private void init(ArrayList<Scalar> params) throws BitrixLocalException {
+		if (params.size() != 1)
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(Filename)",
+					toString(), NAME));
+
+		this.filename = params.get(0).asString();
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
-		// TODO Auto-generated method stub
-		return null;
+		File file = new File(filename);
+
+		if (!file.exists())
+			waitForRecord(filename);
+
+		ScalarStringSplitted result = new ScalarStringSplitted("<file>");
+		Base64InputStream test = null;
+		FileInputStream fio = new FileInputStream(file);
+
+		try {
+			int b;
+			test = new Base64InputStream(fio, true);
+
+			while ((b = test.read()) != -1)
+				result.append((char)b);
+		}
+		finally {
+			if (test != null)
+				test.close();
+		}
+
+		return result;
 	}
 
 	@Override

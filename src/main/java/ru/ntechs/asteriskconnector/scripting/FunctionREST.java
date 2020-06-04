@@ -12,13 +12,28 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 
 public class FunctionREST extends Function {
+	public static final String NAME    = "REST";
+	public static final String LC_NAME = "rest";
+
 	private String method;
 	private String field;
 	private HashMap<String, String> constraints;
 	private ArrayList<User> intermediateBeans;
 
+	public FunctionREST(ScriptFactory scriptFactory, ArrayList<Scalar> params) throws BitrixLocalException {
+		super(scriptFactory, params);
+		init(params);
+	}
+
 	public FunctionREST(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) throws BitrixLocalException {
-		super(scriptFactory, message);
+		super(scriptFactory, message, params);
+		init(params);
+	}
+
+	private void init(ArrayList<Scalar> params) throws BitrixLocalException {
+		if (params.size() < 4)
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(Method, Field, Attr, Value[, Attr, Value]...)",
+					toString(), NAME));
 
 		this.method = params.get(0).asString();
 		this.field = params.get(1).asString();
@@ -38,6 +53,11 @@ public class FunctionREST extends Function {
 		} catch (IndexOutOfBoundsException e) {
 			throw new BitrixLocalException(String.format("Constraint value not defined: %s", key));
 		}
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 
 	@Override

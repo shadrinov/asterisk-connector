@@ -29,13 +29,16 @@ public class RestRequestExternalCallFinish extends RestRequestTemplate {
 	private String costCurrency;
 
 	@JsonProperty("STATUS_CODE")
-	private String statusCode;
+	private Integer statusCode;
 
 	@JsonProperty("FAILED_REASON")
 	private String failedReason;
 
+	@JsonProperty("RECORD_URL")
+	private String recordURL;
+
 	@JsonProperty("VOTE")
-	private Short vote;
+	private Integer vote;
 
 	@JsonProperty("ADD_TO_CHAT")
 	private Integer addToChat;

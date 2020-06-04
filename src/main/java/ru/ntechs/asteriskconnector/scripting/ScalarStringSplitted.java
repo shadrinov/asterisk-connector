@@ -9,7 +9,7 @@ public class ScalarStringSplitted extends ScalarString {
 
 	public ScalarStringSplitted(String name) {
 		super(name);
-		this.builder =  new StringBuilder();
+		this.builder = new StringBuilder();
 	}
 
 	public ScalarStringSplitted(String name, String value) {
@@ -60,6 +60,9 @@ public class ScalarStringSplitted extends ScalarString {
 
 	@Override
 	public Scalar append(Scalar operand) {
+		if (operand == null)
+			return this;
+
 		if (operand instanceof ScalarStringSplitted) {
 			int len = ((ScalarStringSplitted) operand).builder.length();
 			int idx;

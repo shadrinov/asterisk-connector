@@ -98,9 +98,17 @@ public class Expression {
 		Function func;
 
 		switch (funcName.asString().toLowerCase()) {
-			case ("channel"): func = new FunctionChannel(scriptFactory, params); break;
-			case ("filecontents"): func = new FunctionFileContents(scriptFactory, message, params); break;
-			case ("rest"): func = new FunctionREST(scriptFactory, message, params); break;
+			case (FunctionChannel.LC_NAME):
+				func = new FunctionChannel(scriptFactory, params);
+			break;
+
+			case (FunctionFileContents.LC_NAME):
+				func = new FunctionFileContents(scriptFactory, message, params);
+			break;
+
+			case (FunctionREST.LC_NAME):
+				func = new FunctionREST(scriptFactory, message, params);
+			break;
 
 			default:
 				throw new BitrixLocalException(formatError(String.format("Function '%s' is not supported", funcName.asString())));

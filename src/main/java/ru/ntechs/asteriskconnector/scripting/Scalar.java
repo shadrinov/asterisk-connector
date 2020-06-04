@@ -26,6 +26,7 @@ public abstract class Scalar {
 	public abstract Short asShort() throws BitrixLocalException;
 	public abstract Integer asInteger() throws BitrixLocalException;
 	public abstract Long asLong() throws BitrixLocalException;
+	public abstract Double asDouble() throws BitrixLocalException;
 	public abstract Date asDate() throws BitrixLocalException;
 	public abstract byte[] asByteArray();
 

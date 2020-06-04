@@ -67,6 +67,19 @@ public class ScalarString extends Scalar {
 	}
 
 	@Override
+	public Double asDouble() throws BitrixLocalException {
+		if (value == null)
+			return null;
+
+		try {
+			return Double.valueOf(value);
+		} catch (NumberFormatException e) {
+			throw new BitrixLocalException(String.format("%s = %s: is not a double: %s",
+					getName(), value, e.getMessage()));
+		}
+	}
+
+	@Override
 	public Date asDate() throws BitrixLocalException {
 		if (value == null)
 			return null;
@@ -86,7 +99,7 @@ public class ScalarString extends Scalar {
 
 	@Override
 	public Scalar append(Scalar operand) {
-		if (operand.isNull())
+		if ((operand == null) || operand.isNull())
 			return this;
 
 		if (value == null)
