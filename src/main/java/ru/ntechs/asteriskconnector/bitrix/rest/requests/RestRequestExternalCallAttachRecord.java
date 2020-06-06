@@ -6,25 +6,26 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
+import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
+import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallAttachRecord;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalAttachRecord extends RestRequestTemplate {
+public class RestRequestExternalCallAttachRecord extends RestRequestTemplate {
 	@JsonProperty("CALL_ID")
 	private String callId;
 
 	@JsonProperty("FILENAME")
 	private String filename;
 
-//	@JsonSerialize(using = BitrixBinarySerializer.class)
 	@JsonProperty("FILE_CONTENT")
-	private byte[] fileContent;
+	private String fileContent;
 
 	@JsonProperty("RECORD_URL")
 	private String recordURL;
 
-	public RestRequestExternalAttachRecord(BitrixAuth auth, String callId, String filename) {
+	public RestRequestExternalCallAttachRecord(BitrixAuth auth, String callId, String filename) {
 		super(auth);
 
 		this.callId = callId;
@@ -34,5 +35,9 @@ public class RestRequestExternalAttachRecord extends RestRequestTemplate {
 	@Override
 	public String getMethod() {
 		return "telephony.externalCall.attachRecord";
+	}
+
+	public RestResultExternalCallAttachRecord exec() throws BitrixRestApiException {
+		return exec(RestResultExternalCallAttachRecord.class);
 	}
 }

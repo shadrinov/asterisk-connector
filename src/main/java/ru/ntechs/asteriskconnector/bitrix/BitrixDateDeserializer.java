@@ -10,9 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class BitrixDateDeserializer extends JsonDeserializer<Date> {
 	static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
@@ -21,10 +18,8 @@ public class BitrixDateDeserializer extends JsonDeserializer<Date> {
 			throws IOException, JsonProcessingException {
 		String date = jsonParser.getText();
 
-		if (date.equals("{")) {
-			log.info("!!!! date is {}");
+		if (date.equals("{"))
 			return null;
-		}
 
 		try {
 		    return format.parse(date);
