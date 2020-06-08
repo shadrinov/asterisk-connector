@@ -106,15 +106,19 @@ public class BitrixAuth {
 					auth();
 					save();
 				}
-
-				if (expiresIn == null)
-					Thread.sleep(5000);
-				else if (expiresIn < 180) {
-					log.info("too short access token expiration period ({}), using 90", expiresIn);
-					Thread.sleep(90000);
-				}
 				else
-					Thread.sleep((expiresIn - 90) * 1000);
+					expiresIn = null;
+
+				long timeout;
+
+				if ((expiresIn == null) || (expiresIn < 15))
+					timeout = 15000;
+				else if (expiresIn >= 7200)
+					timeout = 7200 * 850;
+				else
+					timeout = expiresIn * 850;
+
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
 				log.info("forced token renewal");
 			}
@@ -181,30 +185,21 @@ public class BitrixAuth {
 					else if (result.getStatusCode().value() != 200) {
 						log.info(formatErrorMessage(result.getStatusCode(), result.getBody()));
 
-						if (tokens.getError().equalsIgnoreCase("invalid_grant")) {
+						if (tokens.getError().equalsIgnoreCase("invalid_grant"))
 							log.info("refresh_token expired or invalid, application reinstallation needed");
 
-							this.accessToken = null;
-							this.refreshToken = null;
-							this.expires = null;
-							this.expiresIn = null;
-						}
-						else {
-							this.expires = null;
-							this.expiresIn = null;
-						}
+						this.expiresIn = null;
 					}
 					else {
 						log.info(formatErrorMessage(result.getStatusCode(), result.getBody()));
-
-						this.accessToken = null;
-						this.expires = null;
 						this.expiresIn = null;
 					}
 				} catch (BitrixLocalException e) {
 					log.info(e.getMessage());
+					this.expiresIn = null;
 				} catch (RestClientException e) {
 					log.info("Failed to update access token, possible Bitrix24 cloud servers faulure: {}", e.getMessage());
+					this.expiresIn = null;
 				}
 			}
 		}
