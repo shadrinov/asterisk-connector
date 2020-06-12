@@ -121,7 +121,7 @@ public class FunctionFileContents extends Function {
 	}
 
 	private boolean waitForRecord(WatchService watcher, Path obj) throws IOException, InterruptedException {
-		log.info("wait requested for: {}", obj);
+		log.info("waiting requested for: {}", obj);
 
 		if (obj == null)
 			return false;
