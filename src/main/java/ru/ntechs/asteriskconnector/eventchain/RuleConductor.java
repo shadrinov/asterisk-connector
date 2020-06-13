@@ -1,19 +1,30 @@
 package ru.ntechs.asteriskconnector.eventchain;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
+import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
+import ru.ntechs.asteriskconnector.config.ConnectorEvent;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
+import ru.ntechs.asteriskconnector.scripting.Expression;
+import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
 @Slf4j
 public class RuleConductor {
+	private EventChain eventChain;
+	private ScriptFactory scriptFactory;
 	private ConnectorRule rule;
 	private int progress;
 
-	List<String> eventNames;
+	List<ConnectorEvent> eventNames;
 
-	public RuleConductor(ConnectorRule rule) {
+	public RuleConductor(EventChain eventChain, ScriptFactory scriptFactory, ConnectorRule rule) {
+		this.eventChain = eventChain;
+		this.scriptFactory = scriptFactory;
 		this.rule = rule;
 		this.progress = 0;
 
@@ -36,10 +47,14 @@ public class RuleConductor {
 		}
 		else {
 			if (preProgress != progress)
-				log.info("{}! Got {} on {}, waiting for {}",
-						(progress == 0) ? "RESET" : "PROGRESS",
-						eventNames.subList(0, progress), channel,
-						eventNames.subList(progress, eventNames.size()));
+				if (progress != 0)
+					log.info("PROGRESS! Got {} on {}, waiting for {}",
+							eventNames.subList(0, progress), channel,
+							eventNames.subList(progress, eventNames.size()));
+				else
+					log.info("RESET! Got {} on {} waiting for {}",
+							message.getName(), channel,
+							eventNames.subList(progress, eventNames.size()));
 
 			return false;
 		}
@@ -47,25 +62,65 @@ public class RuleConductor {
 
 	private boolean check(Message message, String channel, int progress) {
 		boolean result = false;
-		String eventName = eventNames.get(progress++);
 
-		if (eventName.charAt(0) == '!') {
-			if (!eventName.substring(1).equalsIgnoreCase(message.getName()))
-				result = (progress < eventNames.size()) ? check(message, channel, progress) : true;
-			else
-				this.progress = 0;
-		}
-		else {
-			if (eventName.equalsIgnoreCase(message.getName())) {
-				if (progress >= eventNames.size()) {
-					progress = 0;
-					result = true;
-				}
+		ConnectorEvent event = eventNames.get(progress++);
+		String eventName = event.getName();
 
-				this.progress = progress;
+		try {
+			if (eventName.charAt(0) == '!') {
+				if (!(eventName.substring(1).equalsIgnoreCase(message.getName()) && checkConstraints(event, message)))
+					result = (progress < eventNames.size()) ? check(message, channel, progress) : true;
+				else
+					this.progress = 0;
 			}
+			else {
+				if (eventName.equalsIgnoreCase(message.getName()) && checkConstraints(event, message)) {
+					if (progress >= eventNames.size()) {
+						progress = 0;
+						result = true;
+					}
+
+					this.progress = progress;
+				}
+			}
+		} catch (IOException | BitrixLocalException e) {
+			log.info(String.format("failure during evaluation event constraints: %s", e.getMessage()));
+			this.progress = 0;
+			result = false;
 		}
 
 		return result;
+	}
+
+	private boolean checkConstraints(ConnectorEvent event, Message message) throws IOException, BitrixLocalException {
+		HashMap<String, String> constraints = event.getConstraints();
+
+		if (event.getConstraints() != null) {
+			boolean result = true;
+
+			for (Entry<String, String> entry : constraints.entrySet()) {
+				String entryKey = entry.getKey();
+				String entryValue = entry.getValue();
+
+				if ((entryKey != null) && (entryValue != null)) {
+					String messageAttr = message.getAttribute(entryKey);
+
+					Expression expr = new Expression(scriptFactory, eventChain, entryValue, message);
+					entryValue = expr.eval().toString();
+
+					if ((entryValue == null) && (messageAttr == null))
+						continue;
+
+					if ((entryValue == null) || (messageAttr == null) || (!messageAttr.equalsIgnoreCase(entryValue))) {
+						result = false;
+						break;
+					}
+				}
+			}
+
+			return result;
+		}
+		else
+			return true;
 	}
 }

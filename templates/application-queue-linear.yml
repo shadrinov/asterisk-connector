@@ -26,8 +26,8 @@ connector:
            priority: 1
    rules:
       - events:
-         - Join
-         - AgentCalled
+         - name: Join
+         - name: AgentCalled
         action:
            - method: telephony.externalcall.register
              data:
@@ -35,20 +35,20 @@ connector:
                 PHONE_NUMBER: ${Join(CallerIDNum)}
                 TYPE: 2
       - events:
-         - AgentCalled
-         - AgentRingNoAnswer
+         - name: AgentCalled
+         - name: AgentRingNoAnswer
         action:
            - method: telephony.externalcall.hide
       - events:
-         - AgentRingNoAnswer
-         - AgentCalled
+         - name: AgentRingNoAnswer
+         - name: AgentCalled
         action:
            - method: telephony.externalcall.show
              data:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))
       - events:
-         - Join
-         - AgentCalled
-         - Hangup
+         - name: Join
+         - name: AgentCalled
+         - name: Hangup
         action:
            - method: telephony.externalcall.finish

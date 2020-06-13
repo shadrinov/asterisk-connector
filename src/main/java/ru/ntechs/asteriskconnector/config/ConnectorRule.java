@@ -10,6 +10,6 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class ConnectorRule {
-	private List<String> events;
+	private List<ConnectorEvent> events;
 	private List<ConnectorAction> action;
 }

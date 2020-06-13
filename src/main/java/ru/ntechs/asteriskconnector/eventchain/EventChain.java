@@ -32,7 +32,7 @@ public class EventChain {
 		this.conductors = new ArrayList<>(rules.size());
 
 		for (ConnectorRule rule : rules)
-			conductors.add(new RuleConductor(rule));
+			conductors.add(new RuleConductor(this, scriptFactory, rule));
 
 		this.context = new ChainContext();
 	}
