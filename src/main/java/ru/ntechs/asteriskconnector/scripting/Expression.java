@@ -3,6 +3,7 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
@@ -61,21 +62,24 @@ public class Expression {
 		return result;
 	}
 
-	private Scalar evalEvent(Scalar eventName, ArrayList<Scalar> params) throws BitrixLocalException {
+	private Scalar evalEvent(Scalar eventName, HashMap<String,String> constraints, ArrayList<Scalar> params) throws BitrixLocalException {
 		if (params.size() != 1)
 			throw new BitrixLocalException(formatError("Wrong number of parameters in event reference"));
 
 		Message msg;
 		String eventNameStr = eventName.asString();
 
-		if (eventNameStr.equalsIgnoreCase("!")) {
+		if (eventNameStr.equals("!")) {
 			msg = message;
+
+			if (!constraints.isEmpty())
+				throw new BitrixLocalException(formatError(String.format("no atribute constraints allowed on context event message ('%s')", eventNameStr)));
 
 			if (msg == null)
 				throw new BitrixLocalException(formatError(String.format("no context event message ('%s') specfied", eventNameStr)));
 		}
 		else {
-			EventNode node = eventChain.findMessage(message, eventNameStr);
+			EventNode node = eventChain.findMessage(message, eventNameStr, constraints);
 
 			if (node == null)
 				throw new BitrixLocalException(formatError(String.format("Unable to find message '%s' in current event chain", eventNameStr)));
@@ -136,10 +140,10 @@ public class Expression {
 			switch (chr) {
 				case ('{'): return parseEvent();
 				case ('('): return parseFunction();
-				case (-1): throw new BitrixLocalException(formatError("End of expression, but replacement type is expected"));
+				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: replacement type '(' or '{' is expected"));
 
 				default:
-					new BitrixLocalException(formatError("Unsupported replacement, '(' or '{' expected"));
+					new BitrixLocalException(formatError("Unsupported replacement, '(' or '{' is expected"));
 			}
 		}
 	}
@@ -147,17 +151,33 @@ public class Expression {
 	private Scalar parseEvent() throws IOException, BitrixLocalException {
 		Scalar eventName = new ScalarStringSplitted("<event name>");
 		ArrayList<Scalar> params = null;
+		HashMap<String, String> constraints = null;
 
 		while (true) {
 			int chr = reader.read();
 			failCharIndex++;
 
 			switch (chr) {
-				case ('('): params = parseParam(); break;
-				case (')'): throw new BitrixLocalException(formatError("Unexpected closing bracket"));
-				case ('{'): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
-				case ('}'): return evalEvent(eventName.trim(), params);
-				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
+				case ('['):
+					if (constraints != null)
+						throw new BitrixLocalException(formatError("The only constraint specification is allowed"));
+
+					constraints = parseConstraints();
+					break;
+
+				case (']'): throw new BitrixLocalException(formatError("Unexpected closing bracket ']'"));
+
+				case ('('):
+					if (params != null)
+						throw new BitrixLocalException(formatError("The only parameter specification is allowed"));
+
+					params = parseParam();
+					break;
+
+				case (')'): throw new BitrixLocalException(formatError("Unexpected closing bracket ')'"));
+				case ('{'): throw new BitrixLocalException(formatError("Excessive use of opening bracket '{'"));
+				case ('}'): return evalEvent(eventName.trim(), constraints, params);
+				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: event name or closing bracket '}' is expected"));
 
 				default: eventName = eventName.append((char)chr); break;
 			}
@@ -173,13 +193,85 @@ public class Expression {
 			failCharIndex++;
 
 			switch (chr) {
-				case ('('): params = parseParam(); break;
+				case ('('):
+					if (params != null)
+						throw new BitrixLocalException(formatError("The only parameter specification is allowed"));
+
+					params = parseParam();
+					break;
+
 				case (')'): return evalFunc(funcName.trim(), params);
 				case ('{'): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
 				case ('}'): throw new BitrixLocalException(formatError("Unexpected closing bracket"));
 				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
 
 				default: funcName = funcName.append((char)chr); break;
+			}
+		}
+	}
+
+	private HashMap<String, String> parseConstraints() throws IOException, BitrixLocalException {
+		HashMap<String, String> constraints = new HashMap<>();
+		Scalar attrName = new ScalarStringSplitted("<constraint attribute name>");
+		Scalar attrVal = new ScalarStringSplitted("<constraint attribute value>");
+
+		while (true) {
+			int chr = reader.read();
+			failCharIndex++;
+
+			switch (chr) {
+				case ('='):
+					boolean doScan = true;
+
+					while (doScan) {
+						String attrNameStr;
+
+						chr = reader.read();
+						failCharIndex++;
+
+						switch (chr) {
+							case (','):
+								attrNameStr = attrName.trim().asString();
+
+								if (constraints.containsKey(attrNameStr))
+									throw new BitrixLocalException(String.format("Event attribute constraint already defined: (%s = %s)", attrNameStr, constraints.get(attrNameStr)));
+
+								constraints.put(attrNameStr, attrVal.trim().asString());
+								doScan = false;
+								break;
+
+							case ('['): throw new BitrixLocalException(formatError("Excessive use of opening bracket '['"));
+
+							case (']'):
+								attrNameStr = attrName.trim().asString();
+
+								if (constraints.containsKey(attrNameStr))
+									throw new BitrixLocalException(String.format("Event attribute constraint already defined: (%s = %s)", attrNameStr, constraints.get(attrNameStr)));
+
+								constraints.put(attrNameStr, attrVal.trim().asString());
+								return constraints;
+
+							case ('$'): attrName = attrName.append(parseReplace()); break;
+							case ('"'): attrName = attrName.append(parseQuoted()); break;
+							case ('\\'): attrName = attrName.append(parseEscape()); break;
+							case (-1): throw new BitrixLocalException(formatError("Premature end of expression: attribute value or closing bracket ']' is expected"));
+
+							default:
+								attrVal = attrVal.append((char)chr);
+								break;
+						}
+					}
+
+					break;
+
+				case ('['): throw new BitrixLocalException(formatError("Excessive use of opening bracket '['"));
+				case (']'): throw new BitrixLocalException(formatError("Unexpected closing bracket ']'"));
+				case ('$'): attrName = attrName.append(parseReplace()); break;
+				case ('"'): attrName = attrName.append(parseQuoted()); break;
+				case ('\\'): attrName = attrName.append(parseEscape()); break;
+				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: 'attribute = value' is expected"));
+
+				default: attrName = attrName.append((char)chr); break;
 			}
 		}
 	}
@@ -199,7 +291,7 @@ public class Expression {
 				case ('$'): param = param.append(parseReplace()); break;
 				case ('"'): param = param.append(parseQuoted()); break;
 				case ('\\'): param = param.append(parseEscape()); break;
-				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
+				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: parameter or closing bracket ')' is expected"));
 
 				default: param = param.append((char)chr); break;
 			}
@@ -216,7 +308,7 @@ public class Expression {
 			switch (chr) {
 				case ('"'): return param;
 				case ('\\'): param = param.append(parseEscape()); break;
-				case (-1): throw new BitrixLocalException(formatError("Unexpected end of expression"));
+				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: closing quotes '\"' is expected"));
 
 				default: param = param.append((char)chr); break;
 			}
@@ -230,7 +322,7 @@ public class Expression {
 		if (chr != -1)
 			return (char)chr;
 		else
-			throw new BitrixLocalException(formatError("Unexpected end of expression"));
+			throw new BitrixLocalException(formatError("Premature end of expression: escaped symbol is expected"));
 	}
 
 	private String formatError(String message) {

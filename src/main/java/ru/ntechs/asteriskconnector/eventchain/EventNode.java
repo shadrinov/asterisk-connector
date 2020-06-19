@@ -1,5 +1,8 @@
 package ru.ntechs.asteriskconnector.eventchain;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 
@@ -74,15 +77,63 @@ public class EventNode {
 		EventNode candidate = this;
 
 		if (before != null) {
-			while ((candidate != null) && (candidate.getMessage() != null)
-					&& (candidate.getMessage() != before)) {
-				candidate = candidate.getPrev();
+			while ((candidate != null) && (candidate.message != null)
+					&& (candidate.message != before)) {
+				candidate = candidate.prev;
 			}
 		}
 
-		while ((candidate != null) && (candidate.getMessage() != null)
-				&& !candidate.getMessage().getName().equalsIgnoreCase(name)) {
-			candidate = candidate.getPrev();
+		while ((candidate != null) && (candidate.message != null)
+				&& !candidate.message.getName().equalsIgnoreCase(name)) {
+			candidate = candidate.prev;
+		}
+
+		return candidate;
+	}
+
+	public EventNode findMessage(Message before, String name, HashMap<String, String> constraints) {
+		EventNode candidate = findMessage(before, name);
+
+		if ((constraints == null) || constraints.isEmpty())
+			return candidate;
+
+		while (candidate != null) {
+			if (candidate.message == null) {
+				candidate = candidate.prev;
+				continue;
+			}
+
+			boolean match = true;
+
+			for (Entry<String, String> entry : constraints.entrySet()) {
+				if (entry.getKey() != null) {
+					String msgAttrValue = candidate.message.getAttribute(entry.getKey());
+
+					if (entry.getValue() != null) {
+						if (msgAttrValue != null) {
+							if (!msgAttrValue.equalsIgnoreCase(entry.getValue())) {
+								match = false;
+								break;
+							}
+						}
+						else {
+							match = false;
+							break;
+						}
+					}
+					else {
+						if (msgAttrValue != null) {
+							match = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (!match)
+				candidate = candidate.prev;
+			else
+				break;
 		}
 
 		return candidate;

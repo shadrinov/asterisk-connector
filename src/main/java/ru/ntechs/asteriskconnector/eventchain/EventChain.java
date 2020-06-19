@@ -1,6 +1,7 @@
 package ru.ntechs.asteriskconnector.eventchain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ru.ntechs.ami.Message;
@@ -91,6 +92,10 @@ public class EventChain {
 
 	public EventNode findMessage(Message before, String name) {
 		return (tailEvent != null) ? tailEvent.findMessage(before, name) : null;
+	}
+
+	public EventNode findMessage(Message before, String name, HashMap<String,String> constraints) {
+		return (tailEvent != null) ? tailEvent.findMessage(before, name, constraints) : null;
 	}
 
 	@Override
