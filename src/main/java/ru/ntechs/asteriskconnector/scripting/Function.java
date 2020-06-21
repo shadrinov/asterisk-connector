@@ -6,25 +6,18 @@ import java.util.ArrayList;
 import lombok.Getter;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
+import ru.ntechs.asteriskconnector.eventchain.EventChain;
+import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
 @Getter
 public abstract class Function {
-	private ScriptFactory scriptFactory;
-	private Message message;
+	private Expression expression;
 	private ArrayList<Scalar> params;
 
-	public Function(ScriptFactory scriptFactory, ArrayList<Scalar> params) {
+	public Function(Expression expression, ArrayList<Scalar> params) {
 		super();
 
-		this.scriptFactory = scriptFactory;
-		this.params = params;
-	}
-
-	public Function(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) {
-		super();
-
-		this.scriptFactory = scriptFactory;
-		this.message = message;
+		this.expression = expression;
 		this.params = params;
 	}
 
@@ -36,6 +29,23 @@ public abstract class Function {
 			params.add(entry.asString());
 
 		return String.format("%s(%s)", getName(), String.join(", ", params));
+	}
+
+	public Message getMessage() {
+		return (expression != null) ? expression.getMessage() : null;
+	}
+
+	public ScriptFactory getScriptFactory() {
+		return (expression != null) ? expression.getScriptFactory() : null;
+	}
+
+	public EventChain getEventChain() {
+		return (expression != null) ? expression.getEventChain() : null;
+	}
+
+	public EventDispatcher getEventDispatcher() {
+		ScriptFactory scriptFactory = getScriptFactory();
+		return (scriptFactory != null) ? scriptFactory.getEventDispatcher() : null;
 	}
 
 	public abstract String getName();

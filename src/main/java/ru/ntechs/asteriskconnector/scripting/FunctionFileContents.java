@@ -18,25 +18,20 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.binary.Base64InputStream;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 
 @Slf4j
 public class FunctionFileContents extends Function {
 	public static final String NAME    = "FileContents";
 	public static final String LC_NAME = "filecontents";
+
 	public static final long RECORD_FILE_TIMEOUT = 30000l;
 
 	private String filename;
 	private long waitTimestamp;
 
-	public FunctionFileContents(ScriptFactory scriptFactory, ArrayList<Scalar> params) throws BitrixLocalException {
-		super(scriptFactory, params);
-		init(params);
-	}
-
-	public FunctionFileContents(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) throws BitrixLocalException {
-		super(scriptFactory, message, params);
+	public FunctionFileContents(Expression expression, ArrayList<Scalar> params) throws BitrixLocalException {
+		super(expression, params);
 		init(params);
 	}
 

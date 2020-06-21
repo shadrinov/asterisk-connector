@@ -22,11 +22,11 @@ public class MethodExternalCallAttachRecord extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluateActionData();
 
 		try {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
-			log.info("evaluated: {}", ParamsToString(data));
+			log.info("evaluated: {{}}", ParamsToString(data));
 
 			String callId = null;
 			String filename = null;
@@ -74,7 +74,9 @@ public class MethodExternalCallAttachRecord extends Method {
 			@Override
 			public void accept(String t, Scalar u) {
 				if (!t.equals("FILE_CONTENT"))
-				elements.add(String.format("%s=%s", t, u));
+					elements.add(String.format("%s=%s", t, u));
+				else
+					elements.add(String.format("%s=%s", t, "<base64-encoded-binary>"));
 			}
 		});
 

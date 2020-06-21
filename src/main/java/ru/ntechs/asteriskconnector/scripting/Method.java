@@ -62,19 +62,20 @@ public abstract class Method {
 		return eventChain.getContext();
 	}
 
-	protected HashMap<String, Scalar> evaluate(EventDispatcher eventDispatcher, EventChain eventChain, Map<String, String> template) {
+	protected HashMap<String, Scalar> evaluateActionData() {
+		Map<String, String> template = action.getData();
 		HashMap<String, Scalar> params = new HashMap<>();
 
 		if (template != null)
-			try {
-				for (String key : template.keySet()) {
+			for (String key : template.keySet()) {
+				try {
 					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), message);
 					Scalar result = expr.eval();
 					intermediateBeans = expr.getIntermediateBeans();
 					params.put(key, result);
+				} catch (IOException | BitrixLocalException e) {
+					log.warn("Expression evaluation failure: {}", e.getMessage());
 				}
-			} catch (IOException | BitrixLocalException e) {
-				log.warn("Expression evaluation failure: {}", e.getMessage());
 			}
 
 		return params;

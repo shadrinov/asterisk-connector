@@ -22,7 +22,7 @@ public class MethodFinishExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluateActionData();
 
 		try {
 			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");

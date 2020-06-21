@@ -42,6 +42,22 @@ public class Expression {
 		this.message = message;
 	}
 
+	public ArrayList<Object> getIntermediateBeans() {
+		return intermediateBeans;
+	}
+
+	public ScriptFactory getScriptFactory() {
+		return scriptFactory;
+	}
+
+	public EventChain getEventChain() {
+		return eventChain;
+	}
+
+	public Message getMessage() {
+		return message;
+	}
+
 	public Scalar eval() throws IOException, BitrixLocalException {
 		Scalar result = new ScalarString(expr);
 		int chr;
@@ -103,16 +119,20 @@ public class Expression {
 
 		switch (funcName.asString().toLowerCase()) {
 			case (FunctionChannel.LC_NAME):
-				func = new FunctionChannel(scriptFactory, params);
-			break;
+				func = new FunctionChannel(this, params);
+				break;
+
+			case (FunctionDuration.LC_NAME):
+				func = new FunctionDuration(this, params);
+				break;
 
 			case (FunctionFileContents.LC_NAME):
-				func = new FunctionFileContents(scriptFactory, message, params);
-			break;
+				func = new FunctionFileContents(this, params);
+				break;
 
 			case (FunctionREST.LC_NAME):
-				func = new FunctionREST(scriptFactory, message, params);
-			break;
+				func = new FunctionREST(this, params);
+				break;
 
 			default:
 				throw new BitrixLocalException(formatError(String.format("Function '%s' is not supported", funcName.asString())));
@@ -330,9 +350,5 @@ public class Expression {
 			return String.format("%s: %s", message, expr);
 		else
 			return String.format("%s: %s <-- ... %s", message, expr.substring(0, failCharIndex), expr.substring(failCharIndex + 1));
-	}
-
-	public ArrayList<Object> getIntermediateBeans() {
-		return intermediateBeans;
 	}
 }

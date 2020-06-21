@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
@@ -20,13 +19,8 @@ public class FunctionREST extends Function {
 	private HashMap<String, String> constraints;
 	private ArrayList<User> intermediateBeans;
 
-	public FunctionREST(ScriptFactory scriptFactory, ArrayList<Scalar> params) throws BitrixLocalException {
-		super(scriptFactory, params);
-		init(params);
-	}
-
-	public FunctionREST(ScriptFactory scriptFactory, Message message, ArrayList<Scalar> params) throws BitrixLocalException {
-		super(scriptFactory, message, params);
+	public FunctionREST(Expression expression, ArrayList<Scalar> params) throws BitrixLocalException {
+		super(expression, params);
 		init(params);
 	}
 

@@ -23,7 +23,7 @@ public class MethodRegisterExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluateActionData();
 
 		try {
 			RestRequestExternalCallRegister req;

@@ -3,15 +3,19 @@ package ru.ntechs.asteriskconnector.eventchain;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 
 @Slf4j
+@Getter
 public class EventNode {
 	private Message message;
 	private EventNode next;
 	private EventNode prev;
-	private int ticks;
+
+	private final int ticks;
+	private final long millis = System.currentTimeMillis();
 
 	public EventNode(int birthTicks, Message message) {
 		super();
@@ -38,22 +42,6 @@ public class EventNode {
 
 			ancestor.next = this;
 		}
-	}
-
-	public Message getMessage() {
-		return message;
-	}
-
-	public EventNode getNext() {
-		return next;
-	}
-
-	public EventNode getPrev() {
-		return prev;
-	}
-
-	public Integer getTicks() {
-		return ticks;
 	}
 
 	public EventNode split() {

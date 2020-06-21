@@ -22,7 +22,7 @@ public class MethodHideExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluate(getEventDispatcher(), getEventChain(), getAction().getData());
+		HashMap<String, Scalar> data = evaluateActionData();
 
 		try {
 			RestRequestExternalCallHide req;

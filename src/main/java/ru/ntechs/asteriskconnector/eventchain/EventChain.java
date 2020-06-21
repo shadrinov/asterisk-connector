@@ -46,6 +46,10 @@ public class EventChain {
 		else
 			tailEvent = new EventNode(birthTicks, message, tailEvent);
 
+		checkRules(message);
+	}
+
+	private synchronized void checkRules(Message message) {
 		if (channel == null)
 			channel = eventDispatcher.registerChannel(message);
 
@@ -72,6 +76,10 @@ public class EventChain {
 
 	public EventNode getHead() {
 		return headEvent;
+	}
+
+	public EventNode getTail() {
+		return tailEvent;
 	}
 
 	public ChainContext getContext() {
