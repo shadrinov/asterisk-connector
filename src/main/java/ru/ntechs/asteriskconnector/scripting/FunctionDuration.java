@@ -58,7 +58,7 @@ public class FunctionDuration extends Function {
 		else
 			throw new BitrixLocalException(String.format("AMI event (lastEvent) '%s' not found in current event chain", firstEvent));
 
-		return new ScalarInteger("Duration", Math.abs(lastMessageMillis - firstMessageMillis) / 1000000l);
+		return new ScalarInteger("Duration", Math.abs(lastMessageMillis - firstMessageMillis) / 1000l);
 	}
 
 	@Override
