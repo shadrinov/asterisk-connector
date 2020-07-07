@@ -212,7 +212,15 @@ public class BitrixTelephonyController {
 		originate.setContext(externalLine.getContext());
 		originate.setExten(MessageFormat.format(externalLine.getExten(), cleanupPhoneNumber(event.getDataPhoneNumber())));
 		originate.setPriority(externalLine.getPriority());
-		originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(event.getDataPhoneNumber())));
+		originate.setApplication(externalLine.getApplication());
+		originate.setData(externalLine.getData());
+		originate.setTimeout(externalLine.getTimeout());
+		originate.setCallerId(String.format("<%s>", (externalLine.getCallerId() == null) ? cleanupPhoneNumber(event.getDataPhoneNumber()) : externalLine.getCallerId()));
+		originate.setVariable(externalLine.getVariable());
+		originate.setAccount(externalLine.getAccount());
+		originate.setEarlyMedia(externalLine.getEarlyMedia());
+		originate.setAsync(externalLine.getAsync());
+		originate.setCodecs(externalLine.getCodecs());
 		originate.submit();
 
 		Response response = originate.waitForResponse(30000);
