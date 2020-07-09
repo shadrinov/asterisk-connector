@@ -20,7 +20,7 @@ public class ExternalCall {
 	private Long crmCreatedLead;
 
 	@JsonProperty("CRM_CREATED_ENTITIES")
-	private ArrayList<String> crmCreatedEntites;
+	private ArrayList<CRMCreatedEntity> crmCreatedEntites;
 
 	@JsonProperty("CRM_ENTITY_ID")
 	private Long crmEntityId;

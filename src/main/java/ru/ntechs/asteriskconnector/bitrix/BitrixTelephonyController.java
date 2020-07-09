@@ -208,6 +208,11 @@ public class BitrixTelephonyController {
 
 		Originate originate = new Originate(ami);
 
+		if (externalLine.getCallerId() != null)
+			originate.setCallerId(externalLine.getCallerId());
+		else
+			originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(event.getDataPhoneNumber())));
+
 		originate.setChannel(MessageFormat.format(externalLine.getChannel(), userInfo.getUfPhoneInner()));
 		originate.setContext(externalLine.getContext());
 		originate.setExten(MessageFormat.format(externalLine.getExten(), cleanupPhoneNumber(event.getDataPhoneNumber())));
@@ -215,7 +220,6 @@ public class BitrixTelephonyController {
 		originate.setApplication(externalLine.getApplication());
 		originate.setData(externalLine.getData());
 		originate.setTimeout(externalLine.getTimeout());
-		originate.setCallerId(String.format("<%s>", (externalLine.getCallerId() == null) ? cleanupPhoneNumber(event.getDataPhoneNumber()) : externalLine.getCallerId()));
 		originate.setVariable(externalLine.getVariable());
 		originate.setAccount(externalLine.getAccount());
 		originate.setEarlyMedia(externalLine.getEarlyMedia());
