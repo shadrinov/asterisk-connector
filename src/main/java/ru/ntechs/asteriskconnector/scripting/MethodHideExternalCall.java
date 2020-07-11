@@ -22,14 +22,9 @@ public class MethodHideExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluateActionData();
+		HashMap<String, Scalar> params = evaluate(getAction().getParams());
 
 		try {
-			RestRequestExternalCallHide req;
-
-			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
-			log.info("evaluated: {}", data.toString());
-
 			String callId = null;
 			ArrayList<Long> userIds = new ArrayList<>();
 
@@ -42,11 +37,11 @@ public class MethodHideExternalCall extends Method {
 				return;
 			}
 
-			if (data.containsKey("CALL_ID"))
-				callId = data.get("CALL_ID").asString();
+			if (params.containsKey("CALL_ID"))
+				callId = params.get("CALL_ID").asString();
 
-			if (data.containsKey("USER_ID"))
-				userIds.add(data.get("USER_ID").asLong());
+			if (params.containsKey("USER_ID"))
+				userIds.add(params.get("USER_ID").asLong());
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();
@@ -61,7 +56,7 @@ public class MethodHideExternalCall extends Method {
 			if (userIds.isEmpty())
 				throw new BitrixLocalException("Required parameter is not defined: USER_ID");
 
-			req = new RestRequestExternalCallHide(getAuth(), callId, userIds);
+			RestRequestExternalCallHide req = new RestRequestExternalCallHide(getAuth(), callId, userIds);
 			req.exec();
 
 			getContext().remove(users);

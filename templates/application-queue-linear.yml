@@ -30,7 +30,7 @@ connector:
          - name: AgentCalled
         action:
            - method: telephony.externalcall.register
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))
                 PHONE_NUMBER: ${Join(CallerIDNum)}
                 TYPE: 2
@@ -44,7 +44,7 @@ connector:
          - name: AgentCalled
         action:
            - method: telephony.externalcall.show
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", $(Channel(${AgentCalled(DestinationChannel)}, "${Newchannel(CallerIDNum)}"))))
       - events:
          - name: Join

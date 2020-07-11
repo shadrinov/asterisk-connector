@@ -11,5 +11,6 @@ import lombok.ToString;
 @ToString
 public class ConnectorAction {
 	private String method;
-	private Map<String, String> data;
+	private Map<String, String> params;
+	private Map<String, String> fields;
 }

@@ -31,7 +31,7 @@ connector:
          - name: "AgentCalled"
         action:
            - method: telephony.externalcall.register
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
                 PHONE_NUMBER: ${QueueCallerJoin(CallerIDNum)}
                 TYPE: 2
@@ -39,13 +39,13 @@ connector:
          - name: "AgentRingNoAnswer"
         action:
            - method: telephony.externalcall.hide
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentRingNoAnswer(DestCallerIDNum)}))
       - events:
          - name: "AgentCalled"
         action:
            - method: telephony.externalcall.show
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
       - events:
          - name: "Newchannel"
@@ -56,12 +56,12 @@ connector:
          - name: "Hangup"
         action:
            - method: telephony.externalcall.finish
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(DestCallerIDNum)}))
                 DURATION: ${AgentComplete(TalkTime)}
                 STATUS_CODE: 200
            - method: telephony.externalcall.attachrecord
-             data:
+             params:
                 FILENAME: ${UserEvent(Filename)}.mp3
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
       - events:
@@ -72,7 +72,7 @@ connector:
          - name: "Hangup"
         action:
            - method: telephony.externalcall.finish
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
                 STATUS_CODE: 304
       - events:
@@ -83,7 +83,7 @@ connector:
          - name: "DialBegin"
         action:
            - method: telephony.externalcall.register
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
                 PHONE_NUMBER: ${UserEvent[UserEvent=ExternalCall](ConnectedLineNum)}
                 TYPE: 1
@@ -99,12 +99,12 @@ connector:
          - name: "Hangup"
         action:
            - method: telephony.externalcall.finish
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
                 DURATION: $(Duration(DialEnd, Hangup))
                 STATUS_CODE: 200
            - method: telephony.externalcall.attachrecord
-             data:
+             params:
                 FILENAME: ${UserEvent[UserEvent=MonitorFile](Filename)}.mp3
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
       - events:
@@ -119,6 +119,6 @@ connector:
          - name: "Hangup"
         action:
            - method: telephony.externalcall.finish
-             data:
+             params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
                 STATUS_CODE: 304

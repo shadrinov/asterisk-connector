@@ -56,6 +56,10 @@ public class ScriptFactory {
 			}
 
 			switch (action.getMethod().toLowerCase()) {
+			case ("crm.lead.add"):
+				new MethodCrmLeadAdd(this, eventChain, action, message).exec();
+				break;
+
 			case ("telephony.externalcall.finish"):
 				new MethodFinishExternalCall(this, eventChain, action, message).exec();
 				break;

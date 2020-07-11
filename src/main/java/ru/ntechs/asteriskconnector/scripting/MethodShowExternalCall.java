@@ -22,14 +22,9 @@ public class MethodShowExternalCall extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> data = evaluateActionData();
+		HashMap<String, Scalar> params = evaluate(getAction().getParams());
 
 		try {
-			RestRequestExternalCallShow req;
-
-			log.info("source: {}", (getAction().getData() != null) ? getAction().getData().toString() : "null");
-			log.info("evaluated: {}", data.toString());
-
 			ArrayList<ExternalCall> calls = getContext().get(ExternalCall.class);
 
 			ExternalCall firstCall = (calls.size() > 0) ? calls.get(0) : null;
@@ -41,11 +36,11 @@ public class MethodShowExternalCall extends Method {
 			String callId = null;
 			ArrayList<Integer> userIds = new ArrayList<>();
 
-			if (data.containsKey("CALL_ID"))
-				callId = data.get("CALL_ID").asString();
+			if (params.containsKey("CALL_ID"))
+				callId = params.get("CALL_ID").asString();
 
-			if (data.containsKey("USER_ID"))
-				userIds.add(data.get("USER_ID").asInteger());
+			if (params.containsKey("USER_ID"))
+				userIds.add(params.get("USER_ID").asInteger());
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();
@@ -56,7 +51,7 @@ public class MethodShowExternalCall extends Method {
 			if (userIds.isEmpty())
 				throw new BitrixLocalException("Required parameter is not defined: USER_ID");
 
-			req = new RestRequestExternalCallShow(getAuth(), callId, userIds);
+			RestRequestExternalCallShow req = new RestRequestExternalCallShow(getAuth(), callId, userIds);
 			req.exec();
 
 			for (User user : findIntermediateBeans(User.class))

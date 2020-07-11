@@ -55,20 +55,26 @@ public class FunctionFileContents extends Function {
 		if (!waitForRecord(file))
 			throw new BitrixLocalException(String.format("file is unavailable: %s", filename));
 
-		ScalarStringSplitted result = new ScalarStringSplitted("<file>");
-		Base64InputStream test = null;
+		ScalarStringSplitted result = new ScalarStringSplitted("<base64-encoded-binary>") {
+			@Override
+			public String toString() {
+				return getName();
+			}
+		};
+
+		Base64InputStream stream = null;
 		FileInputStream fio = new FileInputStream(file);
 
 		try {
 			int b;
-			test = new Base64InputStream(fio, true);
+			stream = new Base64InputStream(fio, true);
 
-			while ((b = test.read()) != -1)
+			while ((b = stream.read()) != -1)
 				result.append((char)b);
 		}
 		finally {
-			if (test != null)
-				test.close();
+			if (stream != null)
+				stream.close();
 		}
 
 		return result;
