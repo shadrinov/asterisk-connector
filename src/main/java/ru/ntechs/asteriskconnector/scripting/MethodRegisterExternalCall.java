@@ -16,6 +16,7 @@ import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
 public class MethodRegisterExternalCall extends Method {
+	public static final String NAME = "telephony.externalcall.register";
 
 	public MethodRegisterExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);
@@ -86,5 +87,10 @@ public class MethodRegisterExternalCall extends Method {
 		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());
 		}
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }

@@ -63,10 +63,15 @@ public abstract class Method {
 	}
 
 	protected HashMap<String, Scalar> evaluate(Map<String, String> template) {
+		return evaluate(template, true);
+	}
+
+	protected HashMap<String, Scalar> evaluate(Map<String, String> template, boolean doLog) {
 		HashMap<String, Scalar> result = new HashMap<>();
 
 		if (template != null) {
-			log.info("source: {}", template.toString());
+			if (doLog)
+				log.info("source: {}, params: {}", getName(), template.toString());
 
 			for (String key : template.keySet()) {
 				try {
@@ -78,11 +83,14 @@ public abstract class Method {
 					log.warn("Expression evaluation failure: {}", e.getMessage());
 				}
 			}
+
+			if (doLog)
+				log.info("evaluated: {}, params: {}", getName(), result.toString());
 		}
 		else
-			log.info("source: null");
+			if (doLog)
+				log.info("source: {}, no params", getName());
 
-		log.info("evaluated: {}", result.toString());
 		return result;
 	}
 
@@ -126,5 +134,6 @@ public abstract class Method {
 		return result;
 	}
 
+	public abstract String getName();
 	public abstract void exec();
 }

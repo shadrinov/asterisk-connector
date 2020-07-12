@@ -56,27 +56,27 @@ public class ScriptFactory {
 			}
 
 			switch (action.getMethod().toLowerCase()) {
-			case ("crm.lead.add"):
+			case (MethodCrmLeadAdd.NAME):
 				new MethodCrmLeadAdd(this, eventChain, action, message).exec();
 				break;
 
-			case ("telephony.externalcall.finish"):
+			case (MethodFinishExternalCall.NAME):
 				new MethodFinishExternalCall(this, eventChain, action, message).exec();
 				break;
 
-			case ("telephony.externalcall.hide"):
+			case (MethodHideExternalCall.NAME):
 				new MethodHideExternalCall(this, eventChain, action, message).exec();
 				break;
 
-			case ("telephony.externalcall.register"):
+			case (MethodRegisterExternalCall.NAME):
 				new MethodRegisterExternalCall(this, eventChain, action, message).exec();
 				break;
 
-			case ("telephony.externalcall.show"):
+			case (MethodShowExternalCall.NAME):
 				new MethodShowExternalCall(this, eventChain, action, message).exec();
 				break;
 
-			case ("telephony.externalcall.attachrecord"):
+			case (MethodExternalCallAttachRecord.NAME):
 				new MethodExternalCallAttachRecord(this, eventChain, action, message).exec();
 				break;
 

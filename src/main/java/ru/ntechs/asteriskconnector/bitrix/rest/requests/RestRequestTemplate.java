@@ -74,6 +74,7 @@ public abstract class RestRequestTemplate {
 		}
 	}
 
+	@JsonIgnore
 	public abstract String getMethod();
 
 	protected RestTemplate getRestTemplate() {

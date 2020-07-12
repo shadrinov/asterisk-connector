@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.Getter;
@@ -13,7 +14,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultCrmLeadAdd;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestCrmLeadAdd extends RestRequestTemplate {
-	private HashMap<String, String> fields;
+	private HashMap<String, Object> fields;
 	private HashMap<String, String> params;
 
 	public RestRequestCrmLeadAdd(BitrixAuth auth) {
@@ -25,6 +26,38 @@ public class RestRequestCrmLeadAdd extends RestRequestTemplate {
 
 	public void addField(String name, String val) {
 		fields.put(name, val);
+	}
+
+	public void addFieldPhone(String phone) {
+		addFieldPhone(phone, null);
+	}
+
+	public void addFieldPhone(String phone, String type) {
+		if (phone == null)
+			return;
+
+		@SuppressWarnings("unchecked")
+		ArrayList<HashMap<String, String>> phones = (ArrayList<HashMap<String, String>>) fields.get("PHONE");
+
+		if (phones == null) {
+			phones = new ArrayList<>();
+			fields.put("PHONE", phones);
+		}
+
+		for (HashMap<String, String> entry : phones) {
+			String value = entry.get("VALUE");
+
+			if ((value != null) && (value.equals(phones)))
+				return;
+		}
+
+		HashMap<String, String> newEntry = new HashMap<>();
+		newEntry.put("VALUE", phone);
+
+		if (type != null)
+			newEntry.put("VALUE_TYPE", type);
+
+		phones.add(newEntry);
 	}
 
 	public void removeField(String name) {
