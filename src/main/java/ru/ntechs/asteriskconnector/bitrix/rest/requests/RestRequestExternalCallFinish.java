@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -13,6 +14,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallFin
 @Setter
 @ToString(callSuper = true)
 public class RestRequestExternalCallFinish extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "telephony.externalcall.finish";
+
 	@JsonProperty("CALL_ID")
 	private String callId;
 
@@ -54,7 +58,7 @@ public class RestRequestExternalCallFinish extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "telephony.externalcall.finish";
+		return METHOD;
 	}
 
 	public RestResultExternalCallFinish exec() throws BitrixRestApiException {

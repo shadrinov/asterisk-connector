@@ -9,15 +9,15 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
-import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallHide;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallShow;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
-public class MethodHideExternalCall extends Method {
-	public static final String NAME = "telephony.externalcall.hide";
+public class MethodExternalCallShow extends Method {
+	public static final String NAME = RestRequestExternalCallShow.METHOD;
 
-	public MethodHideExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+	public MethodExternalCallShow(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);
 	}
 
@@ -26,10 +26,6 @@ public class MethodHideExternalCall extends Method {
 		HashMap<String, Scalar> params = evaluate(getAction().getParams());
 
 		try {
-			String callId = null;
-			ArrayList<Long> userIds = new ArrayList<>();
-
-			ArrayList<User> users = getContext().get(User.class);
 			ArrayList<ExternalCall> calls = getContext().get(ExternalCall.class);
 
 			ExternalCall firstCall = (calls.size() > 0) ? calls.get(0) : null;
@@ -38,18 +34,17 @@ public class MethodHideExternalCall extends Method {
 				return;
 			}
 
+			String callId = null;
+			ArrayList<Integer> userIds = new ArrayList<>();
+
 			if (params.containsKey("CALL_ID"))
 				callId = params.get("CALL_ID").asString();
 
 			if (params.containsKey("USER_ID"))
-				userIds.add(params.get("USER_ID").asLong());
+				userIds.add(params.get("USER_ID").asInteger());
 
 			if ((callId == null) && !calls.isEmpty() && (firstCall != null))
 				callId = firstCall.getCallId();
-
-			if (userIds.isEmpty() && !users.isEmpty())
-				for (User entity : users)
-					userIds.add(entity.getId());
 
 			if (callId == null)
 				throw new BitrixLocalException("Required parameter is not defined: CALL_ID");
@@ -57,10 +52,11 @@ public class MethodHideExternalCall extends Method {
 			if (userIds.isEmpty())
 				throw new BitrixLocalException("Required parameter is not defined: USER_ID");
 
-			RestRequestExternalCallHide req = new RestRequestExternalCallHide(getAuth(), callId, userIds);
+			RestRequestExternalCallShow req = new RestRequestExternalCallShow(getAuth(), callId, userIds);
 			req.exec();
 
-			getContext().remove(users);
+			for (User user : findIntermediateBeans(User.class))
+				getContext().put(user);
 		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());
 		}

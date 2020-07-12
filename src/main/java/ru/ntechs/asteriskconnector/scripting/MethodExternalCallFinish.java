@@ -14,10 +14,10 @@ import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
-public class MethodFinishExternalCall extends Method {
-	public static final String NAME = "telephony.externalcall.finish";
+public class MethodExternalCallFinish extends Method {
+	public static final String NAME = RestRequestExternalCallFinish.METHOD;
 
-	public MethodFinishExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+	public MethodExternalCallFinish(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);
 	}
 

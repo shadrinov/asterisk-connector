@@ -14,7 +14,7 @@ import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
 public class MethodExternalCallAttachRecord extends Method {
-	public static final String NAME = "telephony.externalcall.attachrecord";
+	public static final String NAME = RestRequestExternalCallAttachRecord.METHOD;
 
 	public MethodExternalCallAttachRecord(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);

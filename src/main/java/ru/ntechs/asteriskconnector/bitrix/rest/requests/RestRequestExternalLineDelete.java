@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -14,6 +15,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineDel
 @Setter
 @ToString(callSuper = true)
 public class RestRequestExternalLineDelete extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "telephony.externalLine.delete";
+
 	@JsonProperty("NUMBER")
 	private String number;
 
@@ -29,7 +33,7 @@ public class RestRequestExternalLineDelete extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "telephony.externalLine.delete";
+		return METHOD;
 	}
 
 	public RestResultExternalLineDelete exec() throws BitrixRestApiException {

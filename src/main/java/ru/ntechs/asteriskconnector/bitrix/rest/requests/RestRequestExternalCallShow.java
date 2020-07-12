@@ -2,6 +2,7 @@ package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -15,6 +16,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestExternalCallShow extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "telephony.externalcall.show";
+
 	@JsonProperty("CALL_ID")
 	private String callId;
 
@@ -31,7 +35,7 @@ public class RestRequestExternalCallShow extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "telephony.externalcall.show";
+		return METHOD;
 	}
 
 	public RestResult exec() throws BitrixRestApiException {

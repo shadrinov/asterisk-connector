@@ -2,6 +2,8 @@ package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +15,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultUserGet;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestUserGet extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "user.get";
+
 	private Integer id;
 	private HashMap<String, String> filter;
 
@@ -32,7 +37,7 @@ public class RestRequestUserGet extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "user.get";
+		return METHOD;
 	}
 
 	public RestResultUserGet exec() throws BitrixRestApiException {

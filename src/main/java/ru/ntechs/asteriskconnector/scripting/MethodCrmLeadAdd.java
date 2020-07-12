@@ -12,7 +12,7 @@ import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
 public class MethodCrmLeadAdd extends Method {
-	public static final String NAME = "crm.lead.add";
+	public static final String NAME = RestRequestCrmLeadAdd.METHOD;
 
 	public MethodCrmLeadAdd(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);

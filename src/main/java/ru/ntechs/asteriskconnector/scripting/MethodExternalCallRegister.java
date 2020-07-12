@@ -15,10 +15,10 @@ import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 
 @Slf4j
-public class MethodRegisterExternalCall extends Method {
-	public static final String NAME = "telephony.externalcall.register";
+public class MethodExternalCallRegister extends Method {
+	public static final String NAME = RestRequestExternalCallRegister.METHOD;
 
-	public MethodRegisterExternalCall(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+	public MethodExternalCallRegister(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
 		super(scriptFactory, eventChain, action, message);
 	}
 

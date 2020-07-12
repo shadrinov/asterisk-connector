@@ -60,20 +60,20 @@ public class ScriptFactory {
 				new MethodCrmLeadAdd(this, eventChain, action, message).exec();
 				break;
 
-			case (MethodFinishExternalCall.NAME):
-				new MethodFinishExternalCall(this, eventChain, action, message).exec();
+			case (MethodExternalCallFinish.NAME):
+				new MethodExternalCallFinish(this, eventChain, action, message).exec();
 				break;
 
-			case (MethodHideExternalCall.NAME):
-				new MethodHideExternalCall(this, eventChain, action, message).exec();
+			case (MethodExternalCallHide.NAME):
+				new MethodExternalCallHide(this, eventChain, action, message).exec();
 				break;
 
-			case (MethodRegisterExternalCall.NAME):
-				new MethodRegisterExternalCall(this, eventChain, action, message).exec();
+			case (MethodExternalCallRegister.NAME):
+				new MethodExternalCallRegister(this, eventChain, action, message).exec();
 				break;
 
-			case (MethodShowExternalCall.NAME):
-				new MethodShowExternalCall(this, eventChain, action, message).exec();
+			case (MethodExternalCallShow.NAME):
+				new MethodExternalCallShow(this, eventChain, action, message).exec();
 				break;
 
 			case (MethodExternalCallAttachRecord.NAME):

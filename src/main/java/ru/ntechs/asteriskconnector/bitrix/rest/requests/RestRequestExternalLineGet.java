@@ -1,5 +1,7 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +13,8 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineGet
 @Setter
 @ToString(callSuper = true)
 public class RestRequestExternalLineGet extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "telephony.externalLine.get";
 
 	public RestRequestExternalLineGet(BitrixAuth auth) {
 		super(auth);
@@ -18,7 +22,7 @@ public class RestRequestExternalLineGet extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "telephony.externalLine.get";
+		return METHOD;
 	}
 
 	public RestResultExternalLineGet exec() throws BitrixRestApiException {

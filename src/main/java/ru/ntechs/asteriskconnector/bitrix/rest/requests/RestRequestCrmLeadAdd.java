@@ -3,6 +3,8 @@ package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,6 +16,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultCrmLeadAdd;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestCrmLeadAdd extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "crm.lead.add";
+
 	private HashMap<String, Object> fields;
 	private HashMap<String, String> params;
 
@@ -74,7 +79,7 @@ public class RestRequestCrmLeadAdd extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "crm.lead.add";
+		return METHOD;
 	}
 
 	public RestResultCrmLeadAdd exec() throws BitrixRestApiException {

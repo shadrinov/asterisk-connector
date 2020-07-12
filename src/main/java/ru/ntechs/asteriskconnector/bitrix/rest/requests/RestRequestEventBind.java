@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -13,6 +14,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestEventBind extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "event.bind";
+
 	private String event;
 	private String handler;
 
@@ -32,7 +36,7 @@ public class RestRequestEventBind extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "event.bind";
+		return METHOD;
 	}
 
 	public RestResult exec() throws BitrixRestApiException {

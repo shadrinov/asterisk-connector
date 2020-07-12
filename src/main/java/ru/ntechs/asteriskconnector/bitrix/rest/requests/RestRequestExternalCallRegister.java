@@ -3,6 +3,7 @@ package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -16,19 +17,33 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallReg
 @Setter
 @ToString(callSuper = true)
 public class RestRequestExternalCallRegister extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "telephony.externalcall.register";
+
+	@JsonIgnore
 	final static public Integer CRM_CREATE_NEGATIVE = 0;
+	@JsonIgnore
 	final static public Integer CRM_CREATE_POSITIVE = 1;
 
+	@JsonIgnore
 	final static public String CRM_ENTITY_TYPE_CONTACT = "CONTACT";
+	@JsonIgnore
 	final static public String CRM_ENTITY_TYPE_COMPANY = "COMPANY";
+	@JsonIgnore
 	final static public String CRM_ENTITY_TYPE_LEAD = "LEAD";
 
+	@JsonIgnore
 	final static public Integer SHOW_NEGATIVE = 0;
+	@JsonIgnore
 	final static public Integer SHOW_POSITIVE = 1;
 
+	@JsonIgnore
 	final static public Integer TYPE_OUTGOING = 1;
+	@JsonIgnore
 	final static public Integer TYPE_INCOMING = 2;
+	@JsonIgnore
 	final static public Integer TYPE_INCOMING_FORWARDED = 3;
+	@JsonIgnore
 	final static public Integer TYPE_CALLBACK = 4;
 
 	@JsonProperty("USER_PHONE_INNER")
@@ -86,7 +101,7 @@ public class RestRequestExternalCallRegister extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "telephony.externalcall.register";
+		return METHOD;
 	}
 
 	public RestResultExternalCallRegister exec() throws BitrixRestApiException {

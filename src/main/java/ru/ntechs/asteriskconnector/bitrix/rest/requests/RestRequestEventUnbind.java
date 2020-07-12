@@ -1,5 +1,6 @@
 package ru.ntechs.asteriskconnector.bitrix.rest.requests;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -14,6 +15,9 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultEventUnbind;
 @Setter
 @ToString(callSuper = true)
 public class RestRequestEventUnbind extends RestRequestTemplate {
+	@JsonIgnore
+	public static final String METHOD = "event.unbind";
+
 	private String event;
 	private String handler;
 
@@ -33,7 +37,7 @@ public class RestRequestEventUnbind extends RestRequestTemplate {
 
 	@Override
 	public String getMethod() {
-		return "event.unbind";
+		return METHOD;
 	}
 
 	public RestResultEventUnbind exec() throws BitrixRestApiException {
