@@ -68,10 +68,30 @@ public class Expression {
 			failCharIndex++;
 
 			switch (chr) {
-				case ('$'): result = result.append(parseReplace()); break;
-				case ('\\'): result = result.append(parseEscape()); break;
+			case ('$'):
+				result = result.append(parseReplace());
+				break;
 
-				default: result = result.append((char)chr); break;
+			case ('|'):
+				if (result.isNull())
+					break;
+				else
+					return result;
+
+			case ('"'):
+				result = result.append(parseQuoted());
+				break;
+
+			case ('\\'):
+				result = result.append(parseEscape());
+				break;
+
+			case (' '):
+				break;
+
+			default:
+				result = result.append((char)chr);
+				break;
 			}
 		}
 
@@ -128,6 +148,10 @@ public class Expression {
 
 			case (FunctionFileContents.LC_NAME):
 				func = new FunctionFileContents(this, params);
+				break;
+
+			case (FunctionResponsible.LC_NAME):
+				func = new FunctionResponsible(this, params);
 				break;
 
 			case (FunctionREST.LC_NAME):

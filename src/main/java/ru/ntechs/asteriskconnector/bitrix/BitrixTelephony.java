@@ -6,10 +6,15 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import ru.ntechs.asteriskconnector.bitrix.rest.data.CrmDuplicateFindByComm;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmCompanyGet;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmContactGet;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmDuplicateFindByComm;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmLeadGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventBind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventUnbind;
@@ -79,6 +84,26 @@ public class BitrixTelephony {
 	public ArrayList<User> getUser(HashMap<String, String> constraints) throws BitrixRestApiException {
 		RestRequestUserGet req = new RestRequestUserGet(bitrixAuth);
 		req.setFilter(constraints);
+		return req.exec().getResult();
+	}
+
+	public CrmDuplicateFindByComm findCrmDuplicateByComm(String phone) throws BitrixRestApiException {
+		RestRequestCrmDuplicateFindByComm req = new RestRequestCrmDuplicateFindByComm(bitrixAuth, phone);
+		return req.exec().getResult();
+	}
+
+	public HashMap<String, Object> getCrmLead(Long leadId) throws BitrixRestApiException {
+		RestRequestCrmLeadGet req = new RestRequestCrmLeadGet(bitrixAuth, leadId);
+		return req.exec().getResult();
+	}
+
+	public HashMap<String, Object> getCrmContact(Long contactId) throws BitrixRestApiException {
+		RestRequestCrmContactGet req = new RestRequestCrmContactGet(bitrixAuth, contactId);
+		return req.exec().getResult();
+	}
+
+	public HashMap<String, Object> getCrmCompany(Long companyId) throws BitrixRestApiException {
+		RestRequestCrmCompanyGet req = new RestRequestCrmCompanyGet(bitrixAuth, companyId);
 		return req.exec().getResult();
 	}
 }

@@ -16,12 +16,6 @@ public class MainLoop {
 
 	public void run() throws Exception {
 		ami.addHandler(message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("Join", message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("Leave", message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("AgentCalled", message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("AgentRingNoAnswer", message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("AgentConnect", message -> { eventDispatcher.dispatch(message); });
-//		ami.addHandler("AgentComplete", message -> { eventDispatcher.dispatch(message); });
 
 		while (true) {
 			eventDispatcher.collectGarbage();

@@ -9,6 +9,7 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserGet;
 
 public class FunctionREST extends Function {
 	public static final String NAME    = "REST";
@@ -57,7 +58,7 @@ public class FunctionREST extends Function {
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
 		switch (method.toLowerCase()) {
-			case ("user.get"): return userGet();
+			case (RestRequestUserGet.METHOD): return userGet();
 
 			default:
 				throw new BitrixLocalException(String.format("Unsupported method: %s", method));

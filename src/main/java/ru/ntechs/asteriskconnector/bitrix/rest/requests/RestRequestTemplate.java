@@ -7,11 +7,14 @@ import java.io.InputStreamReader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +44,14 @@ public abstract class RestRequestTemplate {
 
 		if (restTemplate == null) {
 			restTemplate = new RestTemplate();
+
+			for (HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
+				if (converter instanceof MappingJackson2HttpMessageConverter) {
+					((MappingJackson2HttpMessageConverter) converter).getObjectMapper()
+						.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
+				}
+			}
+
 			restTemplate.setErrorHandler(new ResponseErrorHandler() {
 				@Override
 				public boolean hasError(ClientHttpResponse response) throws IOException {
