@@ -3,11 +3,13 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventNode;
 
+@Slf4j
 public class FunctionDuration extends Function {
 	public static final String NAME    = "Duration";
 	public static final String LC_NAME = "duration";
@@ -35,7 +37,7 @@ public class FunctionDuration extends Function {
 	public Scalar eval() throws IOException, BitrixLocalException {
 		EventChain eventChain = getEventChain();
 		Message messageCurrent = getMessage();
-		Long firstMessageMillis, lastMessageMillis;
+		Long firstMessageMillis = null, lastMessageMillis = null;
 
 		if (eventChain.isEmpty())
 			return new ScalarInteger("Duration", 0l);
@@ -47,7 +49,7 @@ public class FunctionDuration extends Function {
 		if (eventNode != null)
 			firstMessageMillis = eventNode.getMillis();
 		else
-			throw new BitrixLocalException(String.format("AMI event (firstEvent) '%s' not found in current event chain", firstEvent));
+			log.info("Warning: AMI event (firstEvent) '{}' not found in current event chain", firstEvent);
 
 		eventNode = (lastEvent != null) ?
 				eventChain.findMessage(messageCurrent, lastEvent) :
@@ -56,9 +58,12 @@ public class FunctionDuration extends Function {
 		if (eventNode != null)
 			lastMessageMillis = eventNode.getMillis();
 		else
-			throw new BitrixLocalException(String.format("AMI event (lastEvent) '%s' not found in current event chain", firstEvent));
+			log.info("Warning: AMI event (lastEvent) '{}' not found in current event chain", lastEvent);
 
-		return new ScalarInteger("Duration", Math.abs(lastMessageMillis - firstMessageMillis) / 1000l);
+		if ((firstMessageMillis != null) && (lastMessageMillis != null))
+			return new ScalarInteger("Duration", Math.abs(lastMessageMillis - firstMessageMillis) / 1000l);
+		else
+			return new ScalarInteger("Duration");
 	}
 
 	@Override

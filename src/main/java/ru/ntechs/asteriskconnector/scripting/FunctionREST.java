@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestUserGet;
 
+@Slf4j
 public class FunctionREST extends Function {
 	public static final String NAME    = "REST";
 	public static final String LC_NAME = "rest";
@@ -73,8 +75,10 @@ public class FunctionREST extends Function {
 		try {
 			intermediateBeans = bitrixTelephony.getUser(constraints);
 
-			if ((intermediateBeans == null) || (intermediateBeans.size() == 0))
-				throw new BitrixLocalException("No Bitrix user account found, constraints: " +  constraintsToString());
+			if ((intermediateBeans == null) || (intermediateBeans.size() == 0)) {
+				log.info("Warning: no Bitrix24 user account found, constraints: {}",  constraintsToString());
+				return new ScalarString(String.format("$(REST(%s, %s...))", method, field));
+			}
 
 			if (intermediateBeans.size() > 1) {
 				ArrayList<String> userIds = new ArrayList<>();
