@@ -3,10 +3,12 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
 
+@Slf4j
 public class FunctionChannel extends Function {
 	public static final String NAME    = "Channel";
 	public static final String LC_NAME = "channel";
@@ -44,8 +46,10 @@ public class FunctionChannel extends Function {
 			intermediateBeans = expr.getIntermediateBeans();
 			return result;
 		}
-		else
-			throw new BitrixLocalException(String.format("Unable to find reference channel: %s", channelId));
+		else {
+			log.info("Warning: unable to find referenced channel: {}", channelId);
+			return new ScalarString("<undef>");
+		}
 	}
 
 	@Override

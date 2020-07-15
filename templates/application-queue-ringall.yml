@@ -34,7 +34,9 @@ connector:
              params:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
                 PHONE_NUMBER: ${QueueCallerJoin(CallerIDNum)}
+                CRM_CREATE: 1
                 TYPE: 2
+                SHOW: 0
       - events:
          - name: "AgentRingNoAnswer"
         action:
@@ -57,8 +59,8 @@ connector:
         action:
            - method: telephony.externalcall.finish
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(DestCallerIDNum)}))
-                DURATION: ${AgentComplete(TalkTime)}
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(ConnectedLineNum)}))
+                DURATION: $(Duration(AgentConnect, AgentComplete))
                 STATUS_CODE: 200
            - method: telephony.externalcall.attachrecord
              params:

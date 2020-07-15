@@ -15,7 +15,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallAtt
 @ToString(callSuper = true)
 public class RestRequestExternalCallAttachRecord extends RestRequestTemplate {
 	@JsonIgnore
-	public static final String METHOD = "telephony.externalCall.attachRecord";
+	public static final String METHOD = "telephony.externalcall.attachrecord";
 
 	@JsonProperty("CALL_ID")
 	private String callId;

@@ -48,8 +48,6 @@ public class FunctionResponsible extends Function {
 				if (entities.getCompanies().size() > 1)
 					log.info("Phone number {} is assosiated with multiple companies: {}", phone, entities.getCompanies());
 
-				// TODO: get responsible id and return
-				log.info("TODO: companies, get responsible id and return");
 				for (Long companyId : entities.getCompanies()) {
 					HashMap<String, Object> company = bitrixTelephony.getCrmCompany(companyId);
 					Object respUserId = company.get("ASSIGNED_BY_ID");
@@ -102,7 +100,7 @@ public class FunctionResponsible extends Function {
 							e.getMessage(), RestRequestCrmDuplicateFindByComm.METHOD, phone));
 		}
 
-		return null;
+		return new ScalarString("<userId>");
 	}
 
 	@Override
@@ -110,5 +108,4 @@ public class FunctionResponsible extends Function {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
