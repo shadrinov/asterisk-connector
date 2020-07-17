@@ -13,7 +13,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestEventBind extends RestRequestTemplate {
+public class RestRequestEventBind extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "event.bind";
 

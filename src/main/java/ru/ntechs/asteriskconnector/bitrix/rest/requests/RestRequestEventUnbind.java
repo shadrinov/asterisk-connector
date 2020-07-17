@@ -14,7 +14,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultEventUnbind;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestEventUnbind extends RestRequestTemplate {
+public class RestRequestEventUnbind extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "event.unbind";
 

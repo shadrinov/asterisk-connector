@@ -15,7 +15,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalCallHide extends RestRequestTemplate {
+public class RestRequestExternalCallHide extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalcall.hide";
 

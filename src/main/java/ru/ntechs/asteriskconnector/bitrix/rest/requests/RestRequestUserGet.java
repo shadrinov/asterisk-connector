@@ -14,7 +14,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultUserGet;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestUserGet extends RestRequestTemplate {
+public class RestRequestUserGet extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "user.get";
 

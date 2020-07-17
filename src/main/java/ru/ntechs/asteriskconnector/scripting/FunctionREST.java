@@ -93,12 +93,7 @@ public class FunctionREST extends Function {
 		} catch (BitrixRestApiException e) {
 			ArrayList<String> params = new ArrayList<>();
 
-			constraints.forEach(new BiConsumer<String, String>() {
-				@Override
-				public void accept(String t, String u) {
-					params.add(t + " => " + u);
-				}
-			});
+			constraints.forEach((key, val) -> params.add(key + " => " + val));
 
 			throw new BitrixLocalException(
 					String.format("%s: failed method: %s(%s, %s)",

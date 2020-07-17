@@ -12,7 +12,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultCrmCompanyGet;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestCrmCompanyGet extends RestRequestTemplate {
+public class RestRequestCrmCompanyGet extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "crm.company.get";
 

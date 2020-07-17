@@ -13,7 +13,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallFin
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalCallFinish extends RestRequestTemplate {
+public class RestRequestExternalCallFinish extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalcall.finish";
 

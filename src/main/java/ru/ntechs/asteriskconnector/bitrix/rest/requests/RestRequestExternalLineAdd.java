@@ -13,7 +13,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineAdd
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalLineAdd extends RestRequestTemplate {
+public class RestRequestExternalLineAdd extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalLine.add";
 

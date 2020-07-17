@@ -16,7 +16,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalCallReg
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalCallRegister extends RestRequestTemplate {
+public class RestRequestExternalCallRegister extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalcall.register";
 

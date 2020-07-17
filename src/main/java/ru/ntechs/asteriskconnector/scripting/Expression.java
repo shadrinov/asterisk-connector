@@ -4,7 +4,6 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
@@ -126,15 +125,9 @@ public class Expression {
 			attrVal = msg.getAttribute(params.get(0).asString());
 
 			if (attrVal == null) {
-				final ArrayList<String> constrStrnigs = new ArrayList<>();
+				ArrayList<String> constrStrnigs = new ArrayList<>();
 
-				constraints.forEach(new BiConsumer<String, String>() {
-					@Override
-					public void accept(String key, String val) {
-						constrStrnigs.add(key + "=" + val);
-					}
-				});
-
+				constraints.forEach((key, val) -> constrStrnigs.add(key + "=" + val));
 				log.info("Warning: message attribute ${{}[{}]({})} is not defined",
 						eventName, String.join(", ", constrStrnigs), params.get(0).asString());
 			}

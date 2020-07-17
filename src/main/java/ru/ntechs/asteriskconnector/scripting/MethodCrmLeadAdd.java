@@ -1,7 +1,6 @@
 package ru.ntechs.asteriskconnector.scripting;
 
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
@@ -32,14 +31,11 @@ public class MethodCrmLeadAdd extends Method {
 			if (params.containsKey("REGISTER_SONET_EVENT"))
 				req.addParam("REGISTER_SONET_EVENT", params.get("REGISTER_SONET_EVENT").asString());
 
-			fields.forEach(new BiConsumer<String, Scalar>() {
-				@Override
-				public void accept(String name, Scalar val) {
-					if (name.equals("PHONE"))
-						req.addFieldPhone(val.asString());
-					else
-						req.addField(name, val.asString());
-				}
+			fields.forEach((name, val) -> {
+				if (name.equals("PHONE"))
+					req.addFieldPhone(val.asString());
+				else
+					req.addField(name, val.asString());
 			});
 
 			req.exec();

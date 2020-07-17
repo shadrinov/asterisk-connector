@@ -28,7 +28,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Getter
 @Setter
 @ToString
-public abstract class RestRequestTemplate {
+public abstract class RestRequest {
 	@JsonProperty("access_token")
 	private String accessToken;
 
@@ -38,7 +38,7 @@ public abstract class RestRequestTemplate {
 	@JsonIgnore
 	private static RestTemplate restTemplate;
 
-	public RestRequestTemplate(BitrixAuth auth) {
+	public RestRequest(BitrixAuth auth) {
 		this.auth = auth;
 		this.accessToken = auth.getAccessToken();
 

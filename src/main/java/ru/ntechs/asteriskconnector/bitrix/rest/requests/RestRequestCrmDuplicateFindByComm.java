@@ -14,7 +14,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultCrmDuplicateFin
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestCrmDuplicateFindByComm extends RestRequestTemplate {
+public class RestRequestCrmDuplicateFindByComm extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "crm.duplicate.findbycomm";
 

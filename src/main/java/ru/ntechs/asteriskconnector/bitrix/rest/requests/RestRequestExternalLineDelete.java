@@ -14,7 +14,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineDel
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalLineDelete extends RestRequestTemplate {
+public class RestRequestExternalLineDelete extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalLine.delete";
 

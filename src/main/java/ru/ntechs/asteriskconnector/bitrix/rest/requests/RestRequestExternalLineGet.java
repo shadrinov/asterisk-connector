@@ -12,7 +12,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultExternalLineGet
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalLineGet extends RestRequestTemplate {
+public class RestRequestExternalLineGet extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalLine.get";
 

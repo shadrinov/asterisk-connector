@@ -12,7 +12,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultUserCurrent;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestUserCurrent extends RestRequestTemplate {
+public class RestRequestUserCurrent extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "user.current";
 

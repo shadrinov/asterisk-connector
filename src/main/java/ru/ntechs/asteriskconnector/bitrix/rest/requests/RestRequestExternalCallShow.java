@@ -15,7 +15,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class RestRequestExternalCallShow extends RestRequestTemplate {
+public class RestRequestExternalCallShow extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "telephony.externalcall.show";
 
