@@ -4,21 +4,30 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
+import ru.ntechs.asteriskconnector.bitrix.rest.cache.Cache;
 import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultUserGet;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class RestRequestUserGet extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "user.get";
 
+	@JsonIgnore
+	private static Cache<RestRequestUserGet, RestResultUserGet> cache = new Cache<>();
+
+	@EqualsAndHashCode.Include
 	private Integer id;
+
+	@EqualsAndHashCode.Include
 	private HashMap<String, String> filter;
 
 	public RestRequestUserGet(BitrixAuth auth) {
@@ -41,6 +50,11 @@ public class RestRequestUserGet extends RestRequest {
 	}
 
 	public RestResultUserGet exec() throws BitrixRestApiException {
-		return exec(RestResultUserGet.class);
+		RestResultUserGet result = cache.get(this);
+
+		if (result == null)
+			result = cache.put(this, exec(RestResultUserGet.class));
+
+		return result;
 	}
 }
