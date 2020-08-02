@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class FunctionDuration extends Function {
@@ -35,14 +35,14 @@ public class FunctionDuration extends Function {
 
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
-		EventChain eventChain = getEventChain();
+		MessageChain eventChain = getEventChain();
 		Message messageCurrent = getMessage();
 		Long firstMessageMillis = null, lastMessageMillis = null;
 
 		if (eventChain.isEmpty())
 			return new ScalarInteger("Duration", 0l);
 
-		EventNode eventNode = (firstEvent != null) ?
+		MessageNode eventNode = (firstEvent != null) ?
 				eventChain.findMessage(messageCurrent, firstEvent) :
 					eventChain.getHead();
 

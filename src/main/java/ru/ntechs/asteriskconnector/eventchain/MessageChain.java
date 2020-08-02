@@ -8,19 +8,19 @@ import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
-public class EventChain {
-	private EventNode tailEvent;
-	private EventNode headEvent;
+public class MessageChain {
+	private MessageNode tailEvent;
+	private MessageNode headEvent;
 
 	private String channel;
-	private EventDispatcher eventDispatcher;
+	private MessageDispatcher eventDispatcher;
 	private ScriptFactory scriptFactory;
 
 	private ArrayList<RuleConductor> conductors;
 
 	private ChainContext context;
 
-	EventChain(EventDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
+	MessageChain(MessageDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
 		super();
 
 		this.tailEvent = null;
@@ -40,16 +40,16 @@ public class EventChain {
 
 	public synchronized void enqueue(int birthTicks, Message message) {
 		if (tailEvent == null) {
-			headEvent = new EventNode(birthTicks, message);
+			headEvent = new MessageNode(birthTicks, message);
 			tailEvent = headEvent;
 		}
 		else
-			tailEvent = new EventNode(birthTicks, message, tailEvent);
+			tailEvent = new MessageNode(birthTicks, message, tailEvent);
 
 		checkRules(tailEvent);
 	}
 
-	private synchronized void checkRules(EventNode node) {
+	private synchronized void checkRules(MessageNode node) {
 		if (channel == null)
 			channel = eventDispatcher.registerChannel(node.getMessage());
 
@@ -74,11 +74,11 @@ public class EventChain {
 		return channel;
 	}
 
-	public EventNode getHead() {
+	public MessageNode getHead() {
 		return headEvent;
 	}
 
-	public EventNode getTail() {
+	public MessageNode getTail() {
 		return tailEvent;
 	}
 
@@ -94,22 +94,22 @@ public class EventChain {
 			tailEvent = null;
 	}
 
-	public EventNode findMessage(String name) {
+	public MessageNode findMessage(String name) {
 		return (tailEvent != null) ? tailEvent.findMessage(name) : null;
 	}
 
-	public EventNode findMessage(Message before, String name) {
+	public MessageNode findMessage(Message before, String name) {
 		return (tailEvent != null) ? tailEvent.findMessage(before, name) : null;
 	}
 
-	public EventNode findMessage(Message before, String name, HashMap<String,String> constraints) {
+	public MessageNode findMessage(Message before, String name, HashMap<String,String> constraints) {
 		return (tailEvent != null) ? tailEvent.findMessage(before, name, constraints) : null;
 	}
 
 	@Override
 	public String toString() {
 		ArrayList<String> eventList = new ArrayList<>();
-		EventNode node = getHead();
+		MessageNode node = getHead();
 
 		while (node != null) {
 			eventList.add(String.format("%s (%d)", node.getMessage().getName(), node.getTicks()));

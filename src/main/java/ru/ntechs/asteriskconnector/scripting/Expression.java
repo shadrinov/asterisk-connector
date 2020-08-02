@@ -8,22 +8,22 @@ import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class Expression {
 	private ScriptFactory scriptFactory;
-	private EventChain eventChain;
+	private MessageChain eventChain;
 	private String expr;
 	private ArrayList<Object> intermediateBeans;
-	private EventNode contextNode;
+	private MessageNode contextNode;
 
 	private CharArrayReader reader;
 
 	private int failCharIndex;
 
-	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr) {
+	public Expression(ScriptFactory scriptFactory, MessageChain eventChain, String expr) {
 		super();
 
 		this.scriptFactory = scriptFactory;
@@ -33,7 +33,7 @@ public class Expression {
 		this.reader = new CharArrayReader(this.expr.toCharArray());
 	}
 
-	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr, EventNode node) {
+	public Expression(ScriptFactory scriptFactory, MessageChain eventChain, String expr, MessageNode node) {
 		super();
 
 		this.scriptFactory = scriptFactory;
@@ -52,7 +52,7 @@ public class Expression {
 		return scriptFactory;
 	}
 
-	public EventChain getEventChain() {
+	public MessageChain getEventChain() {
 		return eventChain;
 	}
 
@@ -94,7 +94,7 @@ public class Expression {
 		if (params.size() > 1)
 			throw new BitrixLocalException(formatError("Event search statement doesn't match prototype ${EventName[[attrName=attrValue[,attrName=attrValue]]][(attrName)]}"));
 
-		EventNode node;
+		MessageNode node;
 		String name = eventName.asString();
 
 		if (name.equals("!")) {

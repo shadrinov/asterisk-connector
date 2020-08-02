@@ -15,22 +15,22 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.ChainContext;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public abstract class Method {
 	private static final DateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
 	private ScriptFactory scriptFactory;
-	private EventChain eventChain;
+	private MessageChain eventChain;
 	private ConnectorAction action;
-	private EventNode contextNode;
+	private MessageNode contextNode;
 
 	private ArrayList<Object> intermediateBeans;
 
-	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
+	public Method(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
 		super();
 
 		this.scriptFactory = scriptFactory;
@@ -39,11 +39,11 @@ public abstract class Method {
 		this.contextNode = node;
 	}
 
-	public EventDispatcher getEventDispatcher() {
+	public MessageDispatcher getEventDispatcher() {
 		return scriptFactory.getEventDispatcher();
 	}
 
-	public EventChain getEventChain() {
+	public MessageChain getEventChain() {
 		return eventChain;
 	}
 

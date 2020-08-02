@@ -6,14 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmLeadAdd;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class MethodCrmLeadAdd extends Method {
 	public static final String NAME = RestRequestCrmLeadAdd.METHOD;
 
-	public MethodCrmLeadAdd(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
+	public MethodCrmLeadAdd(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
 		super(scriptFactory, eventChain, action, node);
 	}
 

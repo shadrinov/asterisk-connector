@@ -5,16 +5,16 @@ import java.util.Date;
 
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 public class ScalarMessage extends Scalar {
-	EventNode value;
+	MessageNode value;
 
 	public ScalarMessage(String name) {
 		super(name);
 	}
 
-	public ScalarMessage(String name, EventNode event) {
+	public ScalarMessage(String name, MessageNode event) {
 		super(name);
 		this.value = event;
 	}

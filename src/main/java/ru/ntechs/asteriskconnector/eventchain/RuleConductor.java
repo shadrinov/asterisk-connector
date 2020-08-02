@@ -14,14 +14,14 @@ import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
 @Slf4j
 public class RuleConductor {
-	private EventChain eventChain;
+	private MessageChain eventChain;
 	private ScriptFactory scriptFactory;
 	private ConnectorRule rule;
 	private int progress;
 
 	List<ConnectorEvent> eventNames;
 
-	public RuleConductor(EventChain eventChain, ScriptFactory scriptFactory, ConnectorRule rule) {
+	public RuleConductor(MessageChain eventChain, ScriptFactory scriptFactory, ConnectorRule rule) {
 		this.eventChain = eventChain;
 		this.scriptFactory = scriptFactory;
 		this.rule = rule;
@@ -34,7 +34,7 @@ public class RuleConductor {
 		return rule;
 	}
 
-	public boolean check(EventNode node, String channel) {
+	public boolean check(MessageNode node, String channel) {
 		if ((rule == null) || (eventNames == null) || (eventNames.size() == 0))
 			return false;
 
@@ -59,7 +59,7 @@ public class RuleConductor {
 		}
 	}
 
-	private boolean check(EventNode node, String channel, int progress) {
+	private boolean check(MessageNode node, String channel, int progress) {
 		boolean result = false;
 
 		ConnectorEvent event = eventNames.get(progress++);
@@ -91,7 +91,7 @@ public class RuleConductor {
 		return result;
 	}
 
-	private boolean checkConstraints(ConnectorEvent event, EventNode node) throws IOException, BitrixLocalException {
+	private boolean checkConstraints(ConnectorEvent event, MessageNode node) throws IOException, BitrixLocalException {
 		HashMap<String, String> constraints = event.getConstraints();
 
 		if (event.getConstraints() != null) {

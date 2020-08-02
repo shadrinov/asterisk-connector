@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 
 @Slf4j
 public class FunctionChannel extends Function {
@@ -36,9 +36,9 @@ public class FunctionChannel extends Function {
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
 		ScriptFactory scriptFactory = getScriptFactory();
-		EventDispatcher eventDispatcher = getEventDispatcher();
+		MessageDispatcher eventDispatcher = getEventDispatcher();
 
-		EventChain eventChain = eventDispatcher.getEventChain(channelId);
+		MessageChain eventChain = eventDispatcher.getEventChain(channelId);
 
 		if (eventChain != null) {
 			Expression expr = new Expression(scriptFactory, eventChain, this.expressionString);

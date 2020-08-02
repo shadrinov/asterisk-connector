@@ -9,14 +9,14 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallAttachRecord;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class MethodExternalCallAttachRecord extends Method {
 	public static final String NAME = RestRequestExternalCallAttachRecord.METHOD;
 
-	public MethodExternalCallAttachRecord(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
+	public MethodExternalCallAttachRecord(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
 		super(scriptFactory, eventChain, action, node);
 	}
 

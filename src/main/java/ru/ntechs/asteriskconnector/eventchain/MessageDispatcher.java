@@ -13,7 +13,7 @@ import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
 @Slf4j
 @Component
-public class EventDispatcher {
+public class MessageDispatcher {
 	final static int EVENT_LIFETIME = 1800;
 
 	@Autowired
@@ -21,18 +21,18 @@ public class EventDispatcher {
 
 	private ConnectorConfig config;
 
-	private ConcurrentHashMap<String, EventChain> chainByUniqueId = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, MessageChain> chainByUniqueId = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, String> uniqueIdByChannel = new ConcurrentHashMap<>();
-	private EventChain unmappableEvents;
+	private MessageChain unmappableEvents;
 	private int tickCount = 0;
 
-	public EventDispatcher(ConnectorConfig config) {
+	public MessageDispatcher(ConnectorConfig config) {
 		this.config = config;
-		this.unmappableEvents = new EventChain(this, scriptFactory, config.getRules());
+		this.unmappableEvents = new MessageChain(this, scriptFactory, config.getRules());
 	}
 
 	public void dispatch(Message msg) {
-		EventChain eventChain;
+		MessageChain eventChain;
 
 		String uniqueId = msg.getAttribute("Uniqueid");
 
@@ -40,7 +40,7 @@ public class EventDispatcher {
 			eventChain = chainByUniqueId.get(uniqueId);
 
 			if (eventChain == null) {
-				eventChain = new EventChain(this, scriptFactory, config.getRules());
+				eventChain = new MessageChain(this, scriptFactory, config.getRules());
 				chainByUniqueId.put(uniqueId, eventChain);
 			}
 		}
@@ -67,7 +67,7 @@ public class EventDispatcher {
 			return null;
 	}
 
-	public EventChain getEventChain(String channelId) {
+	public MessageChain getEventChain(String channelId) {
 		if (chainByUniqueId.containsKey(channelId))
 			return chainByUniqueId.get(channelId);
 
@@ -84,8 +84,8 @@ public class EventDispatcher {
 	public void collectGarbage() {
 		tickCount++;
 
-		for (Entry<String, EventChain> chainEntry : chainByUniqueId.entrySet()) {
-			EventChain eventChain = chainEntry.getValue();
+		for (Entry<String, MessageChain> chainEntry : chainByUniqueId.entrySet()) {
+			MessageChain eventChain = chainEntry.getValue();
 
 			if ((tickCount - eventChain.getTailBirthTicks()) > EVENT_LIFETIME) {
 				String channel = eventChain.getChannel();

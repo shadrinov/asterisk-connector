@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ru.ntechs.ami.AMI;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 
 @Component
 public class MainLoop {
 	@Autowired
-	private EventDispatcher eventDispatcher;
+	private MessageDispatcher eventDispatcher;
 
 	@Autowired
 	private AMI ami;

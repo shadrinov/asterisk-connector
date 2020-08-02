@@ -11,14 +11,14 @@ import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallRegister;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class MethodExternalCallRegister extends Method {
 	public static final String NAME = RestRequestExternalCallRegister.METHOD;
 
-	public MethodExternalCallRegister(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
+	public MethodExternalCallRegister(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
 		super(scriptFactory, eventChain, action, node);
 	}
 

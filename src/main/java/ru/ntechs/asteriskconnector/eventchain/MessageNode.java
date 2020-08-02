@@ -9,15 +9,15 @@ import ru.ntechs.ami.Message;
 
 @Slf4j
 @Getter
-public class EventNode {
+public class MessageNode {
 	private Message message;
-	private EventNode next;
-	private EventNode prev;
+	private MessageNode next;
+	private MessageNode prev;
 
 	private final int ticks;
 	private final long millis = System.currentTimeMillis();
 
-	public EventNode(int birthTicks, Message message) {
+	public MessageNode(int birthTicks, Message message) {
 		super();
 
 		this.message = message;
@@ -26,7 +26,7 @@ public class EventNode {
 		this.prev = null;
 	}
 
-	public EventNode(int birthTicks, Message message, EventNode ancestor) {
+	public MessageNode(int birthTicks, Message message, MessageNode ancestor) {
 		super();
 
 		while (ancestor.next != null) {
@@ -44,8 +44,8 @@ public class EventNode {
 		}
 	}
 
-	public EventNode split() {
-		EventNode newHead = next;
+	public MessageNode split() {
+		MessageNode newHead = next;
 
 		if (next != null) {
 			synchronized (next) {
@@ -57,16 +57,16 @@ public class EventNode {
 		return newHead;
 	}
 
-	public EventNode findMessage(String name) {
+	public MessageNode findMessage(String name) {
 		return findMessage(null, name);
 	}
 
-	public EventNode findMessage(String name, HashMap<String, String> constraints) {
+	public MessageNode findMessage(String name, HashMap<String, String> constraints) {
 		return findMessage(null, name, constraints);
 	}
 
-	public EventNode findMessage(Message before, String name) {
-		EventNode candidate = this;
+	public MessageNode findMessage(Message before, String name) {
+		MessageNode candidate = this;
 
 		if (before != null) {
 			while ((candidate != null) && (candidate.message != null)
@@ -83,8 +83,8 @@ public class EventNode {
 		return candidate;
 	}
 
-	public EventNode findMessage(Message before, String name, HashMap<String, String> constraints) {
-		EventNode candidate = findMessage(before, name);
+	public MessageNode findMessage(Message before, String name, HashMap<String, String> constraints) {
+		MessageNode candidate = findMessage(before, name);
 
 		if ((constraints == null) || constraints.isEmpty())
 			return candidate;

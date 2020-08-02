@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import lombok.Getter;
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 
 @Getter
 public abstract class Function {
@@ -39,11 +39,11 @@ public abstract class Function {
 		return (expression != null) ? expression.getScriptFactory() : null;
 	}
 
-	public EventChain getEventChain() {
+	public MessageChain getEventChain() {
 		return (expression != null) ? expression.getEventChain() : null;
 	}
 
-	public EventDispatcher getEventDispatcher() {
+	public MessageDispatcher getEventDispatcher() {
 		ScriptFactory scriptFactory = getScriptFactory();
 		return (scriptFactory != null) ? scriptFactory.getEventDispatcher() : null;
 	}

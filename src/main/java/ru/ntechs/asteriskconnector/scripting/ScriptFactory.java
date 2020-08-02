@@ -11,9 +11,9 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
-import ru.ntechs.asteriskconnector.eventchain.EventChain;
-import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
-import ru.ntechs.asteriskconnector.eventchain.EventNode;
+import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 @Getter
@@ -23,12 +23,12 @@ public class ScriptFactory {
 	private BitrixAuth auth;
 
 	@Autowired
-	private EventDispatcher eventDispatcher;
+	private MessageDispatcher eventDispatcher;
 
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
 
-	public void buildScript(EventChain eventChain, ConnectorRule rule, EventNode node) {
+	public void buildScript(MessageChain eventChain, ConnectorRule rule, MessageNode node) {
 		if (rule == null)
 			return;
 
