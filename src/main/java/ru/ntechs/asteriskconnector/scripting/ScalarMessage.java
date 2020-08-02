@@ -14,9 +14,9 @@ public class ScalarMessage extends Scalar {
 		super(name);
 	}
 
-	public ScalarMessage(String name, MessageNode event) {
+	public ScalarMessage(String name, MessageNode message) {
 		super(name);
-		this.value = event;
+		this.value = message;
 	}
 
 	@Override
@@ -92,10 +92,7 @@ public class ScalarMessage extends Scalar {
 		return this;
 	}
 
-	public Message getMessage() {
-		if ((value != null) && (value.getMessage() != null))
-			return value.getMessage();
-		else
-			return null;
+	public MessageNode getMessage() {
+		return value;
 	}
 }

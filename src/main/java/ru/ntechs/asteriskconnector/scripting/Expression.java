@@ -91,7 +91,7 @@ public class Expression {
 	}
 
 	private Scalar evalEvent(Scalar eventName, HashMap<String, String> constraints, ArrayList<Scalar> params) throws BitrixLocalException {
-		if (params.size() > 1)
+		if ((params != null) && params.size() > 1)
 			throw new BitrixLocalException(formatError("Event search statement doesn't match prototype ${EventName[[attrName=attrValue[,attrName=attrValue]]][(attrName)]}"));
 
 		MessageNode node;
@@ -107,7 +107,7 @@ public class Expression {
 			node = contextNode.findMessage(name, constraints);
 
 		if (node != null) {
-			if (params.size() == 0)
+			if ((params == null) || params.size() == 0)
 				return new ScalarMessage("${" + name + "}", node);
 			else if (params.size() == 1) {
 				String attrVal = node.getMessage().getAttribute(params.get(0).asString());
@@ -131,6 +131,9 @@ public class Expression {
 
 	private Scalar evalFunc(Scalar funcName, ArrayList<Scalar> params) throws IOException, BitrixLocalException {
 		Function func;
+
+		if (params == null)
+			params = new ArrayList<>();
 
 		switch (funcName.asString().toLowerCase()) {
 			case (FunctionChannel.LC_NAME):

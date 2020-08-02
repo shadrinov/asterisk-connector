@@ -14,8 +14,8 @@ public class FunctionDuration extends Function {
 	public static final String NAME    = "Duration";
 	public static final String LC_NAME = "duration";
 
-	private String firstEvent;
-	private String lastEvent;
+	private Scalar firstMessage;
+	private Scalar lastMessage;
 
 	public FunctionDuration(Expression expression, ArrayList<Scalar> params) throws BitrixLocalException {
 		super(expression, params);
@@ -24,8 +24,8 @@ public class FunctionDuration extends Function {
 			throw new BitrixLocalException(String.format("%s doesn't match prototype %s([event1[, event2]])",
 					toString(), NAME));
 
-		this.firstEvent = (params.size() > 0) ? params.get(0).asString() : null;
-		this.lastEvent = (params.size() > 1) ? params.get(1).asString() : null;
+		this.firstMessage = (params.size() > 0) ? params.get(0) : null;
+		this.lastMessage = (params.size() > 1) ? params.get(1) : null;
 	}
 
 	@Override
@@ -36,29 +36,34 @@ public class FunctionDuration extends Function {
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
 		MessageChain eventChain = getEventChain();
-		Message messageCurrent = getMessage();
+		Message curMessage = getMessage();
 		Long firstMessageMillis = null, lastMessageMillis = null;
+		MessageNode messageNode;
 
 		if (eventChain.isEmpty())
 			return new ScalarInteger("Duration", 0l);
 
-		MessageNode eventNode = (firstEvent != null) ?
-				eventChain.findMessage(messageCurrent, firstEvent) :
-					eventChain.getHead();
+		messageNode = ((firstMessage != null) && !firstMessage.isNull()) ?
+				((firstMessage instanceof ScalarMessage) ?
+						((ScalarMessage)firstMessage).getMessage() :
+							eventChain.findMessage(curMessage, firstMessage.asString())) :
+								eventChain.getHead();
 
-		if (eventNode != null)
-			firstMessageMillis = eventNode.getMillis();
+		if (messageNode != null)
+			firstMessageMillis = messageNode.getMillis();
 		else
-			log.info("Warning: AMI event (firstEvent) '{}' not found in current event chain", firstEvent);
+			log.info("Warning: AMI event (firstEvent) '{}' not found in current event chain", firstMessage);
 
-		eventNode = (lastEvent != null) ?
-				eventChain.findMessage(messageCurrent, lastEvent) :
-					eventChain.getTail();
+		messageNode = ((lastMessage != null) && !firstMessage.isNull()) ?
+				((lastMessage instanceof ScalarMessage) ?
+						((ScalarMessage)lastMessage).getMessage() :
+							eventChain.findMessage(curMessage, lastMessage.asString())) :
+								eventChain.getTail();
 
-		if (eventNode != null)
-			lastMessageMillis = eventNode.getMillis();
+		if (messageNode != null)
+			lastMessageMillis = messageNode.getMillis();
 		else
-			log.info("Warning: AMI event (lastEvent) '{}' not found in current event chain", lastEvent);
+			log.info("Warning: AMI event (lastEvent) '{}' not found in current event chain", lastMessage);
 
 		if ((firstMessageMillis != null) && (lastMessageMillis != null))
 			return new ScalarInteger("Duration", Math.abs(lastMessageMillis - firstMessageMillis) / 1000l);
