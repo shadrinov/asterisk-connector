@@ -23,38 +23,43 @@ public class ScalarStringSplitted extends ScalarString {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return (builder.length() == 0);
+	}
+
+	@Override
 	public String asString() {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asString();
 	}
 
 	@Override
 	public Short asShort() throws BitrixLocalException {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asShort();
 	}
 
 	@Override
 	public Integer asInteger() throws BitrixLocalException {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asInteger();
 	}
 
 	@Override
 	public Long asLong() throws BitrixLocalException {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asLong();
 	}
 
 	@Override
 	public Date asDate() throws BitrixLocalException {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asDate();
 	}
 
 	@Override
 	public byte[] asByteArray() {
-		value = builder.toString();
+		value = !isNull() ? builder.toString() : null;
 		return super.asByteArray();
 	}
 

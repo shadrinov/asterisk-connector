@@ -29,7 +29,7 @@ public class FunctionREST extends Function {
 
 	private void init(ArrayList<Scalar> params) throws BitrixLocalException {
 		if (params.size() < 4)
-			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(Method, Field, Attr, Value[, Attr, Value]...)",
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(method, field[, attr, value]...)",
 					toString(), NAME));
 
 		this.method = params.get(0).asString();

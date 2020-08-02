@@ -21,7 +21,7 @@ public class FunctionChannel extends Function {
 		super(expression, params);
 
 		if (params.size() != 2)
-			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(uniqueId, expression)",
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(channel, expression)",
 					toString(), NAME));
 
 		this.channelId = params.get(0).asString();

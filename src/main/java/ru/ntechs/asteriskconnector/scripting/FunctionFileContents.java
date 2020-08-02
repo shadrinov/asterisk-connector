@@ -37,7 +37,7 @@ public class FunctionFileContents extends Function {
 
 	private void init(ArrayList<Scalar> params) throws BitrixLocalException {
 		if (params.size() != 1)
-			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(Filename)",
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(filename)",
 					toString(), NAME));
 
 		this.filename = params.get(0).asString();

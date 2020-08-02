@@ -22,6 +22,7 @@ public abstract class Scalar {
 	}
 
 	public abstract boolean isNull();
+	public abstract boolean isEmpty();
 	public abstract String asString();
 	public abstract Short asShort() throws BitrixLocalException;
 	public abstract Integer asInteger() throws BitrixLocalException;

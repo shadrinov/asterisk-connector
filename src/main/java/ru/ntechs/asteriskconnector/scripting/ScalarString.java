@@ -23,6 +23,11 @@ public class ScalarString extends Scalar {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return (value == null) || value.isEmpty();
+	}
+
+	@Override
 	public String asString() {
 		return value;
 	}

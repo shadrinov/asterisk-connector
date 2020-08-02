@@ -458,8 +458,8 @@ public class Expression {
 				case (','): params.add(param.trim()); param = new ScalarStringSplitted("<parameter>"); break;
 				case ('('): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
 				case (')'): params.add(param.trim()); return params;
-				case ('$'): param = param.append(parseReplace()); break;
-				case ('"'): param = param.append(parseQuoted()); break;
+				case ('$'): param = param.isEmpty() ? parseReplace() : param.append(parseReplace()); break;
+				case ('"'): param = param.isEmpty() ? parseQuoted() : param.append(parseQuoted()); break;
 				case ('\\'): param = param.append(parseEscape()); break;
 				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: parameter or closing bracket ')' is expected"));
 
@@ -486,14 +486,14 @@ public class Expression {
 	}
 
 	private Scalar parseQuoted() throws IOException, BitrixLocalException {
-		Scalar param = new ScalarStringSplitted("<quted>");
+		Scalar param = new ScalarStringSplitted("<quoted>");
 
 		while (true) {
 			int chr = reader.read();
 			failCharIndex++;
 
 			switch (chr) {
-				case ('"'): return param;
+				case ('"'): return param.isEmpty() ? new ScalarString("<quoted>", "") : param;
 				case ('\\'): param = param.append(parseEscape()); break;
 				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: closing quotes '\"' is expected"));
 

@@ -21,7 +21,7 @@ public class FunctionDuration extends Function {
 		super(expression, params);
 
 		if (params.size() > 2)
-			throw new BitrixLocalException(String.format("%s doesn't match prototype %s([firstEvent[, lastEvent]])",
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s([event1[, event2]])",
 					toString(), NAME));
 
 		this.firstEvent = (params.size() > 0) ? params.get(0).asString() : null;
