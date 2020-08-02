@@ -46,16 +46,16 @@ public class EventChain {
 		else
 			tailEvent = new EventNode(birthTicks, message, tailEvent);
 
-		checkRules(message);
+		checkRules(tailEvent);
 	}
 
-	private synchronized void checkRules(Message message) {
+	private synchronized void checkRules(EventNode node) {
 		if (channel == null)
-			channel = eventDispatcher.registerChannel(message);
+			channel = eventDispatcher.registerChannel(node.getMessage());
 
 		for (RuleConductor rc : conductors)
-			if (rc.check(message, channel))
-				scriptFactory.buildScript(this, rc.getRule(), message);
+			if (rc.check(node, channel))
+				scriptFactory.buildScript(this, rc.getRule(), node);
 	}
 
 	public boolean isEmpty() {

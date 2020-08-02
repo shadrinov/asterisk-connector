@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalCall;
@@ -12,13 +11,14 @@ import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallHide;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
+import ru.ntechs.asteriskconnector.eventchain.EventNode;
 
 @Slf4j
 public class MethodExternalCallHide extends Method {
 	public static final String NAME = RestRequestExternalCallHide.METHOD;
 
-	public MethodExternalCallHide(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
-		super(scriptFactory, eventChain, action, message);
+	public MethodExternalCallHide(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
+		super(scriptFactory, eventChain, action, node);
 	}
 
 	@Override

@@ -61,6 +61,10 @@ public class EventNode {
 		return findMessage(null, name);
 	}
 
+	public EventNode findMessage(String name, HashMap<String, String> constraints) {
+		return findMessage(null, name, constraints);
+	}
+
 	public EventNode findMessage(Message before, String name) {
 		EventNode candidate = this;
 
@@ -87,7 +91,7 @@ public class EventNode {
 
 		while (candidate != null) {
 			if (candidate.message == null) {
-				candidate = candidate.prev;
+				candidate = candidate.findMessage(null, name);
 				continue;
 			}
 
@@ -118,10 +122,10 @@ public class EventNode {
 				}
 			}
 
-			if (!match)
-				candidate = candidate.prev;
-			else
+			if (match)
 				break;
+
+			candidate = candidate.findMessage(null, name);
 		}
 
 		return candidate;

@@ -17,7 +17,7 @@ public class Expression {
 	private EventChain eventChain;
 	private String expr;
 	private ArrayList<Object> intermediateBeans;
-	private Message message;
+	private EventNode contextNode;
 
 	private CharArrayReader reader;
 
@@ -33,7 +33,7 @@ public class Expression {
 		this.reader = new CharArrayReader(this.expr.toCharArray());
 	}
 
-	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr, Message message) {
+	public Expression(ScriptFactory scriptFactory, EventChain eventChain, String expr, EventNode node) {
 		super();
 
 		this.scriptFactory = scriptFactory;
@@ -41,7 +41,7 @@ public class Expression {
 		this.expr = expr.trim();
 		this.intermediateBeans = new ArrayList<>();
 		this.reader = new CharArrayReader(this.expr.toCharArray());
-		this.message = message;
+		this.contextNode = node;
 	}
 
 	public ArrayList<Object> getIntermediateBeans() {
@@ -57,7 +57,7 @@ public class Expression {
 	}
 
 	public Message getMessage() {
-		return message;
+		return (contextNode != null) ? contextNode.getMessage() : null;
 	}
 
 	public Scalar eval() throws IOException, BitrixLocalException {
@@ -91,49 +91,42 @@ public class Expression {
 	}
 
 	private Scalar evalEvent(Scalar eventName, HashMap<String, String> constraints, ArrayList<Scalar> params) throws BitrixLocalException {
-		if (params.size() != 1)
-			throw new BitrixLocalException(formatError("Wrong number of parameters in event reference"));
+		if (params.size() > 1)
+			throw new BitrixLocalException(formatError("Event search statement doesn't match prototype ${EventName[[attrName=attrValue[,attrName=attrValue]]][(attrName)]}"));
 
-		Message msg = null;
-		String attrVal = null;
+		EventNode node;
+		String name = eventName.asString();
 
-		String eventNameStr = eventName.asString();
-
-		if (eventNameStr.equals("!")) {
-			msg = message;
+		if (name.equals("!")) {
+			node = contextNode;
 
 			if (!constraints.isEmpty())
-				throw new BitrixLocalException(formatError(String.format("no atribute constraints allowed on context event message ('%s')", eventNameStr)));
-
-			if (msg == null)
-				throw new BitrixLocalException(formatError(String.format("no context event message ('%s') specfied", eventNameStr)));
+				throw new BitrixLocalException(formatError(String.format("no atribute constraints allowed on context event message ('%s')", name)));
 		}
-		else {
-			EventNode node = eventChain.findMessage(message, eventNameStr, constraints);
+		else
+			node = contextNode.findMessage(name, constraints);
 
-			if (node != null) {
-				msg = node.getMessage();
+		if (node != null) {
+			if (params.size() == 0)
+				return new ScalarMessage("${" + name + "}", node);
+			else if (params.size() == 1) {
+				String attrVal = node.getMessage().getAttribute(params.get(0).asString());
 
-				if (msg == null)
-					throw new BitrixLocalException(formatError(String.format("BUG: EventNode found, but it doesn't contain message '%s'", eventNameStr)));
-			}
-			else
-				log.info("Warning: event ${{}} not found", eventName);
-		}
+				if (attrVal == null) {
+					ArrayList<String> constrStrnigs = new ArrayList<>();
 
-		if (msg != null) {
-			attrVal = msg.getAttribute(params.get(0).asString());
+					constraints.forEach((key, val) -> constrStrnigs.add(key + "=" + val));
+					log.info("Warning: message attribute ${{}[{}]({})} is not defined",
+							eventName, String.join(", ", constrStrnigs), params.get(0).asString());
+				}
 
-			if (attrVal == null) {
-				ArrayList<String> constrStrnigs = new ArrayList<>();
-
-				constraints.forEach((key, val) -> constrStrnigs.add(key + "=" + val));
-				log.info("Warning: message attribute ${{}[{}]({})} is not defined",
-						eventName, String.join(", ", constrStrnigs), params.get(0).asString());
+				return new ScalarString("${" + name + "}", attrVal);
 			}
 		}
+		else
+			log.info("Warning: event ${{}} not found", eventName);
 
-		return new ScalarString("${" + eventNameStr + "}", attrVal);
+		return new ScalarString("${" + name + "}", null);
 	}
 
 	private Scalar evalFunc(Scalar funcName, ArrayList<Scalar> params) throws IOException, BitrixLocalException {

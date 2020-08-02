@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.EventNode;
 
 @Slf4j
 @Getter
@@ -28,11 +28,11 @@ public class ScriptFactory {
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
 
-	public void buildScript(EventChain eventChain, ConnectorRule rule, Message message) {
+	public void buildScript(EventChain eventChain, ConnectorRule rule, EventNode node) {
 		if (rule == null)
 			return;
 
-		if (message == null) {
+		if (node == null) {
 			log.info("internal error (bug): no final message specified");
 			return;
 		}
@@ -57,27 +57,27 @@ public class ScriptFactory {
 
 			switch (action.getMethod().toLowerCase()) {
 			case (MethodCrmLeadAdd.NAME):
-				new MethodCrmLeadAdd(this, eventChain, action, message).exec();
+				new MethodCrmLeadAdd(this, eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallFinish.NAME):
-				new MethodExternalCallFinish(this, eventChain, action, message).exec();
+				new MethodExternalCallFinish(this, eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallHide.NAME):
-				new MethodExternalCallHide(this, eventChain, action, message).exec();
+				new MethodExternalCallHide(this, eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallRegister.NAME):
-				new MethodExternalCallRegister(this, eventChain, action, message).exec();
+				new MethodExternalCallRegister(this, eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallShow.NAME):
-				new MethodExternalCallShow(this, eventChain, action, message).exec();
+				new MethodExternalCallShow(this, eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallAttachRecord.NAME):
-				new MethodExternalCallAttachRecord(this, eventChain, action, message).exec();
+				new MethodExternalCallAttachRecord(this, eventChain, action, node).exec();
 				break;
 
 			default:

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorEvent;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
@@ -35,13 +34,13 @@ public class RuleConductor {
 		return rule;
 	}
 
-	public boolean check (Message message, String channel) {
+	public boolean check(EventNode node, String channel) {
 		if ((rule == null) || (eventNames == null) || (eventNames.size() == 0))
 			return false;
 
 		int preProgress = progress;
 
-		if (check(message, channel, progress)) {
+		if (check(node, channel, progress)) {
 			log.info("MATCH! Got {} on {}, executing action: {}", eventNames, channel, rule.getAction());
 			return true;
 		}
@@ -53,14 +52,14 @@ public class RuleConductor {
 							eventNames.subList(progress, eventNames.size()));
 				else
 					log.info("RESET! Got {} on {} waiting for {}",
-							message.getName(), channel,
+							node.getMessage().getName(), channel,
 							eventNames.subList(progress, eventNames.size()));
 
 			return false;
 		}
 	}
 
-	private boolean check(Message message, String channel, int progress) {
+	private boolean check(EventNode node, String channel, int progress) {
 		boolean result = false;
 
 		ConnectorEvent event = eventNames.get(progress++);
@@ -68,13 +67,13 @@ public class RuleConductor {
 
 		try {
 			if (eventName.charAt(0) == '!') {
-				if (!(eventName.substring(1).equalsIgnoreCase(message.getName()) && checkConstraints(event, message)))
-					result = (progress < eventNames.size()) ? check(message, channel, progress) : true;
+				if (!(eventName.substring(1).equalsIgnoreCase(node.getMessage().getName()) && checkConstraints(event, node)))
+					result = (progress < eventNames.size()) ? check(node, channel, progress) : true;
 				else
 					this.progress = 0;
 			}
 			else {
-				if (eventName.equalsIgnoreCase(message.getName()) && checkConstraints(event, message)) {
+				if (eventName.equalsIgnoreCase(node.getMessage().getName()) && checkConstraints(event, node)) {
 					if (progress >= eventNames.size()) {
 						progress = 0;
 						result = true;
@@ -92,7 +91,7 @@ public class RuleConductor {
 		return result;
 	}
 
-	private boolean checkConstraints(ConnectorEvent event, Message message) throws IOException, BitrixLocalException {
+	private boolean checkConstraints(ConnectorEvent event, EventNode node) throws IOException, BitrixLocalException {
 		HashMap<String, String> constraints = event.getConstraints();
 
 		if (event.getConstraints() != null) {
@@ -103,9 +102,9 @@ public class RuleConductor {
 				String entryValue = entry.getValue();
 
 				if ((entryKey != null) && (entryValue != null)) {
-					String messageAttr = message.getAttribute(entryKey);
+					String messageAttr = node.getMessage().getAttribute(entryKey);
 
-					Expression expr = new Expression(scriptFactory, eventChain, entryValue, message);
+					Expression expr = new Expression(scriptFactory, eventChain, entryValue, node);
 					entryValue = expr.eval().toString();
 
 					if ((entryValue == null) && (messageAttr == null))

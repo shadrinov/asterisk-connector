@@ -17,6 +17,7 @@ import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.ChainContext;
 import ru.ntechs.asteriskconnector.eventchain.EventChain;
 import ru.ntechs.asteriskconnector.eventchain.EventDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.EventNode;
 
 @Slf4j
 public abstract class Method {
@@ -25,17 +26,17 @@ public abstract class Method {
 	private ScriptFactory scriptFactory;
 	private EventChain eventChain;
 	private ConnectorAction action;
-	private Message message;
+	private EventNode contextNode;
 
 	private ArrayList<Object> intermediateBeans;
 
-	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, Message message) {
+	public Method(ScriptFactory scriptFactory, EventChain eventChain, ConnectorAction action, EventNode node) {
 		super();
 
 		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.action = action;
-		this.message = message;
+		this.contextNode = node;
 	}
 
 	public EventDispatcher getEventDispatcher() {
@@ -51,7 +52,7 @@ public abstract class Method {
 	}
 
 	public Message getMessage() {
-		return message;
+		return (contextNode != null) ? contextNode.getMessage() : null;
 	}
 
 	public BitrixAuth getAuth() {
@@ -75,7 +76,7 @@ public abstract class Method {
 
 			for (String key : template.keySet()) {
 				try {
-					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), message);
+					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), contextNode);
 					Scalar evaluated = expr.eval();
 					intermediateBeans = expr.getIntermediateBeans();
 					result.put(key, evaluated);
