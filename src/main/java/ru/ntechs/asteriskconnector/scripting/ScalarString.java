@@ -122,7 +122,9 @@ public class ScalarString extends Scalar {
 
 	@Override
 	public Scalar trim() {
-		value = value.trim();
+		if (value != null)
+			value = value.trim();
+
 		return this;
 	}
 }

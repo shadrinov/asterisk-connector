@@ -98,12 +98,8 @@ public class MessageChain {
 		return (tailEvent != null) ? tailEvent.findMessage(name) : null;
 	}
 
-	public MessageNode findMessage(Message before, String name) {
-		return (tailEvent != null) ? tailEvent.findMessage(before, name) : null;
-	}
-
-	public MessageNode findMessage(Message before, String name, HashMap<String,String> constraints) {
-		return (tailEvent != null) ? tailEvent.findMessage(before, name, constraints) : null;
+	public MessageNode findMessage(String name, HashMap<String,String> constraints) {
+		return (tailEvent != null) ? tailEvent.findMessage(name, constraints) : null;
 	}
 
 	@Override

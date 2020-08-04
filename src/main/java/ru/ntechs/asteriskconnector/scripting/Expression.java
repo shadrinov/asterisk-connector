@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
 import ru.ntechs.asteriskconnector.eventchain.MessageNode;
@@ -56,8 +55,8 @@ public class Expression {
 		return eventChain;
 	}
 
-	public Message getMessage() {
-		return (contextNode != null) ? contextNode.getMessage() : null;
+	public MessageNode getContextMessage() {
+		return contextNode;
 	}
 
 	public Scalar eval() throws IOException, BitrixLocalException {
@@ -100,33 +99,30 @@ public class Expression {
 		if (name.equals("!")) {
 			node = contextNode;
 
-			if (!constraints.isEmpty())
+			if ((constraints != null) && !constraints.isEmpty())
 				throw new BitrixLocalException(formatError(String.format("no atribute constraints allowed on context event message ('%s')", name)));
 		}
 		else
-			node = contextNode.findMessage(name, constraints);
+			node = (contextNode != null) ?
+					contextNode.findMessage(name, constraints) :
+						eventChain.findMessage(name, constraints);
 
 		if (node != null) {
 			if ((params == null) || params.size() == 0)
-				return new ScalarMessage("${" + name + "}", node);
+				return new ScalarMessage(String.format("${%s}", name), node);
 			else if (params.size() == 1) {
 				String attrVal = node.getMessage().getAttribute(params.get(0).asString());
 
-				if (attrVal == null) {
-					ArrayList<String> constrStrnigs = new ArrayList<>();
+				if (attrVal == null)
+					log.info("Warning: message attribute {} is not defined", formatEvent(eventName, constraints, params));
 
-					constraints.forEach((key, val) -> constrStrnigs.add(key + "=" + val));
-					log.info("Warning: message attribute ${{}[{}]({})} is not defined",
-							eventName, String.join(", ", constrStrnigs), params.get(0).asString());
-				}
-
-				return new ScalarString("${" + name + "}", attrVal);
+				return new ScalarString(String.format("${%s}", name), attrVal);
 			}
 		}
 		else
-			log.info("Warning: event ${{}} not found", eventName);
+			log.info("Warning: event {} not found", formatEvent(eventName, constraints, params));
 
-		return new ScalarString("${" + name + "}", null);
+		return new ScalarString(String.format("${%s}", name), null);
 	}
 
 	private Scalar evalFunc(Scalar funcName, ArrayList<Scalar> params) throws IOException, BitrixLocalException {
@@ -526,5 +522,24 @@ public class Expression {
 			return String.format("%s: %s", message, expr);
 		else
 			return String.format("%s: %s <-- ... %s", message, expr.substring(0, failCharIndex), expr.substring(failCharIndex + 1));
+	}
+
+	private String formatEvent(Scalar eventName, HashMap<String, String> constraints, ArrayList<Scalar> params) {
+		String logConstrs = "";
+		String logParams = "";
+		ArrayList<String> strings = new ArrayList<>();
+
+		if (constraints != null) {
+			constraints.forEach((key, val) -> strings.add(String.format("%s=%s", key, val)));
+			logConstrs = String.format("[%s]", String.join(",", strings));
+		}
+
+		if (params != null) {
+			strings.clear();
+			params.forEach((arg) -> strings.add(arg.toString()));
+			logParams = String.format("(%s)", String.join(",", strings));
+		}
+
+		return String.format("${%s%s%s}", eventName.toString(), logConstrs, logParams);
 	}
 }

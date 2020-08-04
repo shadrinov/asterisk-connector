@@ -68,6 +68,9 @@ public class MessageDispatcher {
 	}
 
 	public MessageChain getEventChain(String channelId) {
+		if (channelId == null)
+			return null;
+
 		if (chainByUniqueId.containsKey(channelId))
 			return chainByUniqueId.get(channelId);
 

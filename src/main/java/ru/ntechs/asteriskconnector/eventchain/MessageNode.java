@@ -58,22 +58,7 @@ public class MessageNode {
 	}
 
 	public MessageNode findMessage(String name) {
-		return findMessage(null, name);
-	}
-
-	public MessageNode findMessage(String name, HashMap<String, String> constraints) {
-		return findMessage(null, name, constraints);
-	}
-
-	public MessageNode findMessage(Message before, String name) {
 		MessageNode candidate = this;
-
-		if (before != null) {
-			while ((candidate != null) && (candidate.message != null)
-					&& (candidate.message != before)) {
-				candidate = candidate.prev;
-			}
-		}
 
 		while ((candidate != null) && (candidate.message != null)
 				&& !candidate.message.getName().equalsIgnoreCase(name)) {
@@ -83,51 +68,47 @@ public class MessageNode {
 		return candidate;
 	}
 
-	public MessageNode findMessage(Message before, String name, HashMap<String, String> constraints) {
-		MessageNode candidate = findMessage(before, name);
+	public MessageNode findMessage(String name, HashMap<String, String> constraints) {
+		if ((constraints != null) && !constraints.isEmpty()) {
+			MessageNode candidate = this;
 
-		if ((constraints == null) || constraints.isEmpty())
-			return candidate;
+			while ((candidate != null) && (candidate = candidate.findMessage(name)) != null) {
+				boolean match = true;
 
-		while (candidate != null) {
-			if (candidate.message == null) {
-				candidate = candidate.findMessage(null, name);
-				continue;
-			}
+				for (Entry<String, String> entry : constraints.entrySet()) {
+					if (entry.getKey() != null) {
+						String value = candidate.message.getAttribute(entry.getKey());
 
-			boolean match = true;
-
-			for (Entry<String, String> entry : constraints.entrySet()) {
-				if (entry.getKey() != null) {
-					String msgAttrValue = candidate.message.getAttribute(entry.getKey());
-
-					if (entry.getValue() != null) {
-						if (msgAttrValue != null) {
-							if (!msgAttrValue.equalsIgnoreCase(entry.getValue())) {
+						if (entry.getValue() != null) {
+							if (value != null) {
+								if (!value.equalsIgnoreCase(entry.getValue())) {
+									match = false;
+									break;
+								}
+							}
+							else {
 								match = false;
 								break;
 							}
 						}
 						else {
-							match = false;
-							break;
-						}
-					}
-					else {
-						if (msgAttrValue != null) {
-							match = false;
-							break;
+							if (value != null) {
+								match = false;
+								break;
+							}
 						}
 					}
 				}
+
+				if (match)
+					break;
+
+				candidate = candidate.prev;
 			}
 
-			if (match)
-				break;
-
-			candidate = candidate.findMessage(null, name);
+			return candidate;
 		}
-
-		return candidate;
+		else
+			return findMessage(name);
 	}
 }

@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import lombok.Getter;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
 import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
+import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Getter
 public abstract class Function {
@@ -31,8 +31,8 @@ public abstract class Function {
 		return String.format("%s(%s)", getName(), String.join(", ", params));
 	}
 
-	public Message getMessage() {
-		return (expression != null) ? expression.getMessage() : null;
+	public MessageNode getContextMessage() {
+		return (expression != null) ? expression.getContextMessage() : null;
 	}
 
 	public ScriptFactory getScriptFactory() {

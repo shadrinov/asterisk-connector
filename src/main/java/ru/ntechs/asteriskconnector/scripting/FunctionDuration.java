@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
 import ru.ntechs.asteriskconnector.eventchain.MessageNode;
@@ -36,7 +35,7 @@ public class FunctionDuration extends Function {
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
 		MessageChain eventChain = getEventChain();
-		Message curMessage = getMessage();
+		MessageNode contextNode = getContextMessage();
 		Long firstMessageMillis = null, lastMessageMillis = null;
 		MessageNode messageNode;
 
@@ -46,7 +45,7 @@ public class FunctionDuration extends Function {
 		messageNode = ((firstMessage != null) && !firstMessage.isNull()) ?
 				((firstMessage instanceof ScalarMessage) ?
 						((ScalarMessage)firstMessage).getMessage() :
-							eventChain.findMessage(curMessage, firstMessage.asString())) :
+							contextNode.findMessage(firstMessage.asString())) :
 								eventChain.getHead();
 
 		if (messageNode != null)
@@ -54,10 +53,10 @@ public class FunctionDuration extends Function {
 		else
 			log.info("Warning: AMI event (firstEvent) '{}' not found in current event chain", firstMessage);
 
-		messageNode = ((lastMessage != null) && !firstMessage.isNull()) ?
+		messageNode = ((lastMessage != null) && !lastMessage.isNull()) ?
 				((lastMessage instanceof ScalarMessage) ?
 						((ScalarMessage)lastMessage).getMessage() :
-							eventChain.findMessage(curMessage, lastMessage.asString())) :
+							contextNode.findMessage(lastMessage.asString())) :
 								eventChain.getTail();
 
 		if (messageNode != null)
