@@ -21,7 +21,7 @@ public class ScalarMessage extends Scalar {
 
 	@Override
 	public boolean isNull() {
-		return ((value != null) && (value.getMessage() != null));
+		return ((value == null) || (value.getMessage() == null));
 	}
 
 	@Override

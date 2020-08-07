@@ -450,11 +450,14 @@ public class Expression {
 			}
 
 			switch (chr) {
-				case (','): params.add(param.trim()); param = new ScalarStringSplitted("<parameter>"); break;
+				case (','): params.add(param); param = new ScalarStringSplitted("<parameter>"); break;
 				case ('('): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
-				case (')'): params.add(param.trim()); return params;
+				case (')'): params.add(param); return params;
+				case ('{'): throw new BitrixLocalException(formatError("Unexpected opening curly bracket '{'"));
+				case ('}'): throw new BitrixLocalException(formatError("Unexpected closing curly bracket '}'"));
 				case ('$'): param = param.isEmpty() ? parseReplace() : param.append(parseReplace()); break;
 				case ('"'): param = param.isEmpty() ? parseQuoted() : param.append(parseQuoted()); break;
+				case (' '): break;
 				case ('\\'): param = param.append(parseEscape()); break;
 				case (-1): throw new BitrixLocalException(formatError("Premature end of expression: parameter or closing bracket ')' is expected"));
 
@@ -469,7 +472,6 @@ public class Expression {
 			failCharIndex++;
 
 			switch (chr) {
-				case (','): return chr;
 				case ('('): throw new BitrixLocalException(formatError("Excessive use of opening bracket"));
 				case (')'): return chr;
 				case ('$'): skipReplace(); break;
