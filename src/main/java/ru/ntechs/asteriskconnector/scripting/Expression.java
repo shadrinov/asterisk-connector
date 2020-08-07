@@ -350,6 +350,9 @@ public class Expression {
 									throw new BitrixLocalException(String.format("Event attribute constraint already defined: (%s = %s)", attrNameStr, constraints.get(attrNameStr)));
 
 								constraints.put(attrNameStr, attrVal.trim().asString());
+
+								attrName = new ScalarStringSplitted("<constraint attribute name>");
+								attrVal = new ScalarStringSplitted("<constraint attribute value>");
 								doScan = false;
 								break;
 
