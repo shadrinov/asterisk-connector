@@ -52,7 +52,7 @@ public class RestRequestCrmLeadAdd extends RestRequest {
 		for (HashMap<String, String> entry : phones) {
 			String value = entry.get("VALUE");
 
-			if ((value != null) && (value.equals(phones)))
+			if ((value != null) && (value.equals(phone)))
 				return;
 		}
 
