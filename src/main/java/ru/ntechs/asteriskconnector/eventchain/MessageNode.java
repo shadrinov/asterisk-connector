@@ -29,22 +29,27 @@ public class MessageNode {
 	public MessageNode(int birthTicks, Message message, MessageNode ancestor) {
 		super();
 
-		while (ancestor.next != null) {
-			log.warn("ancestor EventNode is not tail... searching for tail...");
-			ancestor = ancestor.next;
-		}
+		this.message = message;
+		this.ticks = birthTicks;
+		this.next = null;
+		this.prev = null;
 
-		synchronized (ancestor) {
-			this.message = message;
-			this.next = null;
-			this.prev = ancestor;
-			this.ticks = birthTicks;
+		while (true) {
+			synchronized (ancestor) {
+				if (ancestor.next != null) {
+					log.debug("ancestor EventNode is not tail... searching for tail...");
+					ancestor = ancestor.next;
+					continue;
+				}
 
-			ancestor.next = this;
+				ancestor.next = this;
+				this.prev = ancestor;
+				break;
+			}
 		}
 	}
 
-	public MessageNode split() {
+	public synchronized MessageNode split() {
 		MessageNode newHead = next;
 
 		if (next != null) {

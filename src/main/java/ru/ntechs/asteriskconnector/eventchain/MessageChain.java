@@ -20,6 +20,8 @@ public class MessageChain {
 
 	private ChainContext context;
 
+	private final Object execLock = new Object();
+
 	MessageChain(MessageDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
 		super();
 
@@ -38,35 +40,43 @@ public class MessageChain {
 		this.context = new ChainContext();
 	}
 
-	public synchronized void enqueue(int birthTicks, Message message) {
-		if (tailEvent == null) {
-			headEvent = new MessageNode(birthTicks, message);
-			tailEvent = headEvent;
+	public void enqueue(int birthTicks, Message message) {
+		MessageNode currentTail;
+		ArrayList<ConnectorRule> rulesToExecute = new ArrayList<>();
+
+		synchronized (this) {
+			if (tailEvent == null) {
+				headEvent = new MessageNode(birthTicks, message);
+				tailEvent = headEvent;
+			}
+			else
+				tailEvent = new MessageNode(birthTicks, message, tailEvent);
+
+			if (channel == null)
+				channel = eventDispatcher.registerChannel(tailEvent.getMessage());
+
+			currentTail = tailEvent;
+
+			for (RuleConductor rc : conductors)
+				if (rc.check(tailEvent, channel))
+					rulesToExecute.add(rc.getRule());
 		}
-		else
-			tailEvent = new MessageNode(birthTicks, message, tailEvent);
 
-		checkRules(tailEvent);
-	}
-
-	private synchronized void checkRules(MessageNode node) {
-		if (channel == null)
-			channel = eventDispatcher.registerChannel(node.getMessage());
-
-		for (RuleConductor rc : conductors)
-			if (rc.check(node, channel))
-				scriptFactory.buildScript(this, rc.getRule(), node);
+		synchronized (execLock) {
+			for (ConnectorRule rule : rulesToExecute)
+				scriptFactory.buildScript(this, rule, currentTail);
+		}
 	}
 
 	public boolean isEmpty() {
 		return (tailEvent == null);
 	}
 
-	public int getTailBirthTicks() {
+	public synchronized int getTailBirthTicks() {
 		return (tailEvent != null) ? tailEvent.getTicks() : 0;
 	}
 
-	public String getUniqueId() {
+	public synchronized String getUniqueId() {
 		return (tailEvent != null) ? tailEvent.getMessage().getAttribute("Uniqueid") : null;
 	}
 
@@ -86,7 +96,7 @@ public class MessageChain {
 		return context;
 	}
 
-	public void garbageCollect(int age) {
+	public synchronized void garbageCollect(int age) {
 		while ((headEvent != null) && (headEvent.getTicks() < age))
 			headEvent = headEvent.split();
 
@@ -94,16 +104,16 @@ public class MessageChain {
 			tailEvent = null;
 	}
 
-	public MessageNode findMessage(String name) {
+	public synchronized MessageNode findMessage(String name) {
 		return (tailEvent != null) ? tailEvent.findMessage(name) : null;
 	}
 
-	public MessageNode findMessage(String name, HashMap<String,String> constraints) {
+	public synchronized MessageNode findMessage(String name, HashMap<String,String> constraints) {
 		return (tailEvent != null) ? tailEvent.findMessage(name, constraints) : null;
 	}
 
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		ArrayList<String> eventList = new ArrayList<>();
 		MessageNode node = getHead();
 

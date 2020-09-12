@@ -56,6 +56,22 @@ public class ScriptFactory {
 			}
 
 			switch (action.getMethod().toLowerCase()) {
+			case (MethodAsteriskAmiDBDel.NAME):
+				new MethodAsteriskAmiDBDel(this, eventChain, action, node).exec();
+				break;
+
+			case (MethodAsteriskAmiDBDelTree.NAME):
+				new MethodAsteriskAmiDBDelTree(this, eventChain, action, node).exec();
+				break;
+
+			case (MethodAsteriskAmiDBPut.NAME):
+				new MethodAsteriskAmiDBPut(this, eventChain, action, node).exec();
+				break;
+
+			case (MethodAsteriskAmiSetvar.NAME):
+				new MethodAsteriskAmiSetvar(this, eventChain, action, node).exec();
+				break;
+
 			case (MethodCrmLeadAdd.NAME):
 				new MethodCrmLeadAdd(this, eventChain, action, node).exec();
 				break;
