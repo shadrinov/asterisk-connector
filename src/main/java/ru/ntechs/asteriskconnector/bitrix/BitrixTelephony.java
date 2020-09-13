@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.CrmDuplicateFindByComm;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.Event;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.ExternalLine;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.TelephoneSearchCrmEntity;
 import ru.ntechs.asteriskconnector.bitrix.rest.data.User;
 import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmCompanyGet;
@@ -18,6 +19,7 @@ import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestCrmLeadGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventBind;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventGet;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestEventUnbind;
+import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalCallSearchCrmEntities;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineAdd;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineDelete;
 import ru.ntechs.asteriskconnector.bitrix.rest.requests.RestRequestExternalLineGet;
@@ -89,6 +91,11 @@ public class BitrixTelephony {
 
 	public CrmDuplicateFindByComm findCrmDuplicateByComm(String phone) throws BitrixRestApiException {
 		RestRequestCrmDuplicateFindByComm req = new RestRequestCrmDuplicateFindByComm(bitrixAuth, phone);
+		return req.exec().getResult();
+	}
+
+	public ArrayList<TelephoneSearchCrmEntity> searchCrmEntity(String phone) throws BitrixRestApiException {
+		RestRequestExternalCallSearchCrmEntities req = new RestRequestExternalCallSearchCrmEntities(bitrixAuth, phone);
 		return req.exec().getResult();
 	}
 
