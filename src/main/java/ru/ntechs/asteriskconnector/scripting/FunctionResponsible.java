@@ -23,7 +23,7 @@ public class FunctionResponsible extends Function {
 	public FunctionResponsible(Expression expression, ArrayList<Scalar> params) throws BitrixLocalException {
 		super(expression, params);
 
-		if ((params.size() < 1) || (params.size() > 4))
+		if ((params.size() < 1) || (params.size() > 5))
 			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(phone[, field[, lead|company|contact[, lead|company|contact[, lead|company|contact]]]])",
 					toString(), NAME));
 
