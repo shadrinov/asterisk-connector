@@ -12,7 +12,7 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 @Slf4j
 public class MethodAsteriskAmiDBPut extends Method {
 	public static final String NAME = "asterisk.ami.dbput";
-	
+
 	public MethodAsteriskAmiDBPut(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action,
 			MessageNode node) {
 		super(scriptFactory, eventChain, action, node);
@@ -33,18 +33,27 @@ public class MethodAsteriskAmiDBPut extends Method {
 
 		DBPut dbPut = new DBPut(getMessage().getAMI());
 
-		if (params.containsKey("Family"))
+		if ((params.containsKey("Family")) && !params.get("Family").isEmpty()) {
 			dbPut.setFamily(params.get("Family").asString());
 
-		if (params.containsKey("Key"))
-			dbPut.setKey(params.get("Key").asString());
+			if ((params.containsKey("Key")) && !params.get("Key").isEmpty()) {
+				dbPut.setKey(params.get("Key").asString());
 
-		if (params.containsKey("Val"))
-			dbPut.setVal(params.get("Val").asString());
+				if ((params.containsKey("Val")) && !params.get("Val").isEmpty()) {
+					dbPut.setVal(params.get("Val").asString());
 
-		dbPut.submit();
-		Response response = dbPut.waitForResponse(15000);
+					dbPut.submit();
+					Response response = dbPut.waitForResponse(15000);
 
-		log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+					log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+				}
+				else
+					log.info("skipping DBPut due to \"Val\" argument is not defined");
+			}
+			else
+				log.info("skipping DBPut due to \"Key\" argument is not defined");
+		}
+		else
+			log.info("skipping DBPut due to \"Family\" argument is not defined");
 	}
 }
