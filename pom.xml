@@ -4,7 +4,7 @@
 
 	<groupId>ru.ntechs</groupId>
 	<artifactId>asterisk-connector</artifactId>
-	<version>0.10.2</version>
+	<version>0.10.3</version>
 	<packaging>jar</packaging>
 
 	<name>asterisk-connector</name>

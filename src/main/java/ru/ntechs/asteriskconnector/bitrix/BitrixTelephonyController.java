@@ -211,9 +211,9 @@ public class BitrixTelephonyController {
 		if (externalLine.getCallerId() != null)
 			originate.setCallerId(externalLine.getCallerId());
 		else
-			originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(event.getDataPhoneNumber())));
+			originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(userInfo.getUfPhoneInner())));
 
-		originate.setChannel(MessageFormat.format(externalLine.getChannel(), userInfo.getUfPhoneInner()));
+		originate.setChannel(MessageFormat.format(externalLine.getChannel(), userInfo.getUfPhoneInner(), event.getDataPhoneNumber()));
 		originate.setContext(externalLine.getContext());
 		originate.setExten(MessageFormat.format(externalLine.getExten(), cleanupPhoneNumber(event.getDataPhoneNumber())));
 		originate.setPriority(externalLine.getPriority());
