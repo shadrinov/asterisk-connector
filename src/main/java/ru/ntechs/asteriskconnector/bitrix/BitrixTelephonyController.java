@@ -208,11 +208,6 @@ public class BitrixTelephonyController {
 
 		Originate originate = new Originate(ami);
 
-		if (externalLine.getCallerId() != null)
-			originate.setCallerId(externalLine.getCallerId());
-		else
-			originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(userInfo.getUfPhoneInner())));
-
 		originate.setChannel(MessageFormat.format(externalLine.getChannel(), userInfo.getUfPhoneInner(), event.getDataPhoneNumber()));
 		originate.setContext(externalLine.getContext());
 		originate.setExten(MessageFormat.format(externalLine.getExten(), cleanupPhoneNumber(event.getDataPhoneNumber())));
@@ -220,11 +215,20 @@ public class BitrixTelephonyController {
 		originate.setApplication(externalLine.getApplication());
 		originate.setData(externalLine.getData());
 		originate.setTimeout(externalLine.getTimeout());
-		originate.setVariable(externalLine.getVariable());
 		originate.setAccount(externalLine.getAccount());
 		originate.setEarlyMedia(externalLine.getEarlyMedia());
 		originate.setAsync(externalLine.getAsync());
 		originate.setCodecs(externalLine.getCodecs());
+
+		if (externalLine.getCallerId() != null)
+			originate.setCallerId(externalLine.getCallerId());
+		else
+			originate.setCallerId(String.format("<%s>", cleanupPhoneNumber(userInfo.getUfPhoneInner())));
+
+		HashMap<String,String> variables = (externalLine.getVariable() != null) ? new HashMap<>(externalLine.getVariable()) : new HashMap<>();
+		variables.put("CALLED_EXTEN", cleanupPhoneNumber(event.getDataPhoneNumber()));
+
+		originate.setVariable(variables);
 		originate.submit();
 
 		Response response = originate.waitForResponse(30000);
