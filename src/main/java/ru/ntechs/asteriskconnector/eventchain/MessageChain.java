@@ -3,6 +3,8 @@ package ru.ntechs.asteriskconnector.eventchain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.ntechs.ami.Message;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
@@ -20,7 +22,8 @@ public class MessageChain {
 
 	private ChainContext context;
 
-	private final Object execLock = new Object();
+	private static ExecutorService scriptExecutionThreadPool = Executors.newCachedThreadPool();
+	private final Object scriptExecutionLock = new Object();
 
 	MessageChain(MessageDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
 		super();
@@ -52,20 +55,30 @@ public class MessageChain {
 			else
 				tailEvent = new MessageNode(birthTicks, message, tailEvent);
 
+			currentTail = tailEvent;
+
 			if (channel == null)
 				channel = eventDispatcher.registerChannel(tailEvent.getMessage());
-
-			currentTail = tailEvent;
 
 			for (RuleConductor rc : conductors)
 				if (rc.check(tailEvent, channel))
 					rulesToExecute.add(rc.getRule());
 		}
 
-		synchronized (execLock) {
-			for (ConnectorRule rule : rulesToExecute)
-				scriptFactory.buildScript(this, rule, currentTail);
-		}
+		scriptExecutionThreadPool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					synchronized (scriptExecutionLock) {
+						for (ConnectorRule rule : rulesToExecute)
+							scriptFactory.buildScript(MessageChain.this, rule, currentTail);
+					}
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public boolean isEmpty() {

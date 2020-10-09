@@ -70,7 +70,7 @@ public class FunctionResponsible extends Function {
 
 		try {
 			ArrayList<TelephoneSearchCrmEntity> entities = bitrixTelephony.searchCrmEntity(phone);
-			log.info(entities.toString());
+			log.info("CRM objects found: {}", entities.toString());
 
 			if (entities.isEmpty())
 				return new ScalarString("<userId>");
