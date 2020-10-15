@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import ru.ntechs.asteriskconnector.bitrix.rest.data.DynamicData;
+import ru.ntechs.asteriskconnector.bitrix.rest.data.OAuthData;
 import ru.ntechs.asteriskconnector.bitrix.rest.events.BitrixEvent;
 import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResult;
 import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultAuth;
@@ -218,7 +218,7 @@ public class BitrixAuth {
 		if (refreshToken == null)
 			return;
 
-		DynamicData data = new DynamicData(refreshToken, applicationToken, authToken, authServer, clientServer);
+		OAuthData data = new OAuthData(refreshToken, applicationToken, authToken, authServer, clientServer);
 
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
@@ -234,7 +234,7 @@ public class BitrixAuth {
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
-			DynamicData data = mapper.readValue(new File("connector.json"), DynamicData.class);
+			OAuthData data = mapper.readValue(new File("connector.json"), OAuthData.class);
 
 			this.refreshToken = data.getRefreshToken();
 			this.applicationToken = data.getApplicationToken();

@@ -76,6 +76,10 @@ public class ScriptFactory {
 				new MethodCrmLeadAdd(this, eventChain, action, node).exec();
 				break;
 
+			case (MethodCrmLeadUpdate.NAME):
+				new MethodCrmLeadUpdate(this, eventChain, action, node).exec();
+				break;
+
 			case (MethodExternalCallFinish.NAME):
 				new MethodExternalCallFinish(this, eventChain, action, node).exec();
 				break;

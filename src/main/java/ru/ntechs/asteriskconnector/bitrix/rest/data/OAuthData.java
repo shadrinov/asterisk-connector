@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DynamicData {
+public class OAuthData {
 	private String refreshToken;
 	private String applicationToken;
 	private String authToken;
@@ -15,11 +15,11 @@ public class DynamicData {
 	private String authServer;
 	private String clientServer;
 
-	public DynamicData() {
+	public OAuthData() {
 		super();
 	}
 
-	public DynamicData(String refreshToken, String applicationToken, String authToken, String authServer, String clientServer) {
+	public OAuthData(String refreshToken, String applicationToken, String authToken, String authServer, String clientServer) {
 		this.refreshToken = refreshToken;
 		this.applicationToken = applicationToken;
 		this.authToken = authToken;
