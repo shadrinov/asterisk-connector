@@ -3,7 +3,6 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
@@ -110,14 +109,7 @@ public class FunctionREST extends Function {
 
 	private String constraintsToString() {
 		ArrayList<String> strConstr = new ArrayList<>();
-
-		constraints.forEach(new BiConsumer<String, String>() {
-			@Override
-			public void accept(String t, String u) {
-				strConstr.add(t + " = " + u);
-			}
-		});
-
+		constraints.forEach((key, val) -> strConstr.add(key + " = " + val));
 		return String.join(", ", strConstr);
 	}
 }

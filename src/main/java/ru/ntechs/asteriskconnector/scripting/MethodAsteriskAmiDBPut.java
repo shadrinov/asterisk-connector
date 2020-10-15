@@ -3,6 +3,7 @@ package ru.ntechs.asteriskconnector.scripting;
 import java.util.HashMap;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.ntechs.ami.actions.DBDel;
 import ru.ntechs.ami.actions.DBPut;
 import ru.ntechs.ami.responses.Response;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
@@ -31,17 +32,19 @@ public class MethodAsteriskAmiDBPut extends Method {
 		log.info("source: {}, params: {}, fields: {}", NAME, getAction().getParams(), getAction().getFields());
 		log.info("evaluated: {}, params: {}, fields: {}", NAME, params, fields);
 
+		boolean isNullValue = false;
 		DBPut dbPut = new DBPut(getMessage().getAMI());
 
 		if ((params.containsKey("Family")) && !params.get("Family").isEmpty()) {
 			dbPut.setFamily(params.get("Family").asString());
 
 			if ((params.containsKey("Key")) && !params.get("Key").isEmpty()) {
+				isNullValue = true;
 				dbPut.setKey(params.get("Key").asString());
 
 				if ((params.containsKey("Val")) && !params.get("Val").isEmpty()) {
+					isNullValue = false;
 					dbPut.setVal(params.get("Val").asString());
-
 					dbPut.submit();
 					Response response = dbPut.waitForResponse(15000);
 
@@ -55,5 +58,20 @@ public class MethodAsteriskAmiDBPut extends Method {
 		}
 		else
 			log.info("skipping DBPut due to \"Family\" argument is not defined");
+
+		if (isNullValue) {
+			Scalar deleteIfNull = params.get("DELETE_IF_NULL");
+
+			if ((deleteIfNull != null) && (!deleteIfNull.isNull()) && (deleteIfNull.asString().equalsIgnoreCase("TRUE"))) {
+				DBDel dbDel = new DBDel(getMessage().getAMI());
+
+				dbDel.setFamily(dbPut.getFamily());
+				dbDel.setKey(dbPut.getKey());
+				dbDel.submit();
+				Response response = dbDel.waitForResponse(15000);
+
+				log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+			}
+		}
 	}
 }

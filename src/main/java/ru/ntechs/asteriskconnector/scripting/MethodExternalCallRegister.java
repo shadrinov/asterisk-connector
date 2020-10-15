@@ -76,6 +76,8 @@ public class MethodExternalCallRegister extends Method {
 				req.setCallStartDate(Calendar.getInstance().getTime());
 
 			ExternalCall call = req.exec().getResult();
+			log.info("Call register results: {}", call);
+
 			getContext().put(call);
 
 			if ((req.getShow() == null) || req.getShow() != 0) {

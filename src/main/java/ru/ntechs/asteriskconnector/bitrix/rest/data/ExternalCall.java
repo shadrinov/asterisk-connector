@@ -28,6 +28,9 @@ public class ExternalCall {
 	@JsonProperty("CRM_ENTITY_TYPE")
 	private String crmEntityType;
 
+	@JsonProperty("LEAD_CREATION_ERROR")
+	private String leadCreationError;
+
 	@JsonIgnore
 	private boolean isFinished;
 }

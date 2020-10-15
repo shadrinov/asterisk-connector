@@ -4,19 +4,25 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.ntechs.asteriskconnector.bitrix.BitrixAuth;
 import ru.ntechs.asteriskconnector.bitrix.BitrixRestApiException;
+import ru.ntechs.asteriskconnector.bitrix.rest.cache.Cache;
 import ru.ntechs.asteriskconnector.bitrix.rest.results.RestResultCrmDuplicateFindByComm;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class RestRequestCrmDuplicateFindByComm extends RestRequest {
 	@JsonIgnore
 	public static final String METHOD = "crm.duplicate.findbycomm";
+
+	@JsonIgnore
+	private static Cache<RestRequestCrmDuplicateFindByComm, RestResultCrmDuplicateFindByComm> cache = new Cache<>(300);
 
 	@JsonIgnore
 	public final static String COMM_TYPE_EMAIL = "EMAIL";
@@ -55,6 +61,11 @@ public class RestRequestCrmDuplicateFindByComm extends RestRequest {
 	}
 
 	public RestResultCrmDuplicateFindByComm exec() throws BitrixRestApiException {
-		return exec(RestResultCrmDuplicateFindByComm.class);
+		RestResultCrmDuplicateFindByComm result = cache.get(this);
+
+		if (result == null)
+			result = cache.put(this, exec(RestResultCrmDuplicateFindByComm.class));
+
+		return result;
 	}
 }
