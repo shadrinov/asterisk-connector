@@ -19,11 +19,6 @@ public class MethodAsteriskAmiDBDel extends Method {
 	}
 
 	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
 	public void exec() {
 		HashMap<String, Scalar> params = evaluate(getAction().getParams(), false);
 		HashMap<String, Scalar> fields = evaluate(getAction().getFields(), false);
@@ -33,15 +28,20 @@ public class MethodAsteriskAmiDBDel extends Method {
 
 		DBDel dbDel = new DBDel(getMessage().getAMI());
 
-		if (params.containsKey("Family"))
-			dbDel.setFamily(params.get("Family").asString());
+		if (fields.containsKey("Family"))
+			dbDel.setFamily(fields.get("Family").asString());
 
-		if (params.containsKey("Key"))
-			dbDel.setKey(params.get("Key").asString());
+		if (fields.containsKey("Key"))
+			dbDel.setKey(fields.get("Key").asString());
 
 		dbDel.submit();
 		Response response = dbDel.waitForResponse(15000);
 
 		log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }

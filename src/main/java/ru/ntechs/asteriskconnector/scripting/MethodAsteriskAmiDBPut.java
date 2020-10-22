@@ -20,11 +20,6 @@ public class MethodAsteriskAmiDBPut extends Method {
 	}
 
 	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
 	public void exec() {
 		HashMap<String, Scalar> params = evaluate(getAction().getParams(), false);
 		HashMap<String, Scalar> fields = evaluate(getAction().getFields(), false);
@@ -35,16 +30,16 @@ public class MethodAsteriskAmiDBPut extends Method {
 		boolean isNullValue = false;
 		DBPut dbPut = new DBPut(getMessage().getAMI());
 
-		if ((params.containsKey("Family")) && !params.get("Family").isEmpty()) {
-			dbPut.setFamily(params.get("Family").asString());
+		if ((fields.containsKey("Family")) && !fields.get("Family").isEmpty()) {
+			dbPut.setFamily(fields.get("Family").asString());
 
-			if ((params.containsKey("Key")) && !params.get("Key").isEmpty()) {
+			if ((fields.containsKey("Key")) && !fields.get("Key").isEmpty()) {
 				isNullValue = true;
-				dbPut.setKey(params.get("Key").asString());
+				dbPut.setKey(fields.get("Key").asString());
 
-				if ((params.containsKey("Val")) && !params.get("Val").isEmpty()) {
+				if ((fields.containsKey("Val")) && !fields.get("Val").isEmpty()) {
 					isNullValue = false;
-					dbPut.setVal(params.get("Val").asString());
+					dbPut.setVal(fields.get("Val").asString());
 					dbPut.submit();
 					Response response = dbPut.waitForResponse(15000);
 
@@ -73,5 +68,10 @@ public class MethodAsteriskAmiDBPut extends Method {
 				log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
 			}
 		}
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }

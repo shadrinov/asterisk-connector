@@ -19,11 +19,6 @@ public class MethodAsteriskAmiDBDelTree extends Method {
 	}
 
 	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
 	public void exec() {
 		HashMap<String, Scalar> params = evaluate(getAction().getParams(), false);
 		HashMap<String, Scalar> fields = evaluate(getAction().getFields(), false);
@@ -33,15 +28,20 @@ public class MethodAsteriskAmiDBDelTree extends Method {
 
 		DBDelTree dbDelTree = new DBDelTree(getMessage().getAMI());
 
-		if (params.containsKey("Family"))
-			dbDelTree.setFamily(params.get("Family").asString());
+		if (fields.containsKey("Family"))
+			dbDelTree.setFamily(fields.get("Family").asString());
 
-		if (params.containsKey("Key"))
-			dbDelTree.setKey(params.get("Key").asString());
+		if (fields.containsKey("Key"))
+			dbDelTree.setKey(fields.get("Key").asString());
 
 		dbDelTree.submit();
 		Response response = dbDelTree.waitForResponse(15000);
 
 		log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }

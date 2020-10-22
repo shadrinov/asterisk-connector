@@ -93,7 +93,8 @@ public class BitrixEvent {
 	}
 
 	public static String getEvent(MultiValueMap<String, String> data) {
-		return getString(data, "event").toUpperCase();
+		String event = getString(data, "event");
+		return (event != null) ? event.toUpperCase() : null;
 	}
 
 	protected static String getString(MultiValueMap<String, String> data, String attr) {

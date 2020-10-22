@@ -19,11 +19,6 @@ public class MethodAsteriskAmiSetvar extends Method {
 	}
 
 	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
 	public void exec() {
 		HashMap<String, Scalar> params = evaluate(getAction().getParams(), false);
 		HashMap<String, Scalar> fields = evaluate(getAction().getFields(), false);
@@ -34,15 +29,20 @@ public class MethodAsteriskAmiSetvar extends Method {
 		Setvar setVar = new Setvar(getMessage().getAMI());
 		setVar.setChannel(getEventChain().getChannel());
 
-		if (params.containsKey("Variable"))
-			setVar.setVariable(params.get("Variable").asString());
+		if (fields.containsKey("Variable"))
+			setVar.setVariable(fields.get("Variable").asString());
 
-		if (params.containsKey("Value"))
-			setVar.setValue(params.get("Value").asString());
+		if (fields.containsKey("Value"))
+			setVar.setValue(fields.get("Value").asString());
 
 		setVar.submit();
 		Response response = setVar.waitForResponse(15000);
 
 		log.info("{} result: {}", NAME, (response != null) ? response.getMessage() : null);
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }

@@ -113,28 +113,46 @@ public class BitrixTelephonyController {
 		return "Welcome to NTechs Asterisk Connector";
 	}
 
+	private String cleanupPhoneNumber(String phone) {
+		return phone.replaceAll("[^\\d\\+]", "").replaceAll("^\\+7", "8");
+	}
+
 	@RequestMapping(method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded" }, value = "/b24/event")
 	public @ResponseBody String event(@RequestBody MultiValueMap<String, String> params) {
 		try {
-			switch (BitrixEvent.getEvent(params).toUpperCase()) {
-				case ("ONAPPINSTALL"): onAppInstall(params); break;
-				case ("ONEXTERNALCALLSTART"): onExternalCallStart(params); break;
+			String event = BitrixEvent.getEvent(params);
 
-				default:
-					log.info("Unhandled event: {}", BitrixEvent.getEvent(params));
-					break;
+			if (event != null) {
+				switch (event) {
+					case ("ONAPPINSTALL"): onAppInstall(params); break;
+					case ("ONEXTERNALCALLSTART"): onExternalCallStart(params); break;
+
+					default:
+						log.info("Unhandled event: {}", BitrixEvent.getEvent(params));
+						break;
+				}
 			}
-		} catch (BitrixRestApiException e) {
-			log.info(e.getMessage());
-		} catch (BitrixLocalException e) {
+			else {
+				log.info("Nameless event is received, trying to update tokens...");
+
+				// DOMAIN=[ntechs.bitrix24.ru],
+				// PROTOCOL=[1],
+				// LANG=[ru],
+				// APP_SID=[665d2e802b26a223ec4c3be004c07652],
+				// AUTH_ID=[9ae3885f0047b4ee0042213e00000001000003970121b3e6e7c905f45a935d75e9b317],
+				// AUTH_EXPIRES=[3600],
+				// REFRESH_ID=[8a62b05f0047b4ee0042213e00000001000003e78e37f36dba92a662220fd221027bbc],
+				// member_id=[78727e6e7334a5b7f57357a6a7e63480],
+				// status=[L],
+				// PLACEMENT=[DEFAULT],
+				// PLACEMENT_OPTIONS=[{"any":"31\/"}]
+
+			}
+		} catch (BitrixRestApiException | BitrixLocalException e) {
 			log.info(e.getMessage());
 		}
 
 		return null;
-	}
-
-	private String cleanupPhoneNumber(String phone) {
-		return phone.replaceAll("[^\\d\\+]", "").replaceAll("^\\+7", "8");
 	}
 
 	private void onAppInstall(MultiValueMap<String, String> params) throws BitrixLocalException, BitrixRestApiException {
@@ -180,7 +198,7 @@ public class BitrixTelephonyController {
 		BitrixEventOnExternalCallStart event = new BitrixEventOnExternalCallStart(params);
 
 		log.info("Handling event: {}", event.getEvent());
-		log.debug("Detailed event: {}", event.toString());
+		log.info("Detailed event: {}", event.toString());
 
 		if (!bitrixTelephony.validateAppToken(event))
 			throw new BitrixLocalException(String.format("invalid application token: %s", event.getAuthAccessToken()));
