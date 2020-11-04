@@ -65,18 +65,15 @@ public class MessageChain {
 					rulesToExecute.add(rc.getRule());
 		}
 
-		scriptExecutionThreadPool.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					synchronized (scriptExecutionLock) {
-						for (ConnectorRule rule : rulesToExecute)
-							scriptFactory.buildScript(MessageChain.this, rule, currentTail);
-					}
+		scriptExecutionThreadPool.execute(() -> {
+			try {
+				synchronized (scriptExecutionLock) {
+					for (ConnectorRule rule : rulesToExecute)
+						scriptFactory.buildScript(MessageChain.this, rule, currentTail);
 				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
