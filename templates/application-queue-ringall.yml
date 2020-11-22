@@ -1,109 +1,221 @@
 connector:
-   address: https://ntechs.bitrix24.ru/rest/
+   address: https://connector.ymz.su/api/
    ami:
       hostname: localhost
       port: 5038
       username: ntcrm
       password: secret
-      debug: false
+      debug: true
    bitrix:
       api: https://ntechs.bitrix24.ru/rest/
       auth: https://oauth.bitrix.info/oauth/token/
       clientid: clientid
       clientkey: clientkey
       externallines:
-         - number: 123456
-           name: Физическое лицо
-           channel: Local/{0}@phy-phones
-           context: org-phones
+         - number: 84852123456
+           name: Название направления
+           channel: Local/{0}@incoming-office-originate
+           context: incoming-office
            exten: "{0}"
            priority: 1
-         - number: 654321
-           name: Организация
-           channel: Local/{0}@org-phones
-           context: org-phones
+           variable:
+              EXTCALLERID: 4852123456
+
+         - number: 84852654321
+           name: Название направления
+           channel: Local/{0}@incoming-office-originate
+           context: incoming-office
            exten: "{0}"
            priority: 1
+           variable:
+              EXTCALLERID: 4852654321
+
    rules:
+      # --- INCOMING CALL ---
       - events:
          - name: "Newchannel"
-         - name: "QueueCallerJoin"
-         - name: "AgentCalled"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+        action:
+           - method: asterisk.ami.dbput
+             fields:
+                Family: ResponsiblePhones
+                Key: ${UserEvent[UserEvent=IncomingCall](CallerIDNum)}
+                Val: $(Responsible(${UserEvent[UserEvent=IncomingCall](CallerIDNum)},USER_PHONE_INNER,company,contact,lead))
+             params:
+                DELETE_IF_NULL: TRUE
+
+      # --- INCOMING CALL VIA DIRECT CALL TO MANAGER ---
+      - events:
+         - name: "Newchannel"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+         - name: "DialBegin"
         action:
            - method: telephony.externalcall.register
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${DialBegin(ConnectedLineNum)}, "ACTIVE", "true"))
+                PHONE_NUMBER: ${DialBegin(CallerIDNum)}
+                LINE_NUMBER: ${UserEvent[UserEvent=IncomingCall](B24ExternalLine)}
+                CRM_CREATE: ${UserEvent[UserEvent=IncomingCall](B24CrmCreate)} | 1
+                TYPE: 2
+                SHOW: 1
+
+      # --- INCOMING CALL VIA QUEUE ---
+      - events:
+         - name: "Newchannel"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+         - name: "QueueCallerJoin"
+         - name: "AgentCalled"
+         - name: "DialBegin"
+        action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${DialBegin(ConnectedLineNum)}, "ACTIVE", "true"))
+           - method: telephony.externalcall.register
+             params:
+                USER_ID: $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
                 PHONE_NUMBER: ${QueueCallerJoin(CallerIDNum)}
-                CRM_CREATE: 1
+                LINE_NUMBER: ${UserEvent[UserEvent=IncomingCall](B24ExternalLine)}
+                CRM_CREATE: ${UserEvent[UserEvent=IncomingCall](B24CrmCreate)} | 1
                 TYPE: 2
                 SHOW: 0
+
+      # --- HIDE CALL CARD ---
       - events:
          - name: "AgentRingNoAnswer"
         action:
            - method: telephony.externalcall.hide
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentRingNoAnswer(DestCallerIDNum)}))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentRingNoAnswer(DestCallerIDNum)}, "ACTIVE", "true"))
+
+      # --- SHOW CALL CARD ---
       - events:
          - name: "AgentCalled"
         action:
            - method: telephony.externalcall.show
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}, "ACTIVE", "true"))
+
+      # --- INCOMING CALL VIA DIRECT CALL TO MANAGER, SUCCESS ---
       - events:
          - name: "Newchannel"
-         - name: "QueueCallerJoin"
-         - name: "AgentCalled"
-         - name: "AgentConnect"
-         - name: "AgentComplete"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+         - name: "DialBegin"
+         - name: "DialEnd"
+           constraints:
+              DialStatus: ANSWER
+         - name: "!QueueCallerJoin"
+         - name: "!AgentCalled"
+         - name: "!AgentConnect"
          - name: "Hangup"
         action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${Hangup(ConnectedLineNum)} | ${SoftHangupRequest(ConnectedLineNum)} | ${DialEnd(DestCallerIDNum)} | ${DialEnd(ConnectedLineNum)}, "ACTIVE", "true"))
            - method: telephony.externalcall.finish
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(ConnectedLineNum)}))
-                DURATION: $(Duration(AgentConnect, AgentComplete))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${Hangup(ConnectedLineNum)} | ${SoftHangupRequest(ConnectedLineNum)} | ${DialEnd(DestCallerIDNum)} | ${DialEnd(ConnectedLineNum)}, "ACTIVE", "true")) | $(Responsible(${Hangup(CallerIDNum)} | ${SoftHangupRequest(CallerIDNum)} | ${DialEnd(CallerIDNum)} | ${DialEnd(DestConnectedLineNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
+                DURATION: $(Duration(${DialEnd, Hangup}))
                 STATUS_CODE: 200
            - method: telephony.externalcall.attachrecord
              params:
-                FILENAME: ${UserEvent(Filename)}.mp3
+                FILENAME: ${UserEvent[UserEvent=MonitorFile](Filename)}.mp3
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
-      - events:
-         - name: "Newchannel"
-         - name: "QueueCallerJoin"
-         - name: "!AgentConnect"
-         - name: "!AgentComplete"
-         - name: "Hangup"
-        action:
-           - method: telephony.externalcall.finish
-             params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}))
-                STATUS_CODE: 304
+
+      # --- INCOMING CALL VIA QUEUE, SUCCESS ---
       - events:
          - name: "Newchannel"
          - name: "UserEvent"
            constraints:
-              UserEvent: ExternalCall
-         - name: "DialBegin"
+              UserEvent: IncomingCall
+         - name: "QueueCallerJoin"
+         - name: "AgentCalled"
+         - name: "AgentConnect"
+         - name: "Hangup"
+        action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(ConnectedLineNum)} | ${AgentComplete(DestCallerIDNum)} | ${AgentConnect(ConnectedLineNum)} | ${AgentConnect(DestCallerIDNum)}, "ACTIVE", "true"))
+           - method: telephony.externalcall.finish
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentComplete(ConnectedLineNum)} | ${AgentComplete(DestCallerIDNum)} | ${AgentConnect(ConnectedLineNum)} | ${AgentConnect(DestCallerIDNum)}, "ACTIVE", "true")) | $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
+                DURATION: $(Duration(${AgentConnect}))
+                STATUS_CODE: 200
+           - method: crm.lead.update
+             fields:
+                ASSIGNED_BY_ID: $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead))
+           - method: telephony.externalcall.attachrecord
+             params:
+                FILENAME: ${UserEvent[UserEvent=MonitorFile](Filename)}.mp3
+                FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
+
+      # --- INCOMING CALL VIA QUEUE, FAIL ---
+      - events:
+         - name: "Newchannel"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+         - name: "!DialEnd"
+           constraints:
+              DialStatus: ANSWER
+         - name: "!AgentConnect"
+         - name: "Hangup"
+        action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${AgentCalled(DestCallerIDNum)}, "ACTIVE", "true"))
+           - method: telephony.externalcall.finish
+             params:
+                USER_ID: $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
+                DURATION: $(Duration())
+                STATUS_CODE: 304
+
+      # --- OUTGOING CALL ---
+      - events:
+         - name: "Newchannel"
+         - name: "!UserEvent"
+           constraints:
+              UserEvent: OutgoingCall
+              B24Disabled: TRUE
+         - name: "UserEvent"
+           constraints:
+              UserEvent: OutgoingCall
         action:
            - method: telephony.externalcall.register
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
-                PHONE_NUMBER: ${UserEvent[UserEvent=ExternalCall](ConnectedLineNum)}
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=OutgoingCall](CallerIDNum)}, "ACTIVE", "true"))
+                PHONE_NUMBER: ${UserEvent[UserEvent=OutgoingCall](ConnectedLineNum)}
+                CRM_CREATE: ${UserEvent[UserEvent=OutgoingCall](B24CrmCreate)} | 0
+                SHOW: ${UserEvent[UserEvent=OutgoingCall](B24Show)} | 0
                 TYPE: 1
       - events:
          - name: "Newchannel"
+         - name: "!UserEvent"
+           constraints:
+              UserEvent: OutgoingCall
+              B24Disabled: TRUE
          - name: "UserEvent"
            constraints:
-              UserEvent: ExternalCall
-         - name: "DialBegin"
+              UserEvent: OutgoingCall
          - name: "DialEnd"
            constraints:
               DialStatus: ANSWER
          - name: "Hangup"
         action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=OutgoingCall](CallerIDNum)}, "ACTIVE", "true"))
            - method: telephony.externalcall.finish
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
-                DURATION: $(Duration(DialEnd, Hangup))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=OutgoingCall](CallerIDNum)}, "ACTIVE", "true"))
+                DURATION: $(Duration(${DialEnd[DialStatus=ANSWER]}))
                 STATUS_CODE: 200
            - method: telephony.externalcall.attachrecord
              params:
@@ -111,16 +223,23 @@ connector:
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
       - events:
          - name: "Newchannel"
+         - name: "!UserEvent"
+           constraints:
+              UserEvent: OutgoingCall
+              B24Disabled: TRUE
          - name: "UserEvent"
            constraints:
-              UserEvent: ExternalCall
-         - name: "DialBegin"
+              UserEvent: OutgoingCall
          - name: "!DialEnd"
            constraints:
               DialStatus: ANSWER
          - name: "Hangup"
         action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=OutgoingCall](CallerIDNum)}, "ACTIVE", "true"))
            - method: telephony.externalcall.finish
              params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=ExternalCall](CallerIDNum)}))
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${UserEvent[UserEvent=OutgoingCall](CallerIDNum)}, "ACTIVE", "true"))
+                DURATION: $(Duration())
                 STATUS_CODE: 304
