@@ -72,7 +72,7 @@ public abstract class Method {
 
 		if (template != null) {
 			if (doLog)
-				log.info("source: {}, params: {}", getName(), template.toString());
+				log.info("source on {}: {}, params: {}", eventChain.getChannel(), getName(), template.toString());
 
 			for (String key : template.keySet()) {
 				try {
@@ -81,16 +81,16 @@ public abstract class Method {
 					intermediateBeans = expr.getIntermediateBeans();
 					result.put(key, evaluated);
 				} catch (IOException | BitrixLocalException e) {
-					log.warn("Expression evaluation failure: {}", e.getMessage());
+					log.warn("Expression evaluation failure on {}: {}", eventChain.getChannel(), e.getMessage());
 				}
 			}
 
 			if (doLog)
-				log.info("evaluated: {}, params: {}", getName(), result.toString());
+				log.info("evaluated on {}: {}, params: {}", eventChain.getChannel(), getName(), result.toString());
 		}
 		else
 			if (doLog)
-				log.info("source: {}, no params", getName());
+				log.info("source on {}: {}, no params", eventChain.getChannel(), getName());
 
 		return result;
 	}
