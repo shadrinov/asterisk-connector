@@ -23,7 +23,8 @@ ${Event\[attrCheck=value\](attribute)}
 
 #### REST API Methods
 
- * [crm.lead.add](https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_add.php) - Add Lead
+ * [crm.lead.add](https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_add.php) - Add lead
+ * [crm.lead.update](https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_update.php) - Update (modify) lead
  * [telephony.externalcall.attachrecord](https://dev.1c-bitrix.ru/rest_help/scope_telephony/telephony/telephony_externalCall_attachRecord.php) - Attach call record
  * [telephony.externalcall.finish](https://dev.1c-bitrix.ru/rest_help/scope_telephony/telephony/telephony_externalcall_finish.php) - Finish registered call
  * [telephony.externalcall.hide](https://dev.1c-bitrix.ru/rest_help/scope_telephony/telephony/telephony_externalcall_hide.php) - Hide call card
