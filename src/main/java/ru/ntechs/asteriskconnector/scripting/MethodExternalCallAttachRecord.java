@@ -22,7 +22,11 @@ public class MethodExternalCallAttachRecord extends Method {
 
 	@Override
 	public void exec() {
+		log.info("source on {}: {}, params: {}", getEventChain().getChannel(), NAME, getAction().getParams());
+
 		HashMap<String, Scalar> params = evaluate(getAction().getParams());
+
+		log.info("evaluated on {}: {}, params: {}", getEventChain().getChannel(), NAME, params);
 
 		try {
 			String callId = null;

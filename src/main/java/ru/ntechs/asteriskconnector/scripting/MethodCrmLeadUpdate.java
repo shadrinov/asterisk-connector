@@ -26,11 +26,12 @@ public class MethodCrmLeadUpdate extends Method {
 
 	@Override
 	public void exec() {
-		HashMap<String, Scalar> params = evaluate(getAction().getParams(), false);
-		HashMap<String, Scalar> fields = evaluate(getAction().getFields(), false);
+		log.info("source on {}: {}, params: {}, fields: {}", getEventChain().getChannel(), NAME, getAction().getParams(), getAction().getFields());
 
-		log.info("source: {}, params: {}, fields: {}", NAME, getAction().getParams(), getAction().getFields());
-		log.info("evaluated: {}, params: {}, fields: {}", NAME, params, fields);
+		HashMap<String, Scalar> params = evaluate(getAction().getParams());
+		HashMap<String, Scalar> fields = evaluate(getAction().getFields());
+
+		log.info("evaluated on {}: {}, params: {}, fields: {}", getEventChain().getChannel(), NAME, params, fields);
 
 		try {
 			RestRequestCrmLeadUpdate req = new RestRequestCrmLeadUpdate(getAuth());

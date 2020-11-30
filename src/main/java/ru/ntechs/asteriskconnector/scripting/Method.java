@@ -64,16 +64,9 @@ public abstract class Method {
 	}
 
 	protected HashMap<String, Scalar> evaluate(Map<String, String> template) {
-		return evaluate(template, true);
-	}
-
-	protected HashMap<String, Scalar> evaluate(Map<String, String> template, boolean doLog) {
 		HashMap<String, Scalar> result = new HashMap<>();
 
 		if (template != null) {
-			if (doLog)
-				log.info("source on {}: {}, params: {}", eventChain.getChannel(), getName(), template.toString());
-
 			for (String key : template.keySet()) {
 				try {
 					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), contextNode);
@@ -84,13 +77,7 @@ public abstract class Method {
 					log.warn("Expression evaluation failure on {}: {}", eventChain.getChannel(), e.getMessage());
 				}
 			}
-
-			if (doLog)
-				log.info("evaluated on {}: {}, params: {}", eventChain.getChannel(), getName(), result.toString());
 		}
-		else
-			if (doLog)
-				log.info("source on {}: {}, no params", eventChain.getChannel(), getName());
 
 		return result;
 	}
