@@ -113,8 +113,6 @@ public abstract class RestRequest {
 
 	protected String formatErrorMessage(HttpStatus statusCode, RestResult body) {
 		return String.format("method %s: %d %s (%s)", getMethod(), statusCode.value(), statusCode.getReasonPhrase(),
-				(body != null) ?
-						String.format("%s (%s)", body.getErrorDescription(), body.getError()) :
-							"No error description");
+				(body != null) ? body.toString() : "<body is absent>");
 	}
 }
