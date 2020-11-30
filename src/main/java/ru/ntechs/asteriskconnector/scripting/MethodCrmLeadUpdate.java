@@ -59,7 +59,7 @@ public class MethodCrmLeadUpdate extends Method {
 				req.addParam("REGISTER_SONET_EVENT", params.get("REGISTER_SONET_EVENT").asString());
 
 			if (!req.getFields().isEmpty())
-				req.exec_debug();
+				req.exec();
 		} catch (BitrixRestApiException e) {
 			log.info(e.getMessage());
 		}
