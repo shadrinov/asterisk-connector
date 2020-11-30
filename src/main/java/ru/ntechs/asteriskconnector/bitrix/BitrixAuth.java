@@ -42,6 +42,7 @@ public class BitrixAuth {
 	private String authServer;
 	private String clientServer;
 
+	private String stateFilename;
 	private RestTemplate restTemplate;
 
 	private ConnectorConfig conf;
@@ -50,6 +51,13 @@ public class BitrixAuth {
 	@Autowired
 	public BitrixAuth(ConnectorConfig conf) {
 		this.conf = conf;
+
+		if ((conf != null) && (conf.getBitrix() != null)) {
+			 stateFilename = conf.getBitrix().getStateFile();
+
+			 if (stateFilename == null)
+				 stateFilename = "connector.json";
+		}
 
 		if (restTemplate == null) {
 			restTemplate = new RestTemplate();
@@ -224,7 +232,7 @@ public class BitrixAuth {
 		ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
 
 		try {
-			writer.writeValue(new File("connector.json"), data);
+			writer.writeValue(new File(stateFilename), data);
 		} catch (IOException e) {
 			log.info("unable to write data: {}", e.getMessage());
 		}
@@ -234,7 +242,7 @@ public class BitrixAuth {
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
-			OAuthData data = mapper.readValue(new File("connector.json"), OAuthData.class);
+			OAuthData data = mapper.readValue(new File(stateFilename), OAuthData.class);
 
 			this.refreshToken = data.getRefreshToken();
 			this.applicationToken = data.getApplicationToken();

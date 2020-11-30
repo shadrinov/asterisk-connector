@@ -13,5 +13,6 @@ public class ConnectorBitrix {
 	private String auth;
 	private String clientId;
 	private String clientKey;
+	private String stateFile;
 	private ArrayList<ConnectorExternalLine> externalLines;
 }

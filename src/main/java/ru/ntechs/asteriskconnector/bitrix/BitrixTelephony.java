@@ -51,6 +51,10 @@ public class BitrixTelephony {
 		return bitrixAuth.isInstalled();
 	}
 
+	public String getStateFile() {
+		return bitrixAuth.getStateFilename();
+	}
+
 	public ArrayList<ExternalLine> getExternalLine() throws BitrixRestApiException {
 		return new RestRequestExternalLineGet(bitrixAuth).exec().getResult();
 	}

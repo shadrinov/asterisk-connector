@@ -136,7 +136,7 @@ public class BitrixTelephonyController {
 				log.info("Nameless event is received, trying to update tokens...");
 
 				if (bitrixTelephony.isInstalled())
-					throw new BitrixLocalException("application is already installed, to perform new installation, please remove data file (connector.json)");
+					throw new BitrixLocalException(String.format("application is already installed, to perform new installation, please remove oauth state file (%s)", bitrixTelephony.getStateFile()));
 
 				// DOMAIN=[ntechs.bitrix24.ru],
 				// PROTOCOL=[1],
@@ -165,7 +165,7 @@ public class BitrixTelephonyController {
 		log.info("Detailed event: {}", event.toString());
 
 		if (bitrixTelephony.isInstalled())
-			throw new BitrixLocalException("application is already installed, to perform new installation, please remove data file (connector.json)");
+			throw new BitrixLocalException(String.format("application is already installed, to perform new installation, please remove oauth state file (%w)", bitrixTelephony.getStateFile()));
 
 		BitrixTelephony btInstall = bitrixTelephony.clone(event);
 
