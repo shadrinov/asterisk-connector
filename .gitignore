@@ -31,5 +31,5 @@ target/
 .project
 
 application.properties
-application.yml
+application*.yml
 connector.json

@@ -11,6 +11,7 @@ connector:
       auth: https://oauth.bitrix.info/oauth/token/
       clientid: clientid
       clientkey: clientkey
+      statefile: /var/lib/asterisk-connector/oauth.json
       externallines:
          - number: 84852123456
            name: Название направления
@@ -52,6 +53,7 @@ connector:
          - name: "UserEvent"
            constraints:
               UserEvent: IncomingCall
+         - name: "!QueueCallerJoin"
          - name: "DialBegin"
         action:
            - method: telephony.externalcall.register
@@ -59,9 +61,9 @@ connector:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${DialBegin(ConnectedLineNum)}, "ACTIVE", "true"))
                 PHONE_NUMBER: ${DialBegin(CallerIDNum)}
                 LINE_NUMBER: ${UserEvent[UserEvent=IncomingCall](B24ExternalLine)}
-                CRM_CREATE: ${UserEvent[UserEvent=IncomingCall](B24CrmCreate)} | 1
-                TYPE: 2
-                SHOW: 1
+                CRM_CREATE: ${UserEvent[UserEvent=IncomingCall](B24CrmCreate)} | 0
+                TYPE: ${UserEvent[UserEvent=IncomingCall](B24CallType)} | 2
+                SHOW: ${UserEvent[UserEvent=IncomingCall](B24Show)} | 1
 
       # --- INCOMING CALL VIA QUEUE ---
       - events:
@@ -82,7 +84,7 @@ connector:
                 PHONE_NUMBER: ${QueueCallerJoin(CallerIDNum)}
                 LINE_NUMBER: ${UserEvent[UserEvent=IncomingCall](B24ExternalLine)}
                 CRM_CREATE: ${UserEvent[UserEvent=IncomingCall](B24CrmCreate)} | 1
-                TYPE: 2
+                TYPE: ${UserEvent[UserEvent=IncomingCall](B24CallType)} | 2
                 SHOW: 0
 
       # --- HIDE CALL CARD ---
@@ -107,12 +109,12 @@ connector:
          - name: "UserEvent"
            constraints:
               UserEvent: IncomingCall
+         - name: "!QueueCallerJoin"
+         - name: "!AgentCalled"
          - name: "DialBegin"
          - name: "DialEnd"
            constraints:
               DialStatus: ANSWER
-         - name: "!QueueCallerJoin"
-         - name: "!AgentCalled"
          - name: "!AgentConnect"
          - name: "Hangup"
         action:
@@ -156,15 +158,34 @@ connector:
                 FILENAME: ${UserEvent[UserEvent=MonitorFile](Filename)}.mp3
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
 
+      # --- INCOMING CALL VIA DIRECT CALL TO MANAGER, FAIL ---
+      - events:
+         - name: "Newchannel"
+         - name: "UserEvent"
+           constraints:
+              UserEvent: IncomingCall
+         - name: "DialBegin"
+         - name: "!DialEnd"
+           constraints:
+              DialStatus: ANSWER
+         - name: "Hangup"
+        action:
+           - method: telephony.externalcall.hide
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${Hangup(ConnectedLineNum)} | ${SoftHangupRequest(ConnectedLineNum)} | ${DialEnd(DestCallerIDNum)} | ${DialEnd(ConnectedLineNum)}, "ACTIVE", "true"))
+           - method: telephony.externalcall.finish
+             params:
+                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${Hangup(ConnectedLineNum)} | ${SoftHangupRequest(ConnectedLineNum)} | ${DialEnd(DestCallerIDNum)} | ${DialEnd(ConnectedLineNum)}, "ACTIVE", "true")) | $(Responsible(${Hangup(CallerIDNum)} | ${SoftHangupRequest(CallerIDNum)} | ${DialEnd(CallerIDNum)} | ${DialEnd(DestConnectedLineNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
+                DURATION: $(Duration())
+                STATUS_CODE: 304
+
       # --- INCOMING CALL VIA QUEUE, FAIL ---
       - events:
          - name: "Newchannel"
          - name: "UserEvent"
            constraints:
               UserEvent: IncomingCall
-         - name: "!DialEnd"
-           constraints:
-              DialStatus: ANSWER
+         - name: "QueueCallerJoin"
          - name: "!AgentConnect"
          - name: "Hangup"
         action:
@@ -182,6 +203,9 @@ connector:
          - name: "Newchannel"
          - name: "!UserEvent"
            constraints:
+              UserEvent: IncomingCall
+         - name: "!UserEvent"
+           constraints:
               UserEvent: OutgoingCall
               B24Disabled: TRUE
          - name: "UserEvent"
@@ -195,8 +219,13 @@ connector:
                 CRM_CREATE: ${UserEvent[UserEvent=OutgoingCall](B24CrmCreate)} | 0
                 SHOW: ${UserEvent[UserEvent=OutgoingCall](B24Show)} | 0
                 TYPE: 1
+
+      # --- OUTGOING CALL, SUCCESS ---
       - events:
          - name: "Newchannel"
+         - name: "!UserEvent"
+           constraints:
+              UserEvent: IncomingCall
          - name: "!UserEvent"
            constraints:
               UserEvent: OutgoingCall
@@ -221,8 +250,13 @@ connector:
              params:
                 FILENAME: ${UserEvent[UserEvent=MonitorFile](Filename)}.mp3
                 FILE_CONTENT: $(FileContents(/home/monitor/records/${UserEvent[UserEvent=MonitorFile](Index)}/${UserEvent[UserEvent=MonitorFile](Filename)}.mp3))
+
+      # --- OUTGOING CALL, FAIL ---
       - events:
          - name: "Newchannel"
+         - name: "!UserEvent"
+           constraints:
+              UserEvent: IncomingCall
          - name: "!UserEvent"
            constraints:
               UserEvent: OutgoingCall
