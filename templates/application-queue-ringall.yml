@@ -1,20 +1,20 @@
 connector:
-   address: https://connector.ymz.su/api/
+   address: https://b24-asterisk.example.com/api/
    ami:
       hostname: localhost
       port: 5038
       username: ntcrm
       password: secret
-      debug: true
+      debug: false
    bitrix:
-      api: https://ntechs.bitrix24.ru/rest/
+      api: https://example.bitrix24.ru/rest/
       auth: https://oauth.bitrix.info/oauth/token/
       clientid: clientid
       clientkey: clientkey
       statefile: /var/lib/asterisk-connector/oauth.json
       externallines:
          - number: 84852123456
-           name: Название направления
+           name: Название направления 1
            channel: Local/{0}@incoming-office-originate
            context: incoming-office
            exten: "{0}"
@@ -23,7 +23,7 @@ connector:
               EXTCALLERID: 4852123456
 
          - number: 84852654321
-           name: Название направления
+           name: Название направления 2
            channel: Local/{0}@incoming-office-originate
            context: incoming-office
            exten: "{0}"
@@ -72,12 +72,7 @@ connector:
            constraints:
               UserEvent: IncomingCall
          - name: "QueueCallerJoin"
-         - name: "AgentCalled"
-         - name: "DialBegin"
         action:
-           - method: telephony.externalcall.hide
-             params:
-                USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${DialBegin(ConnectedLineNum)}, "ACTIVE", "true"))
            - method: telephony.externalcall.register
              params:
                 USER_ID: $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
@@ -178,6 +173,9 @@ connector:
                 USER_ID: $(REST("user.get", "USER_ID", "UF_PHONE_INNER", ${Hangup(ConnectedLineNum)} | ${SoftHangupRequest(ConnectedLineNum)} | ${DialEnd(DestCallerIDNum)} | ${DialEnd(ConnectedLineNum)}, "ACTIVE", "true")) | $(Responsible(${Hangup(CallerIDNum)} | ${SoftHangupRequest(CallerIDNum)} | ${DialEnd(CallerIDNum)} | ${DialEnd(DestConnectedLineNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
                 DURATION: $(Duration())
                 STATUS_CODE: 304
+           - method: crm.lead.update
+             fields:
+                TITLE: ${DialBegin(CallerIDNum)}\ -\ Пропущенный\ входящий\ звонок
 
       # --- INCOMING CALL VIA QUEUE, FAIL ---
       - events:
@@ -197,6 +195,9 @@ connector:
                 USER_ID: $(Responsible(${QueueCallerJoin(CallerIDNum)},ASSIGNED_BY_ID,company,contact,lead)) | ${UserEvent[UserEvent=IncomingCall](B24ResponsibleId)} | 108
                 DURATION: $(Duration())
                 STATUS_CODE: 304
+           - method: crm.lead.update
+             fields:
+                TITLE: ${QueueCallerJoin(CallerIDNum)}\ -\ Пропущенный\ входящий\ звонок
 
       # --- OUTGOING CALL ---
       - events:
