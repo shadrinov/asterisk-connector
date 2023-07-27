@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -56,7 +57,7 @@ public abstract class RestRequest {
 				@Override
 				public boolean hasError(ClientHttpResponse response) throws IOException {
 //					log.info("Request status: {} {}", response.getStatusCode().value(), response.getStatusText());
-					return (response.getStatusCode().compareTo(HttpStatus.UNAUTHORIZED) == 0);
+					return (!response.getStatusCode().is2xxSuccessful());
 				}
 
 				@Override
@@ -111,8 +112,8 @@ public abstract class RestRequest {
 		return result;
 	}
 
-	protected String formatErrorMessage(HttpStatus statusCode, RestResult body) {
-		return String.format("method %s: %d %s (%s)", getMethod(), statusCode.value(), statusCode.getReasonPhrase(),
+	protected String formatErrorMessage(HttpStatusCode statusCode, RestResult body) {
+		return String.format("method %s: %d %s (%s)", getMethod(), statusCode.value(), HttpStatus.valueOf(statusCode.value()).getReasonPhrase(),
 				(body != null) ? body.toString() : "<body is absent>");
 	}
 }

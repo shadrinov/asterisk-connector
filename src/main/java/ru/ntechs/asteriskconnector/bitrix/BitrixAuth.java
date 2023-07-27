@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -182,7 +183,7 @@ public class BitrixAuth {
 
 					RestResultAuth tokens = result.getBody();
 
-					if ((result.getStatusCode().value() == 200) && (tokens.getError() == null) && (tokens.getErrorDescription() == null)) {
+					if ((result.getStatusCode().is2xxSuccessful()) && (tokens.getError() == null) && (tokens.getErrorDescription() == null)) {
 						this.accessToken = tokens.getAccessToken();
 						this.refreshToken = tokens.getRefreshToken();
 						this.expires = tokens.getExpires();
@@ -190,7 +191,7 @@ public class BitrixAuth {
 						this.authServer = tokens.getServerEndpoint();
 						this.clientServer = tokens.getClientEndpoint();
 					}
-					else if (result.getStatusCode().value() != 200) {
+					else if (!result.getStatusCode().is2xxSuccessful()) {
 						log.info(formatErrorMessage(result.getStatusCode(), result.getBody()));
 
 						if (tokens.getError().equalsIgnoreCase("invalid_grant"))
@@ -215,8 +216,8 @@ public class BitrixAuth {
 			log.info("unconfigured connector.bitrix");
 	}
 
-	protected String formatErrorMessage(HttpStatus statusCode, RestResult body) {
-		return String.format("authorization failed: %d %s (%s)", statusCode.value(), statusCode.getReasonPhrase(),
+	protected String formatErrorMessage(HttpStatusCode statusCode, RestResult body) {
+		return String.format("authorization failed: %d %s (%s)", statusCode.value(), HttpStatus.valueOf(statusCode.value()).getReasonPhrase(),
 				(body != null) ?
 						String.format("%s%s", body.getError(), (body.getErrorDescription() != null) ? (", " + body.getErrorDescription()) : "") :
 							"No error description");
