@@ -16,31 +16,24 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.eventchain.ChainContext;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
-import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public abstract class Method {
 	private static final DateFormat iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
-	private ScriptFactory scriptFactory;
 	private MessageChain eventChain;
 	private ConnectorAction action;
 	private MessageNode contextNode;
 
 	private ArrayList<Object> intermediateBeans;
 
-	public Method(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
+	public Method(MessageChain eventChain, ConnectorAction action, MessageNode node) {
 		super();
 
-		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.action = action;
 		this.contextNode = node;
-	}
-
-	public MessageDispatcher getEventDispatcher() {
-		return scriptFactory.getEventDispatcher();
 	}
 
 	public MessageChain getEventChain() {
@@ -56,7 +49,7 @@ public abstract class Method {
 	}
 
 	public BitrixAuth getAuth() {
-		return scriptFactory.getAuth();
+		return eventChain.getEventDispatcher().getScriptFactory().getAuth();
 	}
 
 	public ChainContext getContext() {
@@ -69,7 +62,7 @@ public abstract class Method {
 		if (template != null) {
 			for (String key : template.keySet()) {
 				try {
-					Expression expr = new Expression(scriptFactory, eventChain, template.get(key), contextNode);
+					Expression expr = new Expression(eventChain, template.get(key), contextNode);
 					Scalar evaluated = expr.eval();
 					intermediateBeans = expr.getIntermediateBeans();
 					result.put(key, evaluated);

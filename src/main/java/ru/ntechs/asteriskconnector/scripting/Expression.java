@@ -8,11 +8,11 @@ import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
+import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
 public class Expression {
-	private ScriptFactory scriptFactory;
 	private MessageChain eventChain;
 	private String expr;
 	private ArrayList<Object> intermediateBeans;
@@ -22,20 +22,18 @@ public class Expression {
 
 	private int failCharIndex;
 
-	public Expression(ScriptFactory scriptFactory, MessageChain eventChain, String expr) {
+	public Expression(MessageChain eventChain, String expr) {
 		super();
 
-		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.expr = expr.trim();
 		this.intermediateBeans = new ArrayList<>();
 		this.reader = new CharArrayReader(this.expr.toCharArray());
 	}
 
-	public Expression(ScriptFactory scriptFactory, MessageChain eventChain, String expr, MessageNode node) {
+	public Expression(MessageChain eventChain, String expr, MessageNode node) {
 		super();
 
-		this.scriptFactory = scriptFactory;
 		this.eventChain = eventChain;
 		this.expr = expr.trim();
 		this.intermediateBeans = new ArrayList<>();
@@ -47,8 +45,12 @@ public class Expression {
 		return intermediateBeans;
 	}
 
+	public MessageDispatcher getMessageDispatcher() {
+		return eventChain.getEventDispatcher();
+	}
+
 	public ScriptFactory getScriptFactory() {
-		return scriptFactory;
+		return eventChain.getEventDispatcher().getScriptFactory();
 	}
 
 	public MessageChain getEventChain() {

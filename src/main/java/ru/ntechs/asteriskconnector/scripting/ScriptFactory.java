@@ -12,7 +12,6 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixTelephony;
 import ru.ntechs.asteriskconnector.config.ConnectorAction;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.eventchain.MessageChain;
-import ru.ntechs.asteriskconnector.eventchain.MessageDispatcher;
 import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 
 @Slf4j
@@ -21,9 +20,6 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class ScriptFactory {
 	@Autowired
 	private BitrixAuth auth;
-
-	@Autowired
-	private MessageDispatcher eventDispatcher;
 
 	@Autowired
 	private BitrixTelephony bitrixTelephony;
@@ -57,47 +53,47 @@ public class ScriptFactory {
 
 			switch (action.getMethod().toLowerCase()) {
 			case (MethodAsteriskAmiDBDel.NAME):
-				new MethodAsteriskAmiDBDel(this, eventChain, action, node).exec();
+				new MethodAsteriskAmiDBDel(eventChain, action, node).exec();
 				break;
 
 			case (MethodAsteriskAmiDBDelTree.NAME):
-				new MethodAsteriskAmiDBDelTree(this, eventChain, action, node).exec();
+				new MethodAsteriskAmiDBDelTree(eventChain, action, node).exec();
 				break;
 
 			case (MethodAsteriskAmiDBPut.NAME):
-				new MethodAsteriskAmiDBPut(this, eventChain, action, node).exec();
+				new MethodAsteriskAmiDBPut(eventChain, action, node).exec();
 				break;
 
 			case (MethodAsteriskAmiSetvar.NAME):
-				new MethodAsteriskAmiSetvar(this, eventChain, action, node).exec();
+				new MethodAsteriskAmiSetvar(eventChain, action, node).exec();
 				break;
 
 			case (MethodCrmLeadAdd.NAME):
-				new MethodCrmLeadAdd(this, eventChain, action, node).exec();
+				new MethodCrmLeadAdd(eventChain, action, node).exec();
 				break;
 
 			case (MethodCrmLeadUpdate.NAME):
-				new MethodCrmLeadUpdate(this, eventChain, action, node).exec();
+				new MethodCrmLeadUpdate(eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallFinish.NAME):
-				new MethodExternalCallFinish(this, eventChain, action, node).exec();
+				new MethodExternalCallFinish(eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallHide.NAME):
-				new MethodExternalCallHide(this, eventChain, action, node).exec();
+				new MethodExternalCallHide(eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallRegister.NAME):
-				new MethodExternalCallRegister(this, eventChain, action, node).exec();
+				new MethodExternalCallRegister(eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallShow.NAME):
-				new MethodExternalCallShow(this, eventChain, action, node).exec();
+				new MethodExternalCallShow(eventChain, action, node).exec();
 				break;
 
 			case (MethodExternalCallAttachRecord.NAME):
-				new MethodExternalCallAttachRecord(this, eventChain, action, node).exec();
+				new MethodExternalCallAttachRecord(eventChain, action, node).exec();
 				break;
 
 			default:

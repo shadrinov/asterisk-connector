@@ -13,9 +13,9 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodAsteriskAmiSetvar extends Method {
 	public static final String NAME = "asterisk.ami.setvar";
 
-	public MethodAsteriskAmiSetvar(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action,
+	public MethodAsteriskAmiSetvar(MessageChain eventChain, ConnectorAction action,
 			MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+		super(eventChain, action, node);
 	}
 
 	@Override

@@ -17,8 +17,8 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodExternalCallHide extends Method {
 	public static final String NAME = RestRequestExternalCallHide.METHOD;
 
-	public MethodExternalCallHide(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+	public MethodExternalCallHide(MessageChain eventChain, ConnectorAction action, MessageNode node) {
+		super(eventChain, action, node);
 	}
 
 	@Override

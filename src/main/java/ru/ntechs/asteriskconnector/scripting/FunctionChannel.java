@@ -35,13 +35,12 @@ public class FunctionChannel extends Function {
 
 	@Override
 	public Scalar eval() throws IOException, BitrixLocalException {
-		ScriptFactory scriptFactory = getScriptFactory();
 		MessageDispatcher eventDispatcher = getEventDispatcher();
 
 		MessageChain eventChain = eventDispatcher.getEventChain(channelId);
 
 		if (eventChain != null) {
-			Expression expr = new Expression(scriptFactory, eventChain, this.expressionString);
+			Expression expr = new Expression(eventChain, this.expressionString);
 			Scalar result = expr.eval();
 			intermediateBeans = expr.getIntermediateBeans();
 			return result;

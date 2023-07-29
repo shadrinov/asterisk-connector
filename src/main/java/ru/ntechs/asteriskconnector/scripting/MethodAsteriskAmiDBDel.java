@@ -13,9 +13,8 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodAsteriskAmiDBDel extends Method {
 	public static final String NAME = "asterisk.ami.dbdel";
 
-	public MethodAsteriskAmiDBDel(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action,
-			MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+	public MethodAsteriskAmiDBDel(MessageChain eventChain, ConnectorAction action, MessageNode node) {
+		super(eventChain, action, node);
 	}
 
 	@Override

@@ -14,9 +14,9 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodAsteriskAmiDBPut extends Method {
 	public static final String NAME = "asterisk.ami.dbput";
 
-	public MethodAsteriskAmiDBPut(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action,
+	public MethodAsteriskAmiDBPut(MessageChain eventChain, ConnectorAction action,
 			MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+		super(eventChain, action, node);
 	}
 
 	@Override

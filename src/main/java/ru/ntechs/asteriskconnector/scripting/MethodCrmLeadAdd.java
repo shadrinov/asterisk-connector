@@ -13,8 +13,8 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodCrmLeadAdd extends Method {
 	public static final String NAME = RestRequestCrmLeadAdd.METHOD;
 
-	public MethodCrmLeadAdd(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+	public MethodCrmLeadAdd(MessageChain eventChain, ConnectorAction action, MessageNode node) {
+		super(eventChain, action, node);
 	}
 
 	@Override

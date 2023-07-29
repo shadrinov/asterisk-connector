@@ -17,8 +17,8 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodExternalCallFinish extends Method {
 	public static final String NAME = RestRequestExternalCallFinish.METHOD;
 
-	public MethodExternalCallFinish(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+	public MethodExternalCallFinish(MessageChain eventChain, ConnectorAction action, MessageNode node) {
+		super(eventChain, action, node);
 	}
 
 	@Override

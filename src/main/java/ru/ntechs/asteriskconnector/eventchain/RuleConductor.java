@@ -10,20 +10,19 @@ import ru.ntechs.asteriskconnector.bitrix.BitrixLocalException;
 import ru.ntechs.asteriskconnector.config.ConnectorEvent;
 import ru.ntechs.asteriskconnector.config.ConnectorRule;
 import ru.ntechs.asteriskconnector.scripting.Expression;
-import ru.ntechs.asteriskconnector.scripting.ScriptFactory;
 
 @Slf4j
 public class RuleConductor {
 	private MessageChain eventChain;
-	private ScriptFactory scriptFactory;
+	private MessageDispatcher messageDispatcher;
 	private ConnectorRule rule;
 	private int progress;
 
 	List<ConnectorEvent> eventNames;
 
-	public RuleConductor(MessageChain eventChain, ScriptFactory scriptFactory, ConnectorRule rule) {
+	public RuleConductor(MessageChain eventChain, MessageDispatcher messageDispatcher, ConnectorRule rule) {
 		this.eventChain = eventChain;
-		this.scriptFactory = scriptFactory;
+		this.messageDispatcher = messageDispatcher;
 		this.rule = rule;
 		this.progress = 0;
 
@@ -104,7 +103,7 @@ public class RuleConductor {
 				if ((entryKey != null) && (entryValue != null)) {
 					String messageAttr = node.getMessage().getAttribute(entryKey);
 
-					Expression expr = new Expression(scriptFactory, eventChain, entryValue, node);
+					Expression expr = new Expression(eventChain, entryValue, node);
 					entryValue = expr.eval().toString();
 
 					if ((entryValue == null) && (messageAttr == null))

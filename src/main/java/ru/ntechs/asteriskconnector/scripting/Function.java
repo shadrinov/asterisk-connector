@@ -44,8 +44,7 @@ public abstract class Function {
 	}
 
 	public MessageDispatcher getEventDispatcher() {
-		ScriptFactory scriptFactory = getScriptFactory();
-		return (scriptFactory != null) ? scriptFactory.getEventDispatcher() : null;
+		return (expression != null) ? expression.getMessageDispatcher() : null;
 	}
 
 	public abstract String getName();

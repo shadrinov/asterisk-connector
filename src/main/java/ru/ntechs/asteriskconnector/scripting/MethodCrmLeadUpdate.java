@@ -15,8 +15,8 @@ import ru.ntechs.asteriskconnector.eventchain.MessageNode;
 public class MethodCrmLeadUpdate extends Method {
 	public static final String NAME = RestRequestCrmLeadUpdate.METHOD;
 
-	public MethodCrmLeadUpdate(ScriptFactory scriptFactory, MessageChain eventChain, ConnectorAction action, MessageNode node) {
-		super(scriptFactory, eventChain, action, node);
+	public MethodCrmLeadUpdate(MessageChain eventChain, ConnectorAction action, MessageNode node) {
+		super(eventChain, action, node);
 	}
 
 	@Override

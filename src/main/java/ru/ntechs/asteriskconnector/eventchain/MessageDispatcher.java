@@ -28,7 +28,11 @@ public class MessageDispatcher {
 
 	public MessageDispatcher(ConnectorConfig config) {
 		this.config = config;
-		this.unmappableEvents = new MessageChain(this, scriptFactory, config.getRules());
+		this.unmappableEvents = new MessageChain(this, config.getRules());
+	}
+
+	public ScriptFactory getScriptFactory() {
+		return scriptFactory;
 	}
 
 	public void dispatch(Message msg) {
@@ -40,7 +44,7 @@ public class MessageDispatcher {
 			eventChain = chainByUniqueId.get(uniqueId);
 
 			if (eventChain == null) {
-				eventChain = new MessageChain(this, scriptFactory, config.getRules());
+				eventChain = new MessageChain(this, config.getRules());
 				chainByUniqueId.put(uniqueId, eventChain);
 			}
 		}

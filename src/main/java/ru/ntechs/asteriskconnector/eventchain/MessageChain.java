@@ -16,7 +16,6 @@ public class MessageChain {
 
 	private String channel;
 	private MessageDispatcher eventDispatcher;
-	private ScriptFactory scriptFactory;
 
 	private ArrayList<RuleConductor> conductors;
 
@@ -25,7 +24,7 @@ public class MessageChain {
 	private static ExecutorService scriptExecutionThreadPool = Executors.newCachedThreadPool();
 	private final Object scriptExecutionLock = new Object();
 
-	MessageChain(MessageDispatcher eventDispatcher, ScriptFactory scriptFactory, List<ConnectorRule> rules) {
+	MessageChain(MessageDispatcher eventDispatcher, List<ConnectorRule> rules) {
 		super();
 
 		this.tailEvent = null;
@@ -33,12 +32,11 @@ public class MessageChain {
 
 		this.channel = null;
 		this.eventDispatcher = eventDispatcher;
-		this.scriptFactory = scriptFactory;
 
 		this.conductors = new ArrayList<>(rules.size());
 
 		for (ConnectorRule rule : rules)
-			conductors.add(new RuleConductor(this, scriptFactory, rule));
+			conductors.add(new RuleConductor(this, eventDispatcher, rule));
 
 		this.context = new ChainContext();
 	}
@@ -67,9 +65,10 @@ public class MessageChain {
 
 		scriptExecutionThreadPool.execute(() -> {
 			try {
+				ScriptFactory scriptFactory = eventDispatcher.getScriptFactory();
 				synchronized (scriptExecutionLock) {
 					for (ConnectorRule rule : rulesToExecute)
-						scriptFactory.buildScript(MessageChain.this, rule, currentTail);
+						scriptFactory.buildScript(this, rule, currentTail);
 				}
 			}
 			catch (Exception e) {
@@ -80,6 +79,10 @@ public class MessageChain {
 
 	public boolean isEmpty() {
 		return (tailEvent == null);
+	}
+
+	public MessageDispatcher getEventDispatcher() {
+		return eventDispatcher;
 	}
 
 	public synchronized int getTailBirthTicks() {
