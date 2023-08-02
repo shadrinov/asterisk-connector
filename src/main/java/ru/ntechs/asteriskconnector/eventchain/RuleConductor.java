@@ -14,15 +14,13 @@ import ru.ntechs.asteriskconnector.scripting.Expression;
 @Slf4j
 public class RuleConductor {
 	private MessageChain eventChain;
-	private MessageDispatcher messageDispatcher;
 	private ConnectorRule rule;
 	private int progress;
 
 	List<ConnectorEvent> eventNames;
 
-	public RuleConductor(MessageChain eventChain, MessageDispatcher messageDispatcher, ConnectorRule rule) {
+	public RuleConductor(MessageChain eventChain, ConnectorRule rule) {
 		this.eventChain = eventChain;
-		this.messageDispatcher = messageDispatcher;
 		this.rule = rule;
 		this.progress = 0;
 

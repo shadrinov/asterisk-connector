@@ -36,7 +36,7 @@ public class MessageChain {
 		this.conductors = new ArrayList<>(rules.size());
 
 		for (ConnectorRule rule : rules)
-			conductors.add(new RuleConductor(this, eventDispatcher, rule));
+			conductors.add(new RuleConductor(this, rule));
 
 		this.context = new ChainContext();
 	}
