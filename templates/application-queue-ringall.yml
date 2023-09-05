@@ -6,6 +6,7 @@ connector:
       username: ntcrm
       password: secret
       debug: false
+      eventlifetime: 1800
    bitrix:
       api: https://example.bitrix24.ru/rest/
       auth: https://oauth.bitrix.info/oauth/token/

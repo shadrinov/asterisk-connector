@@ -29,6 +29,7 @@ public class FunctionFileContents extends Function {
 
 	private String filename;
 	private long waitTimestamp;
+	private boolean doDelete;
 
 	public FunctionFileContents(Expression expression, ArrayList<Scalar> params) throws BitrixLocalException {
 		super(expression, params);
@@ -36,11 +37,14 @@ public class FunctionFileContents extends Function {
 	}
 
 	private void init(ArrayList<Scalar> params) throws BitrixLocalException {
-		if (params.size() != 1)
-			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(filename)",
+		if ((params.size() < 1) || (params.size() > 2))
+			throw new BitrixLocalException(String.format("%s doesn't match prototype %s(filename[, doDelete])",
 					toString(), NAME));
 
 		this.filename = params.get(0).asString();
+
+		if (params.size() == 2)
+			doDelete = (params.get(1).asInteger() != 0);
 	}
 
 	@Override
@@ -75,6 +79,12 @@ public class FunctionFileContents extends Function {
 		finally {
 			if (stream != null)
 				stream.close();
+		}
+
+		if (doDelete) {
+			if (!file.delete()) {
+				log.error("failed to delete file: {}", filename);
+			}
 		}
 
 		return result;

@@ -89,12 +89,15 @@ public class MessageDispatcher {
 	}
 
 	public void collectGarbage() {
+		Integer eventLifetime = (config.getAmi().getEventLifetime() != null) ?
+				config.getAmi().getEventLifetime() : EVENT_LIFETIME;
+
 		tickCount++;
 
 		for (Entry<String, MessageChain> chainEntry : chainByUniqueId.entrySet()) {
 			MessageChain eventChain = chainEntry.getValue();
 
-			if ((tickCount - eventChain.getTailBirthTicks()) > EVENT_LIFETIME) {
+			if ((tickCount - eventChain.getTailBirthTicks()) > eventLifetime) {
 				String channel = eventChain.getChannel();
 
 				log.debug("before garbage collection: {}", uniqueIdByChannel);
@@ -110,6 +113,6 @@ public class MessageDispatcher {
 			}
 		}
 
-		unmappableEvents.garbageCollect(tickCount - EVENT_LIFETIME);
+		unmappableEvents.garbageCollect(tickCount - eventLifetime);
 	}
 }

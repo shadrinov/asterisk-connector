@@ -13,4 +13,5 @@ public class ConnectorAmi {
 	private String username;
 	private String password;
 	private boolean debug;
+	private Integer eventLifetime;
 }

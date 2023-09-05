@@ -6,6 +6,8 @@ connector:
       port: 5038
       username: ntcrm
       password: secret
+      debug: true
+      eventlifetime: 1800
    bitrix:
       api: https://ntechs.bitrix24.ru/rest/
       auth: https://oauth.bitrix.info/oauth/token/
